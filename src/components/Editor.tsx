@@ -3,7 +3,7 @@ import * as monaco from "monaco-editor";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { MonacoBinding } from "y-monaco";
-import { initVimMode } from "monaco-vim";
+import { VimMode, initVimMode } from "monaco-vim";
 
 declare global {
   interface Window {
@@ -49,6 +49,7 @@ export const Editor: React.FC = () => {
         provider.awareness
       );
       initVimMode(editor);
+      VimMode.Vim.map("jk", "<Esc>", "insert");
       import("monaco-themes/themes/Monokai.json").then((data) => {
         monaco.editor.defineTheme("monokai", data as any);
         monaco.editor.setTheme("monokai");
