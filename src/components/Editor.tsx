@@ -1,10 +1,15 @@
 import React, { useRef, useEffect } from "react";
 import * as monaco from "monaco-editor";
-// import * as Y from "yjs";
-// import { WebsocketProvider } from "y-websocket";
-// import { MonacoBinding } from "y-monaco";
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { MonacoBinding } from "y-monaco";
+import { initVimMode } from "monaco-vim";
 
-// @ts-ignore
+declare global {
+  interface Window {
+    MonacoEnvironment: any;
+  }
+}
 self.MonacoEnvironment = {
   getWorkerUrl: function (_moduleId: any, label: string) {
     if (label === "json") {
@@ -23,16 +28,30 @@ self.MonacoEnvironment = {
   },
 };
 
+const ydoc = new Y.Doc();
+const provider = new WebrtcProvider("monaco", ydoc);
+const type = ydoc.getText("monaco");
+
 export const Editor: React.FC = () => {
   const divEl = useRef<HTMLDivElement>(null);
   let editor: monaco.editor.IStandaloneCodeEditor;
   useEffect(() => {
     if (divEl.current) {
       editor = monaco.editor.create(divEl.current, {
-        value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join(
-          "\n"
-        ),
+        value: "",
         language: "typescript",
+        theme: "vs-dark",
+      });
+      new MonacoBinding(
+        type,
+        editor.getModel(),
+        new Set([editor]),
+        provider.awareness
+      );
+      initVimMode(editor);
+      import("monaco-themes/themes/Monokai.json").then((data) => {
+        monaco.editor.defineTheme("monokai", data as any);
+        monaco.editor.setTheme("monokai");
       });
     }
     return () => {

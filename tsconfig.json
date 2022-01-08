@@ -9,6 +9,7 @@
     "lib": ["dom", "es5", "es2015.collection", "es2015.promise"],
     "types": [],
     "baseUrl": "./node_modules",
+    "resolveJsonModule": true,
     "jsx": "preserve",
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"]
