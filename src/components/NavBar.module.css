@@ -1,0 +1,4 @@
+.nav {
+  background: white;
+  height: var(--nav-bar-height);
+}

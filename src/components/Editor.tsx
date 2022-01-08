@@ -4,6 +4,7 @@ import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { MonacoBinding } from "y-monaco";
 import { VimMode, initVimMode } from "monaco-vim";
+import styles from "./Editor.module.css";
 
 declare global {
   interface Window {
@@ -28,19 +29,17 @@ self.MonacoEnvironment = {
   },
 };
 
-const ydoc = new Y.Doc();
-const provider = new WebrtcProvider("monaco", ydoc);
-const type = ydoc.getText("monaco");
-
 export const Editor: React.FC = () => {
   const divEl = useRef<HTMLDivElement>(null);
   let editor: monaco.editor.IStandaloneCodeEditor;
   useEffect(() => {
     if (divEl.current) {
+      const { provider, type } = getDocument();
       editor = monaco.editor.create(divEl.current, {
         value: "",
         language: "typescript",
-        theme: "vs-dark",
+        theme: "vs-dark", // vs-light by default
+        automaticLayout: true, // false by default
       });
       new MonacoBinding(
         type,
@@ -59,5 +58,5 @@ export const Editor: React.FC = () => {
       editor.dispose();
     };
   }, []);
-  return <div className="Editor" ref={divEl}></div>;
+  return <div className={styles.editor} ref={divEl}></div>;
 };
