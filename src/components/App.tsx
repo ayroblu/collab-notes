@@ -3,6 +3,7 @@ import { Contexts } from "./Contexts";
 import { Editor } from "./Editor";
 import { Home } from "./Home";
 import { Layout } from "./Layout";
+import { NoMatchFile } from "./NoMatchFile";
 import { Settings } from "./Settings";
 
 export const App: React.FC = () => {
@@ -12,7 +13,7 @@ export const App: React.FC = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="files">
-            <Route path=":fileId" element={<Editor />} />
+            <Route path=":fileName" element={<Editor />} />
             <Route path="*" element={<NoMatchFile />} />
             <Route index element={<NoMatchFile />} />
           </Route>
@@ -26,7 +27,4 @@ export const App: React.FC = () => {
 
 const NoMatch: React.FC = () => {
   return <section>404 path not found</section>;
-};
-const NoMatchFile: React.FC = () => {
-  return <section>File not found</section>;
 };

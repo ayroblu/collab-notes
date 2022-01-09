@@ -6,6 +6,7 @@ const defaultSettings: Settings = {
   name: "",
   theme: "Monokai",
   rooms: [],
+  activeRoomId: null,
 };
 type SettingsContext = {
   settings: Settings;
@@ -22,17 +23,14 @@ export const Contexts: React.FC = ({ children }) => {
   );
 };
 
-type Settings = {
+export type Settings = {
   isVim: boolean;
   vimrc: string;
   name: string;
   theme: string;
+  activeRoomId: string | null;
   rooms: {
     id: string;
     password: string;
-    name: string;
-    files: {
-      name: string;
-    }[];
   }[];
 };

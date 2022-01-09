@@ -3,22 +3,38 @@ import * as monaco from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import { VimMode, initVimMode } from "monaco-vim";
 import styles from "./Editor.module.css";
-import { getDocument } from "../modules/documents";
+import { getDocument, getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 import { WebrtcProvider } from "y-webrtc";
+import { Settings, SettingsContext } from "./Contexts";
+import { useParams } from "react-router-dom";
+import { NoMatchFile } from "./NoMatchFile";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
+  const { settings } = React.useContext(SettingsContext);
+  const params = useParams();
+  const room =
+    params["fileName"] &&
+    settings.rooms.find(({ id }) => id === settings.activeRoomId);
   React.useEffect(() => {
     if (!divElRef.current) {
       return;
     }
-    const editor = createMonacoEditor(divElRef.current, setCursorStyles);
+    const editor = createMonacoEditor(
+      divElRef.current,
+      setCursorStyles,
+      settings,
+      params["fileName"]!
+    );
     return () => {
       editor.dispose();
     };
   }, []);
+  if (!room) {
+    return <NoMatchFile />;
+  }
   return (
     <>
       <style>{cursorStyles.join("")}</style>
@@ -29,27 +45,39 @@ export const Editor: React.FC = () => {
 
 function createMonacoEditor(
   divEl: HTMLDivElement,
-  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
-) {
-  const { provider, type } = getDocument("name", "password");
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
+  settings: Settings,
+  fileName: string
+): monaco.editor.IStandaloneCodeEditor {
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
+  const { provider, ydoc } = getRoom(room.id, room.password);
+  const text = getDocument(room.id, ydoc, fileName);
+  const model = monaco.editor.createModel(
+    "",
+    undefined, // language
+    monaco.Uri.file(fileName) // uri
+  );
   const editor = monaco.editor.create(divEl, {
-    value: "",
-    language: "markdown",
+    model,
+    // value: "",
+    // language: "markdown",
     theme: "vs-dark", // vs-light by default
-    automaticLayout: true, // false by default
+    automaticLayout: true, // false by default, autoresizes
     minimap: {
       enabled: false,
     },
   });
   new MonacoBinding(
-    type,
+    text,
     editor.getModel(),
     new Set([editor]),
     provider.awareness
   );
-  setupYjsMonacoCursorData(provider, setCursorStyles);
-  setupVimBindings(editor);
-  setupThemes();
+  setupYjsMonacoCursorData(provider, setCursorStyles, settings);
+  if (settings.isVim) {
+    setupVimBindings(editor);
+  }
+  setupThemes(settings.theme);
 
   editor.focus();
   return editor;
@@ -57,10 +85,12 @@ function createMonacoEditor(
 
 function setupYjsMonacoCursorData(
   provider: WebrtcProvider,
-  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
+  settings: Settings
 ) {
   provider.awareness.setLocalStateField("user", {
-    name: `User${(Math.random() * 1000).toFixed()}`,
+    // name: `User${(Math.random() * 1000).toFixed()}`,
+    name: settings.name,
     colour: getRandomColor(),
   });
 
@@ -95,10 +125,10 @@ function setupVimBindings(editor: monaco.editor.IStandaloneCodeEditor) {
   VimMode.Vim.map("jk", "<Esc>", "insert");
 }
 
-function setupThemes() {
-  import("monaco-themes/themes/Monokai.json").then((data) => {
-    monaco.editor.defineTheme("monokai", data as any);
-    monaco.editor.setTheme("monokai");
+function setupThemes(name: string) {
+  import(`monaco-themes/themes/${name}.json`).then((data) => {
+    monaco.editor.defineTheme(name, data as any);
+    monaco.editor.setTheme(name);
   });
 }
 

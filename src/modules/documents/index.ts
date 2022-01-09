@@ -1,22 +1,68 @@
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 
-type Document = {
-  provider: WebrtcProvider;
-  type: Y.Text;
-};
-const docs: { [key: string]: Document } = {};
+// type Document = {
+//   provider: WebrtcProvider;
+//   type: Y.Text;
+// };
+// const docs: { [key: string]: Document } = {};
 
-export function getDocument(name: string, password: string): Document {
-  const myDoc = docs[name];
-  if (myDoc) {
-    return myDoc;
+type Room = {
+  provider: WebrtcProvider;
+  ydoc: Y.Doc;
+  files: Y.Array<File>;
+  name: Y.Text;
+};
+type File = {
+  name: string;
+  id: string;
+  tags: string[];
+};
+const rooms: { [roomId: string]: Room } = {};
+const roomDocs: { [roomId: string]: { [name: string]: Y.Text } } = {};
+
+// export function getDocument(name: string, password: string): Document {
+//   const myDoc = docs[name];
+//   if (myDoc) {
+//     return myDoc;
+//   }
+//   const ydoc = new Y.Doc();
+//   // @ts-expect-error - types are wrong
+//   const provider = new WebrtcProvider(name, ydoc, { password });
+//   const type = ydoc.getText(name);
+
+//   docs[name] = { provider, type };
+//   return { provider, type };
+// }
+
+export function getRoom(roomId: string, password: string): Room {
+  const myRoom = rooms[roomId];
+  if (myRoom) {
+    return myRoom;
   }
   const ydoc = new Y.Doc();
   // @ts-expect-error - types are wrong
-  const provider = new WebrtcProvider(name, ydoc, { password });
-  const type = ydoc.getText(name);
+  const provider = new WebrtcProvider(roomId, ydoc, { password });
+  const files = ydoc.getArray<File>(roomId);
+  const name = ydoc.getText("name");
 
-  docs[name] = { provider, type };
-  return { provider, type };
+  rooms[roomId] = { provider, ydoc, files, name };
+  return rooms[roomId]!;
+}
+
+export function getDocument(
+  roomId: string,
+  ydoc: Y.Doc,
+  fileId: string
+): Y.Text {
+  const textDoc = roomDocs[roomId]?.[fileId];
+  if (textDoc) {
+    return textDoc;
+  }
+  const text = ydoc.getText(fileId);
+  if (!roomDocs[roomId]) {
+    roomDocs[roomId] = {};
+  }
+  roomDocs[roomId]![fileId] = text;
+  return text;
 }
