@@ -5,6 +5,7 @@ const defaultSettings: Settings = {
   vimrc: "",
   name: "",
   theme: "Monokai",
+  rooms: [],
 };
 type SettingsContext = {
   settings: Settings;
@@ -26,4 +27,12 @@ type Settings = {
   vimrc: string;
   name: string;
   theme: string;
+  rooms: {
+    id: string;
+    password: string;
+    name: string;
+    files: {
+      name: string;
+    }[];
+  }[];
 };
