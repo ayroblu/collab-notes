@@ -3,7 +3,6 @@ import { Contexts } from "./Contexts";
 import { Editor } from "./Editor";
 import { Home } from "./Home";
 import { Layout } from "./Layout";
-import { NoMatchFile } from "./NoMatchFile";
 import { Settings } from "./Settings";
 
 export const App: React.FC = () => {
@@ -13,9 +12,7 @@ export const App: React.FC = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="files">
-            <Route path=":fileName" element={<Editor />} />
-            <Route path="*" element={<NoMatchFile />} />
-            <Route index element={<NoMatchFile />} />
+            <Route index element={<Editor />} />
           </Route>
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<NoMatch />} />

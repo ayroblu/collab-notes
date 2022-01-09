@@ -7,16 +7,17 @@ import { getDocument, getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 import { WebrtcProvider } from "y-webrtc";
 import { Settings, SettingsContext } from "./Contexts";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { NoMatchFile } from "./NoMatchFile";
+import { v4 as uuidv4 } from "uuid";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { settings } = React.useContext(SettingsContext);
-  const params = useParams();
+  const [searchParams] = useSearchParams();
   const room =
-    params["fileName"] &&
+    searchParams.get("name") &&
     settings.rooms.find(({ id }) => id === settings.activeRoomId);
   React.useEffect(() => {
     if (!divElRef.current) {
@@ -26,7 +27,7 @@ export const Editor: React.FC = () => {
       divElRef.current,
       setCursorStyles,
       settings,
-      params["fileName"]!
+      searchParams.get("name")!
     );
     return () => {
       editor.dispose();
@@ -50,8 +51,14 @@ function createMonacoEditor(
   fileName: string
 ): monaco.editor.IStandaloneCodeEditor {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
-  const { provider, ydoc } = getRoom(room.id, room.password);
-  const text = getDocument(room.id, ydoc, fileName);
+  const { provider, ydoc, files } = getRoom(room.id, room.password);
+  const filesArr = files.toArray();
+  let file = filesArr.find(({ name }) => name === fileName);
+  if (!file) {
+    file = { id: uuidv4(), name: fileName, tags: [] };
+    files.push([file]);
+  }
+  const text = getDocument(room.id, ydoc, file.id);
   const model = monaco.editor.createModel(
     "",
     undefined, // language
