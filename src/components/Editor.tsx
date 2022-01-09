@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import * as monaco from "monaco-editor";
-import * as Y from "yjs";
-import { WebrtcProvider } from "y-webrtc";
 import { MonacoBinding } from "y-monaco";
 import { VimMode, initVimMode } from "monaco-vim";
 import styles from "./Editor.module.css";
+import { getDocument } from "../modules/documents";
+import { getRandomColor } from "../modules/utils";
 
 declare global {
   interface Window {
@@ -30,16 +30,20 @@ self.MonacoEnvironment = {
 };
 
 export const Editor: React.FC = () => {
-  const divEl = useRef<HTMLDivElement>(null);
+  const divEl = React.useRef<HTMLDivElement>(null);
+  const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   let editor: monaco.editor.IStandaloneCodeEditor;
-  useEffect(() => {
+  React.useEffect(() => {
     if (divEl.current) {
-      const { provider, type } = getDocument();
+      const { provider, type } = getDocument("name", "password");
       editor = monaco.editor.create(divEl.current, {
         value: "",
-        language: "typescript",
+        language: "markdown",
         theme: "vs-dark", // vs-light by default
         automaticLayout: true, // false by default
+        minimap: {
+          enabled: false,
+        },
       });
       new MonacoBinding(
         type,
@@ -47,16 +51,46 @@ export const Editor: React.FC = () => {
         new Set([editor]),
         provider.awareness
       );
+      provider.awareness.setLocalStateField("user", {
+        name: `User${(Math.random() * 1000).toFixed()}`,
+        colour: getRandomColor(),
+      });
+      let timeoutId = 0;
+      provider.awareness.on("change", ({ updated }: any) => {
+        const cursorData = Array.from(provider.awareness.getStates()).map(
+          ([clientId, { user }]) => ({ clientId, ...user })
+        );
+        const cursorStyles = cursorData.map(({ clientId, name, colour }) => {
+          const opacity = updated.includes(clientId) ? "opacity:1" : "";
+          return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour};${opacity}}`;
+        });
+        const cursorStylesFadedOut = cursorData.map(
+          ({ clientId, name, colour }) => {
+            return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour}}`;
+          }
+        );
+        setCursorStyles(cursorStyles);
+        clearTimeout(timeoutId);
+        window.setTimeout(() => {
+          setCursorStyles(cursorStylesFadedOut);
+        }, 5000);
+      });
       initVimMode(editor);
       VimMode.Vim.map("jk", "<Esc>", "insert");
       import("monaco-themes/themes/Monokai.json").then((data) => {
         monaco.editor.defineTheme("monokai", data as any);
         monaco.editor.setTheme("monokai");
       });
+      editor.focus();
     }
     return () => {
       editor.dispose();
     };
   }, []);
-  return <div className={styles.editor} ref={divEl}></div>;
+  return (
+    <>
+      <style>{cursorStyles.join("")}</style>
+      <div className={styles.editor} ref={divEl}></div>;
+    </>
+  );
 };

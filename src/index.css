@@ -1,14 +1,44 @@
 :root {
-  --light-primary: blue;
+  --light-background-color: #eee;
+  --light-text-color: black;
+
+  --dark-background-color: #333;
+  --dark-text-color: white;
+
+  --primary: #5bf;
+  --background-color: var(--dark-background-color);
+  --text-color: var(--dark-text-color);
+
+  --spacing-1: 1px;
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-32: 32px;
   --nav-bar-height: 40px;
+
+  --font-size-h1: 2rem;
+  --font-size-h2: 1.8rem;
+  --font-size-h3: 1.6rem;
+  --font-size-h4: 1.4rem;
+  --font-size-h5: 1.2rem;
+  --font-size-h6: 1rem;
+  --font-size-h7: 0.8rem;
 }
 
 body {
   padding: 0;
   margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu, "Helvetica Neue", sans-serif;
 }
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .yRemoteSelection {
@@ -16,17 +46,31 @@ body {
 }
 .yRemoteSelectionHead {
   position: absolute;
-  border-left: orange solid 2px;
-  border-top: orange solid 2px;
-  border-bottom: orange solid 2px;
+  border-left: currentColor solid 2px;
+  border-top: currentColor solid 2px;
+  border-bottom: currentColor solid 2px;
   height: 100%;
-  box-sizing: border-box;
 }
-.yRemoteSelectionHead::after {
+.yRemoteSelectionHead::before {
   position: absolute;
   content: " ";
-  border: 3px solid orange;
+  border: 3px solid currentColor;
   border-radius: 4px;
   left: -4px;
   top: -5px;
+}
+.yRemoteSelectionHead::after {
+  position: absolute;
+  color: white;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  transform: translate(0, -100%);
+  top: 0;
+  left: -4px;
+  pointer-events: none;
+  opacity: 0;
+  padding: 0 4px;
+}
+.yRemoteSelectionHead:hover::after {
+  opacity: 1;
 }

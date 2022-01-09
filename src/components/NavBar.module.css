@@ -1,4 +1,14 @@
 .nav {
-  background: white;
   height: var(--nav-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-16);
+}
+.nav a {
+  color: var(--text-color);
+  text-decoration: none;
+}
+.pageTitle {
+  font-size: var(--font-size-20);
 }

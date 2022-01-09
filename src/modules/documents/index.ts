@@ -7,13 +7,16 @@ type Document = {
 };
 const docs: { [key: string]: Document } = {};
 
-export function getDocument(name: string) {
-  if (docs[name]) {
-    return docs[name];
+export function getDocument(name: string, password: string): Document {
+  const myDoc = docs[name];
+  if (myDoc) {
+    return myDoc;
   }
   const ydoc = new Y.Doc();
-  const provider = new WebrtcProvider("monaco", ydoc);
-  const type = ydoc.getText("monaco");
+  // @ts-expect-error - types are wrong
+  const provider = new WebrtcProvider(name, ydoc, { password });
+  const type = ydoc.getText(name);
+
   docs[name] = { provider, type };
-  return docs[name];
+  return { provider, type };
 }

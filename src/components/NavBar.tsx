@@ -4,9 +4,11 @@ import styles from "./NavBar.module.css";
 
 export const NavBar = (): React.ReactNode => {
   return (
-    <nav className={styles.nav}>
-      <a href="/">Collab Notes</a>
+    <header className={styles.nav}>
+      <h1 className={styles.pageTitle}>
+        <a href="/">Collab Notes</a>
+      </h1>
       <a href="/">Settings</a>
-    </nav>
+    </header>
   );
 };
