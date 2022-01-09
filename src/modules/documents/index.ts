@@ -1,5 +1,6 @@
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
+import { IndexeddbPersistence } from "y-indexeddb";
 
 // type Document = {
 //   provider: WebrtcProvider;
@@ -12,6 +13,7 @@ type Room = {
   ydoc: Y.Doc;
   files: Y.Array<File>;
   name: Y.Text;
+  initialDbPromise: Promise<void>;
 };
 type File = {
   name: string;
@@ -43,10 +45,14 @@ export function getRoom(roomId: string, password: string): Room {
   const ydoc = new Y.Doc();
   // @ts-expect-error - types are wrong
   const provider = new WebrtcProvider(roomId, ydoc, { password });
+  const persistence = new IndexeddbPersistence(roomId, ydoc);
   const files = ydoc.getArray<File>(roomId);
   const name = ydoc.getText("name");
+  const initialDbPromise = new Promise<void>((resolve) =>
+    persistence.once("synced", () => resolve())
+  );
 
-  rooms[roomId] = { provider, ydoc, files, name };
+  rooms[roomId] = { provider, ydoc, files, name, initialDbPromise };
   return rooms[roomId]!;
 }
 

@@ -1,6 +1,6 @@
 const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+// const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -15,7 +15,7 @@ module.exports = {
     "ts.worker": "monaco-editor/esm/vs/language/typescript/ts.worker",
   },
   devServer: {
-    hot: true,
+    // hot: true,
     historyApiFallback: true,
   },
   devtool: "eval-source-map",
@@ -37,12 +37,12 @@ module.exports = {
             loader: require.resolve("babel-loader"),
             options: {
               presets: [
-                "@babel/preset-env",
+                ["@babel/preset-env", { targets: { chrome: "58" } }],
                 "@babel/preset-typescript",
                 ["@babel/preset-react", { runtime: "automatic" }],
               ],
               plugins: [
-                isDevelopment && require.resolve("react-refresh/babel"),
+                // isDevelopment && require.resolve("react-refresh/babel"),
               ].filter(Boolean),
             },
           },
@@ -62,7 +62,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "src/index.html",
     }),
-    isDevelopment && new ReactRefreshWebpackPlugin(),
+    // isDevelopment && new ReactRefreshWebpackPlugin(),
   ].filter(Boolean),
 
   //https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
