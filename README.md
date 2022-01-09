@@ -6,14 +6,13 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Context for data
-- Files manager - just a list? no directories, may add "tags" later
-- Set name at start?
+- Share so that others can join
 - Support change file type
 - Support change theme
 - Support configure vim / .vimrc
-- save to indexeddb
 - setup eslint
+- Make prettier
+  - slidy drawer, side nav rather than top nav
 
 ### Longer term
 - gdoc / gdrive sync
