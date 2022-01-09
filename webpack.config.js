@@ -5,7 +5,7 @@ const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin"
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 module.exports = {
-  mode: "development",
+  mode: isDevelopment ? "development" : "production",
   entry: {
     app: "./src/index.tsx",
     "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
@@ -17,6 +17,7 @@ module.exports = {
   devServer: {
     hot: true,
   },
+  devtool: "eval-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
   },
@@ -52,7 +53,7 @@ module.exports = {
       },
       {
         test: /\.ttf$/,
-        use: ["file-loader"],
+        type: "asset/resource",
       },
     ],
   },

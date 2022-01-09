@@ -8,7 +8,6 @@ TODO
 ### MVP
 - Initial setup - password for everything
 - Files manager - just a list? no directories, may add "tags" later
-- Remote users - change cursor showing fadeout to be per clientId
 - Support change file type
 - Support change theme
 - Support configure vim / .vimrc

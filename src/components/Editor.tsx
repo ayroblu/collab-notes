@@ -5,12 +5,109 @@ import { VimMode, initVimMode } from "monaco-vim";
 import styles from "./Editor.module.css";
 import { getDocument } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
+import { WebrtcProvider } from "y-webrtc";
+
+export const Editor: React.FC = () => {
+  const divElRef = React.useRef<HTMLDivElement>(null);
+  const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (!divElRef.current) {
+      return;
+    }
+    const editor = createMonacoEditor(divElRef.current, setCursorStyles);
+    return () => {
+      editor.dispose();
+    };
+  }, []);
+  return (
+    <>
+      <style>{cursorStyles.join("")}</style>
+      <div className={styles.editor} ref={divElRef}></div>;
+    </>
+  );
+};
+
+function createMonacoEditor(
+  divEl: HTMLDivElement,
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  const { provider, type } = getDocument("name", "password");
+  const editor = monaco.editor.create(divEl, {
+    value: "",
+    language: "markdown",
+    theme: "vs-dark", // vs-light by default
+    automaticLayout: true, // false by default
+    minimap: {
+      enabled: false,
+    },
+  });
+  new MonacoBinding(
+    type,
+    editor.getModel(),
+    new Set([editor]),
+    provider.awareness
+  );
+  setupYjsMonacoCursorData(provider, setCursorStyles);
+  setupVimBindings(editor);
+  setupThemes();
+
+  editor.focus();
+  return editor;
+}
+
+function setupYjsMonacoCursorData(
+  provider: WebrtcProvider,
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  provider.awareness.setLocalStateField("user", {
+    name: `User${(Math.random() * 1000).toFixed()}`,
+    colour: getRandomColor(),
+  });
+
+  let timeoutIds: { [clientId: string]: number } = {};
+  provider.awareness.on("change", ({ updated }: any) => {
+    const cursorData = Array.from(provider.awareness.getStates()).map(
+      ([clientId, { user }]) => ({ clientId, ...user })
+    );
+
+    const mainCursorStyles = cursorData.map(({ clientId, name, colour }) => {
+      return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour}}`;
+    });
+    const tempCursorStyles = cursorData
+      .filter(({ clientId }) => updated.includes(clientId))
+      .map(({ clientId }) => {
+        return `.yRemoteSelectionHead-${clientId}::after{opacity:1}`;
+      });
+    setCursorStyles([...mainCursorStyles, ...tempCursorStyles]);
+    cursorData.forEach(({ clientId }) => {
+      clearTimeout(timeoutIds[clientId]);
+      timeoutIds[clientId] = window.setTimeout(() => {
+        setCursorStyles((cursorStyles) =>
+          cursorStyles.filter((c) => !tempCursorStyles.includes(c))
+        );
+      }, 3000);
+    });
+  });
+}
+
+function setupVimBindings(editor: monaco.editor.IStandaloneCodeEditor) {
+  initVimMode(editor);
+  VimMode.Vim.map("jk", "<Esc>", "insert");
+}
+
+function setupThemes() {
+  import("monaco-themes/themes/Monokai.json").then((data) => {
+    monaco.editor.defineTheme("monokai", data as any);
+    monaco.editor.setTheme("monokai");
+  });
+}
 
 declare global {
   interface Window {
     MonacoEnvironment: any;
   }
 }
+
 self.MonacoEnvironment = {
   getWorkerUrl: function (_moduleId: any, label: string) {
     if (label === "json") {
@@ -27,70 +124,4 @@ self.MonacoEnvironment = {
     }
     return "./editor.worker.bundle.js";
   },
-};
-
-export const Editor: React.FC = () => {
-  const divEl = React.useRef<HTMLDivElement>(null);
-  const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
-  let editor: monaco.editor.IStandaloneCodeEditor;
-  React.useEffect(() => {
-    if (divEl.current) {
-      const { provider, type } = getDocument("name", "password");
-      editor = monaco.editor.create(divEl.current, {
-        value: "",
-        language: "markdown",
-        theme: "vs-dark", // vs-light by default
-        automaticLayout: true, // false by default
-        minimap: {
-          enabled: false,
-        },
-      });
-      new MonacoBinding(
-        type,
-        editor.getModel(),
-        new Set([editor]),
-        provider.awareness
-      );
-      provider.awareness.setLocalStateField("user", {
-        name: `User${(Math.random() * 1000).toFixed()}`,
-        colour: getRandomColor(),
-      });
-      let timeoutId = 0;
-      provider.awareness.on("change", ({ updated }: any) => {
-        const cursorData = Array.from(provider.awareness.getStates()).map(
-          ([clientId, { user }]) => ({ clientId, ...user })
-        );
-        const cursorStyles = cursorData.map(({ clientId, name, colour }) => {
-          const opacity = updated.includes(clientId) ? "opacity:1" : "";
-          return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour};${opacity}}`;
-        });
-        const cursorStylesFadedOut = cursorData.map(
-          ({ clientId, name, colour }) => {
-            return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour}}`;
-          }
-        );
-        setCursorStyles(cursorStyles);
-        clearTimeout(timeoutId);
-        window.setTimeout(() => {
-          setCursorStyles(cursorStylesFadedOut);
-        }, 5000);
-      });
-      initVimMode(editor);
-      VimMode.Vim.map("jk", "<Esc>", "insert");
-      import("monaco-themes/themes/Monokai.json").then((data) => {
-        monaco.editor.defineTheme("monokai", data as any);
-        monaco.editor.setTheme("monokai");
-      });
-      editor.focus();
-    }
-    return () => {
-      editor.dispose();
-    };
-  }, []);
-  return (
-    <>
-      <style>{cursorStyles.join("")}</style>
-      <div className={styles.editor} ref={divEl}></div>;
-    </>
-  );
 };
