@@ -2,7 +2,7 @@ import React from "react";
 
 import styles from "./NavBar.module.css";
 
-export const NavBar = (): React.ReactNode => {
+export const NavBar: React.FC = () => {
   return (
     <header className={styles.nav}>
       <h1 className={styles.pageTitle}>

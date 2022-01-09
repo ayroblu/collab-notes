@@ -1,4 +1,4 @@
-export const OptionsDropdown = (): React.ReactNode => {
+export const OptionsDropdown: React.FC = () => {
   return (
     <div>
       <ul>

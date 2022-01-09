@@ -13,6 +13,7 @@ TODO
 - Support change theme
 - Support configure vim / .vimrc
 - save to indexeddb
+- setup eslint
 
 ### Longer term
 - gdoc / gdrive sync
