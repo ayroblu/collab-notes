@@ -6,7 +6,7 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- React router - different files + settings
+- Context for data
 - Files manager - just a list? no directories, may add "tags" later
 - Set name at start?
 - Support change file type
