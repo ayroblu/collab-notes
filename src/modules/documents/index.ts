@@ -17,7 +17,6 @@ type Room = {
 };
 type File = {
   name: string;
-  id: string;
   tags: string[];
 };
 const rooms: { [roomId: string]: Room } = {};

@@ -9,7 +9,6 @@ import { WebrtcProvider } from "y-webrtc";
 import { Settings, SettingsContext } from "./Contexts";
 import { useSearchParams } from "react-router-dom";
 import { NoMatchFile } from "./NoMatchFile";
-import { v4 as uuidv4 } from "uuid";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
@@ -55,10 +54,10 @@ function createMonacoEditor(
   const filesArr = files.toArray();
   let file = filesArr.find(({ name }) => name === fileName);
   if (!file) {
-    file = { id: uuidv4(), name: fileName, tags: [] };
+    file = { name: fileName, tags: [] };
     files.push([file]);
   }
-  const text = getDocument(room.id, ydoc, file.id);
+  const text = getDocument(room.id, ydoc, file.name);
   const model = monaco.editor.createModel(
     "",
     undefined, // language

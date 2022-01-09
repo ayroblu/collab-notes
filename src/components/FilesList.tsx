@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { getRoom } from "../modules/documents";
 import { SettingsContext } from "./Contexts";
 
@@ -17,8 +18,10 @@ const FileNamesList = () => {
   const { files } = getRoom(room.id, room.password);
   return (
     <ul>
-      {files.map(({ id, name }) => (
-        <li key={id}>{name}</li>
+      {files.map(({ name }) => (
+        <li key={name}>
+          <Link to={`files?name=${encodeURIComponent(name)}`}>{name}</Link>
+        </li>
       ))}
     </ul>
   );

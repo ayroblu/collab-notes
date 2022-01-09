@@ -54,3 +54,25 @@ export function generatePassword({
 
   return generatedPassword;
 }
+
+export const uniqBy = <T>(
+  arr: T[],
+  predicate: ((el: T) => string) | string
+) => {
+  const cb =
+    typeof predicate === "function"
+      ? predicate
+      : (o: T) => (o as any)[predicate as any];
+
+  return [
+    ...arr
+      .reduce((map, item) => {
+        const key = item === null || item === undefined ? item : cb(item);
+
+        map.has(key) || map.set(key, item);
+
+        return map;
+      }, new Map())
+      .values(),
+  ];
+};

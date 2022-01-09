@@ -41,6 +41,10 @@ body {
   margin: 0;
   padding: 0;
 }
+a {
+  color: var(--text-color);
+  text-decoration: none;
+}
 
 .yRemoteSelection {
   background-color: rgb(250, 129, 0, 0.5);
