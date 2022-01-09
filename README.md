@@ -6,12 +6,12 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Initial setup - password for everything
+- React router - different files + settings
 - Files manager - just a list? no directories, may add "tags" later
+- Set name at start?
 - Support change file type
 - Support change theme
 - Support configure vim / .vimrc
-- React router - different files + settings
 - save to indexeddb
 
 ### Longer term
