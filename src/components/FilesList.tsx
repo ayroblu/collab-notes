@@ -38,10 +38,34 @@ const FileNamesList = () => {
           <Link to={`files?name=${encodeURIComponent(name)}`}>{name}</Link>
         </li>
       ))}
+      <li>
+        <NewFile />
+      </li>
     </ul>
   );
 };
 type File = {
   name: string;
   tags: string[];
+};
+
+const NewFile: React.FC = () => {
+  const [isNewFileInput, setIsNewFileInput] = React.useState(false);
+  const { settings } = React.useContext(SettingsContext);
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
+  const { files } = getRoom(room.id, room.password);
+  const handleNewFile = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsNewFileInput(false);
+    const name = e.currentTarget.value.trim();
+    if (name) {
+      files.push([{ name: e.currentTarget.value, tags: [] }]);
+    }
+  };
+
+  if (!isNewFileInput) {
+    return (
+      <button onClick={() => setIsNewFileInput(true)}>➕️ New file</button>
+    );
+  }
+  return <input onBlur={handleNewFile} autoFocus />;
 };

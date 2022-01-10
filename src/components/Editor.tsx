@@ -16,9 +16,10 @@ export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
-  const room =
-    searchParams.get("name") &&
-    settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  const fileName = searchParams.get("name");
+  const hasRoom =
+    fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
+
   React.useEffect(() => {
     if (!divElRef.current) {
       return;
@@ -27,14 +28,15 @@ export const Editor: React.FC = () => {
       divElRef.current,
       setCursorStyles,
       settings,
-      searchParams.get("name")!
+      fileName!
     );
     return () => {
       editor.dispose();
       model.dispose();
     };
-  }, []);
-  if (!room) {
+  }, [fileName]);
+
+  if (!hasRoom) {
     return <NoMatchFile />;
   }
   return (
@@ -92,15 +94,16 @@ function createMonacoEditor(
   return { editor, model };
 }
 
+const randomColour = getRandomColor();
+
 function setupYjsMonacoCursorData(
   provider: WebrtcProvider,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings
 ) {
   provider.awareness.setLocalStateField("user", {
-    // name: `User${(Math.random() * 1000).toFixed()}`,
     name: settings.name,
-    colour: getRandomColor(),
+    colour: randomColour,
   });
 
   let timeoutIds: { [clientId: string]: number } = {};

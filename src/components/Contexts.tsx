@@ -35,8 +35,12 @@ export const Contexts: React.FC = ({ children }) => {
     const savedSettings: Settings | undefined = await get(dbKey);
     if (!savedSettings) {
       if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
+        const name =
+          prompt("Enter your nickname") ||
+          `User${(Math.random() * 1000).toFixed()}`;
         setSettings({
           ...settings,
+          name,
           rooms: [
             {
               id: paramRoomId,
