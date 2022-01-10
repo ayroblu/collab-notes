@@ -2,10 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { deduplicateFiles, getRoom } from "../modules/documents";
 import { SettingsContext } from "./Contexts";
+import styles from "./FilesList.module.css";
 
 export const FilesList = () => {
   return (
-    <section>
+    <section className={styles.fileslist}>
       <h2>Files</h2>
       <FileNamesList />
     </section>

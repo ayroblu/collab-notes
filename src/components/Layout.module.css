@@ -1,6 +1,6 @@
 .layout {
   display: flex;
 }
-.layout > * {
+.flexGrow {
   flex: 1 1 auto;
 }

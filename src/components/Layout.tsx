@@ -9,7 +9,7 @@ export const Layout: React.FC = () => {
     <div className={styles.layout}>
       <RoomsList />
       <FilesList />
-      <div>
+      <div className={styles.flexGrow}>
         <NavBar />
         <Outlet />
       </div>
