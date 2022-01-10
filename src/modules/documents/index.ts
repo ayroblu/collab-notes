@@ -71,3 +71,16 @@ export function getDocument(
   roomDocs[roomId]![fileId] = text;
   return text;
 }
+
+export function deduplicateFiles(files: Y.Array<File>) {
+  const seenSet = new Set();
+  for (let i = 0; i < files.length; ++i) {
+    const { name } = files.get(i);
+    if (seenSet.has(name)) {
+      files.delete(i, 1);
+      --i;
+      continue;
+    }
+    seenSet.add(name);
+  }
+}

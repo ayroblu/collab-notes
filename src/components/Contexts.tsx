@@ -1,7 +1,8 @@
 import React from "react";
 import { get, set } from "idb-keyval";
 import { getRoom } from "../modules/documents";
-import { useIsMounted } from "../hooks/useIsMounted";
+import { Loading } from "./Loading";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const defaultSettings: Settings = {
   isVim: true,
@@ -20,14 +21,49 @@ export const SettingsContext = React.createContext<SettingsContext>({} as any);
 const dbKey = "settings";
 export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
+  const [searchParams] = useSearchParams();
+  const paramRoomId = searchParams.get("roomId");
+  const paramRoomPassword = searchParams.get("roomPassword");
+  const paramFileName = searchParams.get("fileName");
+  const navigate = useNavigate();
   const func = React.useCallback(async () => {
     const savedSettings: Settings | undefined = await get(dbKey);
-    if (!savedSettings) return;
+    if (!savedSettings) {
+      if (paramRoomId && paramRoomPassword && paramFileName) {
+        console.log(paramRoomId, paramRoomPassword, paramFileName);
+        setSettings({
+          ...settings,
+          rooms: [
+            {
+              id: paramRoomId,
+              password: paramRoomPassword,
+            },
+          ],
+          activeRoomId: paramRoomId,
+        });
+        navigate(`files?name=${encodeURIComponent(paramFileName)}`);
+      }
+      return;
+    }
+    if (paramRoomId && paramRoomPassword && paramFileName) {
+      console.log(paramRoomId, paramRoomPassword, paramFileName);
+      savedSettings.rooms.push({
+        id: paramRoomId,
+        password: paramRoomPassword,
+      });
+      savedSettings.activeRoomId = paramRoomId;
+      navigate(`files?name=${encodeURIComponent(paramFileName)}`);
+    }
     setSettings(savedSettings);
     const room = savedSettings.rooms.find(
       ({ id }) => id === savedSettings.activeRoomId
     );
     if (!room) return;
+    console.log(
+      `?roomId=${encodeURIComponent(room.id)}&roomPassword=${encodeURIComponent(
+        room.password
+      )}&fileName=README.md`
+    );
     const { initialDbPromise } = getRoom(room.id, room.password);
     await initialDbPromise;
   }, []);
@@ -47,45 +83,6 @@ export const Contexts: React.FC = ({ children }) => {
     </Loading>
   );
 };
-
-type LoadingProps = {
-  func: () => Promise<void>;
-  loading: React.ReactElement | null;
-  error: React.ReactElement | null;
-};
-const Loading: React.FC<LoadingProps> = ({
-  func,
-  children,
-  error,
-  loading,
-}) => {
-  const [loadingState, setLoadingState] = React.useState<LoadingState>(
-    LoadingState.none
-  );
-  const getIsMounted = useIsMounted();
-  React.useEffect(() => {
-    func()
-      .then(() => getIsMounted() && setLoadingState(LoadingState.loaded))
-      .catch(() => getIsMounted() && setLoadingState(LoadingState.failed));
-    setLoadingState(LoadingState.loading);
-  }, []);
-  switch (loadingState) {
-    case LoadingState.none:
-    case LoadingState.loading:
-      return loading;
-    case LoadingState.loaded:
-      return <>{children}</>;
-    case LoadingState.failed:
-    default:
-      return error;
-  }
-};
-enum LoadingState {
-  none = "none",
-  loading = "loading",
-  loaded = "loaded",
-  failed = "failed",
-}
 
 export type Settings = {
   isVim: boolean;
