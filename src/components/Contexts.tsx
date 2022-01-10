@@ -23,19 +23,24 @@ export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const [searchParams] = useSearchParams();
   const paramRoomId = searchParams.get("roomId");
+  const paramRoomName = searchParams.get("roomName");
   const paramRoomPassword = searchParams.get("roomPassword");
   const paramFileName = searchParams.get("fileName");
   const navigate = useNavigate();
+  const setSettings = React.useCallback((settings: Settings) => {
+    setSettingsState(settings);
+    set(dbKey, settings);
+  }, []);
   const func = React.useCallback(async () => {
     const savedSettings: Settings | undefined = await get(dbKey);
     if (!savedSettings) {
-      if (paramRoomId && paramRoomPassword && paramFileName) {
-        console.log(paramRoomId, paramRoomPassword, paramFileName);
+      if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
         setSettings({
           ...settings,
           rooms: [
             {
               id: paramRoomId,
+              name: paramRoomName,
               password: paramRoomPassword,
             },
           ],
@@ -45,31 +50,30 @@ export const Contexts: React.FC = ({ children }) => {
       }
       return;
     }
-    if (paramRoomId && paramRoomPassword && paramFileName) {
-      console.log(paramRoomId, paramRoomPassword, paramFileName);
-      savedSettings.rooms.push({
-        id: paramRoomId,
-        password: paramRoomPassword,
-      });
-      savedSettings.activeRoomId = paramRoomId;
+    if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
+      const savedSettingsWithParam = {
+        ...savedSettings,
+        rooms: savedSettings.rooms
+          .filter(({ id }) => id !== paramRoomId)
+          .concat({
+            id: paramRoomId,
+            name: paramRoomName,
+            password: paramRoomPassword,
+          }),
+        activeRoomId: paramRoomId,
+      };
+      setSettings(savedSettingsWithParam);
+      // this navigation is fine to do now as everything after this still needs to wait for it to finish
       navigate(`files?name=${encodeURIComponent(paramFileName)}`);
+    } else {
+      setSettings(savedSettings);
     }
-    setSettings(savedSettings);
     const room = savedSettings.rooms.find(
       ({ id }) => id === savedSettings.activeRoomId
     );
     if (!room) return;
-    console.log(
-      `?roomId=${encodeURIComponent(room.id)}&roomPassword=${encodeURIComponent(
-        room.password
-      )}&fileName=README.md`
-    );
     const { initialDbPromise } = getRoom(room.id, room.password);
     await initialDbPromise;
-  }, []);
-  const setSettings = React.useCallback((settings: Settings) => {
-    setSettingsState(settings);
-    set(dbKey, settings);
   }, []);
   return (
     <Loading
@@ -84,14 +88,16 @@ export const Contexts: React.FC = ({ children }) => {
   );
 };
 
+export type Room = {
+  id: string;
+  name: string;
+  password: string;
+};
 export type Settings = {
   isVim: boolean;
   vimrc: string;
   name: string;
   theme: string;
   activeRoomId: string | null;
-  rooms: {
-    id: string;
-    password: string;
-  }[];
+  rooms: Room[];
 };

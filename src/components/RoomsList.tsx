@@ -3,16 +3,29 @@ import { getRoom } from "../modules/documents";
 import { SettingsContext } from "./Contexts";
 
 export const RoomsList = () => {
-  const { settings } = React.useContext(SettingsContext);
-  const [rooms, setRooms] = React.useState<string[]>([]);
+  const { settings, setSettings } = React.useContext(SettingsContext);
   React.useEffect(() => {
     const roomNames = settings.rooms.map(
       ({ id, password }) => getRoom(id, password).name
     );
 
-    setRooms(roomNames.map((t) => t.toString()));
+    setSettings({
+      ...settings,
+      rooms: settings.rooms.map(({ id, password }, i) => ({
+        id,
+        name: roomNames[i]!.toString(),
+        password,
+      })),
+    });
     const changeListener = () => {
-      setRooms(roomNames.map((t) => t.toString()));
+      setSettings({
+        ...settings,
+        rooms: settings.rooms.map(({ id, password }, i) => ({
+          id,
+          name: roomNames[i]!.toString(),
+          password,
+        })),
+      });
     };
     roomNames.forEach((t) => {
       t.observe(changeListener);
@@ -22,7 +35,7 @@ export const RoomsList = () => {
         t.unobserve(changeListener);
       });
     };
-  }, []);
+  }, [settings.rooms.length]);
   if (settings.rooms.length < 2) {
     return null;
   }
@@ -31,8 +44,8 @@ export const RoomsList = () => {
     <section>
       <h2>Rooms</h2>
       <ul>
-        {settings.rooms.map(({ id }, i) => (
-          <li key={id}>{rooms[i]}</li>
+        {settings.rooms.map(({ id, name }) => (
+          <li key={id}>{name}</li>
         ))}
       </ul>
     </section>
