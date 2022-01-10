@@ -58,6 +58,7 @@ function createMonacoEditor(
     files.push([file]);
   }
   const text = getDocument(room.id, ydoc, file.name);
+  // https://stackoverflow.com/questions/56681345/how-to-dynamically-set-language-according-to-file-extension-in-monaco-editor
   const model = monaco.editor.createModel(
     "",
     undefined, // language
