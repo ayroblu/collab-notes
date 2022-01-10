@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 const defaultSettings: Settings = {
   isVim: true,
-  vimrc: "",
+  vimrc: "imap jk <Esc>",
   name: "",
   theme: "Monokai",
   rooms: [],

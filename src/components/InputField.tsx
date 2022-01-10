@@ -19,3 +19,22 @@ export const InputField: React.FC<InputFieldProps> = ({
     <span className={styles.error}>{errorText}</span>
   </label>
 );
+
+type TextAreaProps = {
+  name: string;
+  label: string;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  errorText: string;
+};
+export const TextArea: React.FC<TextAreaProps> = ({
+  label,
+  errorText,
+  ...inputProps
+}) => (
+  <label className={styles.input}>
+    <span className={styles.inputLabel}>{label}</span>
+    <textarea {...inputProps} />
+    <span className={styles.error}>{errorText}</span>
+  </label>
+);

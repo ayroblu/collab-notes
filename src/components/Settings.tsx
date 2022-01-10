@@ -1,7 +1,9 @@
 import React from "react";
 import { useForm } from "use-form-ts";
 import { SettingsContext } from "./Contexts";
-import { InputField } from "./InputField";
+import { InputField, TextArea } from "./InputField";
+import themeList from "monaco-themes/themes/themelist.json";
+import { keys } from "../modules/utils";
 
 export const Settings: React.FC = () => {
   const { settings, setSettings } = React.useContext(SettingsContext);
@@ -24,11 +26,14 @@ export const Settings: React.FC = () => {
       // todo
     }
   };
+  const cancelHandler = () => {
+    setTempSettings(adjustedSettings);
+  };
   return (
     <section>
       <h2>Settings</h2>
       <form onSubmit={handleSubmit}>
-        <p>
+        <div>
           {form.createFormItem("name", {
             required: true,
             adaptor,
@@ -36,8 +41,8 @@ export const Settings: React.FC = () => {
           })(({ meta: { label }, errorText, ...props }) => (
             <InputField label={label} {...props} errorText={errorText || ""} />
           ))}
-        </p>
-        <p>
+        </div>
+        <div>
           {form.createFormItem("isVim", {
             adaptor: checkedAdaptor,
             meta: { label: "Vim Mode enabled: " },
@@ -52,21 +57,73 @@ export const Settings: React.FC = () => {
               />
             </label>
           ))}
-        </p>
+        </div>
+        {tempSettings.isVim &&
+          form.createFormItem("vimrc", {
+            adaptor,
+            custom: (v) => {
+              return parseVimrc(v)
+                ? null
+                : "Failed to parse vimrc, syntax should match: imap jk <Esc>";
+            },
+          })(({ name, onChange, value, errorText }) => (
+            <TextArea
+              label="vimrc"
+              value={value}
+              name={name}
+              onChange={onChange}
+              errorText={errorText || ""}
+            />
+          ))}
+        {form.createFormItem("theme", {
+          required: true,
+          adaptor,
+        })(({ onChange, value, name }) => (
+          <div>
+            <select name={name} onChange={onChange} value={value}>
+              {themes.map(({ label, value }) => (
+                <option key={value} value={label}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
         <input type="submit" value="Save!" />
-        <button>Cancel</button>
+        <button type="button" onClick={cancelHandler}>
+          Cancel
+        </button>
       </form>
-      <ul>
-        <li>vimrc settings</li>
-        <li>Theme</li>
-      </ul>
     </section>
   );
 };
 
-const adaptor: <T = string>(e: React.ChangeEvent<HTMLInputElement>) => T = (
-  e
-) => e.target.value as any;
+const adaptor: <T = string>(
+  e: React.ChangeEvent<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  >
+) => T = (e) => e.target.value as any;
 const checkedAdaptor: (e: React.ChangeEvent<HTMLInputElement>) => boolean = (
   e
 ) => e.target.checked;
+
+const themes = keys(themeList).map((key) => {
+  return {
+    label: themeList[key],
+    value: key,
+  };
+});
+export const parseVimrc = (vimrc: string) => {
+  try {
+    return vimrc
+      .split("\n")
+      .filter((l) => l.trim())
+      .map((l) => {
+        const regex = /^([ni])map +(\S+) +(\S+) *$/g;
+        const [, m, before, after] = regex.exec(l)!;
+        return { mode: m === "i" ? "insert" : "normal", before, after };
+      });
+  } catch {
+    return null;
+  }
+};

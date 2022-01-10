@@ -76,3 +76,13 @@ export const uniqBy = <T>(
       .values(),
   ];
 };
+
+/**
+ * Like Object.keys() but with types.
+ * https://github.com/Microsoft/TypeScript/pull/12253#issuecomment-263132208
+ */
+export function keys<T>(o: T): Exclude<keyof T, number>[] {
+  /* tslint:disable:ban */
+  return Object.keys(o) as any;
+  /* tslint:enable:ban */
+}

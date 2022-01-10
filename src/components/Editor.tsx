@@ -9,6 +9,7 @@ import { WebrtcProvider } from "y-webrtc";
 import { Settings, SettingsContext } from "./Contexts";
 import { useSearchParams } from "react-router-dom";
 import { NoMatchFile } from "./NoMatchFile";
+import { parseVimrc } from "./Settings";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
@@ -22,7 +23,7 @@ export const Editor: React.FC = () => {
     if (!divElRef.current) {
       return;
     }
-    const editor = createMonacoEditor(
+    const { editor, model } = createMonacoEditor(
       divElRef.current,
       setCursorStyles,
       settings,
@@ -30,6 +31,7 @@ export const Editor: React.FC = () => {
     );
     return () => {
       editor.dispose();
+      model.dispose();
     };
   }, []);
   if (!room) {
@@ -48,7 +50,7 @@ function createMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings,
   fileName: string
-): monaco.editor.IStandaloneCodeEditor {
+) {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
   const { provider, ydoc, files } = getRoom(room.id, room.password);
   const filesArr = files.toArray();
@@ -82,12 +84,12 @@ function createMonacoEditor(
   );
   setupYjsMonacoCursorData(provider, setCursorStyles, settings);
   if (settings.isVim) {
-    setupVimBindings(editor);
+    setupVimBindings(editor, settings.vimrc);
   }
   setupThemes(settings.theme);
 
   editor.focus();
-  return editor;
+  return { editor, model };
 }
 
 function setupYjsMonacoCursorData(
@@ -127,9 +129,15 @@ function setupYjsMonacoCursorData(
   });
 }
 
-function setupVimBindings(editor: monaco.editor.IStandaloneCodeEditor) {
+function setupVimBindings(
+  editor: monaco.editor.IStandaloneCodeEditor,
+  vimrc: string
+) {
   initVimMode(editor);
-  VimMode.Vim.map("jk", "<Esc>", "insert");
+  const parsedVimrc = parseVimrc(vimrc);
+  parsedVimrc?.forEach(({ mode, before, after }) => {
+    VimMode.Vim.map(before, after, mode);
+  });
 }
 
 function setupThemes(name: string) {
