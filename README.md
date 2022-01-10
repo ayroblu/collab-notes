@@ -6,13 +6,12 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Share so that others can join
+- Add new files
 - Support change file type
-- Support change theme
-- Support configure vim / .vimrc
 - setup eslint
 - Make prettier
   - slidy drawer, side nav rather than top nav
+- users list
 
 ### Longer term
 - gdoc / gdrive sync
