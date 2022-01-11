@@ -8,7 +8,7 @@ import { App } from "./components/App";
 
 ReactDOM.render(
   <React.StrictMode>
-    <HashRouter basename=".">
+    <HashRouter>
       <App />
     </HashRouter>
   </React.StrictMode>,
