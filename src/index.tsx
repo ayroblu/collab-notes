@@ -40,4 +40,4 @@ register({
     }
   },
 });
-reportWebVitals(console.log);
+reportWebVitals();
