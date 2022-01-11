@@ -25,12 +25,7 @@ module.exports = {
         },
         pathGroups: [
           {
-            pattern: "{modules,components,reducers,hooks}/**",
-            group: "internal",
-          },
-          {
-            pattern:
-              "{modules,components,reducers,hooks,config,serviceWorkerRegistration}",
+            pattern: "@/**",
             group: "internal",
           },
         ],

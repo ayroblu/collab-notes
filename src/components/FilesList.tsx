@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
 import { deduplicateFiles, getRoom } from "../modules/documents";
+
 import { SettingsContext } from "./Contexts";
 import styles from "./FilesList.module.css";
 

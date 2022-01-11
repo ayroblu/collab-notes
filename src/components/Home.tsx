@@ -1,11 +1,15 @@
 import React from "react";
-import { SettingsContext } from "./Contexts";
-import { useForm } from "use-form-ts";
-import { InputField } from "./InputField";
-import { generatePassword, slugify } from "../modules/utils";
-import { getRoom } from "../modules/documents";
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "use-form-ts";
+import { v4 as uuidv4 } from "uuid";
+
+import { getRoom } from "../modules/documents";
+import { generatePassword, slugify } from "../modules/utils";
+
+import { SettingsContext } from "./Contexts";
+import { InputField } from "./InputField";
+
+
 
 export const Home: React.FC = () => {
   const { settings, setSettings } = React.useContext(SettingsContext);

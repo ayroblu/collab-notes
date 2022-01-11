@@ -1,6 +1,6 @@
-import * as Y from "yjs";
-import { WebrtcProvider } from "y-webrtc";
 import { IndexeddbPersistence } from "y-indexeddb";
+import { WebrtcProvider } from "y-webrtc";
+import * as Y from "yjs";
 
 // type Document = {
 //   provider: WebrtcProvider;

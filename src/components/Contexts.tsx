@@ -1,8 +1,11 @@
-import React from "react";
 import { get, set } from "idb-keyval";
-import { getRoom } from "../modules/documents";
-import { Loading } from "./Loading";
+import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { getRoom } from "../modules/documents";
+
+import { Loading } from "./Loading";
+
 
 const defaultSettings: Settings = {
   isVim: true,

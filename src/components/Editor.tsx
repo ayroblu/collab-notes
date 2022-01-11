@@ -1,13 +1,16 @@
-import React from "react";
 import * as monaco from "monaco-editor";
-import { MonacoBinding } from "y-monaco";
 import { VimMode, initVimMode } from "monaco-vim";
-import styles from "./Editor.module.css";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
+import { MonacoBinding } from "y-monaco";
+import { WebrtcProvider } from "y-webrtc";
+
 import { getDocument, getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
-import { WebrtcProvider } from "y-webrtc";
+
+
 import { Settings, SettingsContext } from "./Contexts";
-import { useSearchParams } from "react-router-dom";
+import styles from "./Editor.module.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 

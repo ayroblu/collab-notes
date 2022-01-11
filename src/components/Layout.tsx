@@ -1,7 +1,8 @@
 import { Outlet } from "react-router-dom";
-import { NavBar } from "./NavBar";
-import styles from "./Layout.module.css";
+
 import { FilesList } from "./FilesList";
+import styles from "./Layout.module.css";
+import { NavBar } from "./NavBar";
 import { RoomsList } from "./RoomsList";
 
 export const Layout: React.FC = () => {

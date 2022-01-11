@@ -1,9 +1,11 @@
+import themeList from "monaco-themes/themes/themelist.json";
 import React from "react";
 import { useForm } from "use-form-ts";
+
+import { keys } from "../modules/utils";
+
 import { SettingsContext } from "./Contexts";
 import { InputField, TextArea } from "./InputField";
-import themeList from "monaco-themes/themes/themelist.json";
-import { keys } from "../modules/utils";
 
 export const Settings: React.FC = () => {
   const { settings, setSettings } = React.useContext(SettingsContext);
