@@ -1,9 +1,15 @@
+const fs = require("fs");
 const path = require("path");
 
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require("webpack");
+const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
 // const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
+const isProduction = process.env.NODE_ENV === "production";
+const swSrc = "./src/service-worker.ts";
 
 module.exports = {
   mode: isDevelopment ? "development" : "production",
@@ -63,9 +69,26 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebPackPlugin({
+    new webpack.EnvironmentPlugin({
+      PUBLIC_URL: ".",
+    }),
+    new HtmlWebpackPlugin({
       template: "src/index.html",
     }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: "public" }],
+    }),
+    isProduction &&
+      fs.existsSync(swSrc) &&
+      new WorkboxWebpackPlugin.InjectManifest({
+        swSrc,
+        dontCacheBustURLsMatching: /\.[0-9a-f]{8}\./,
+        exclude: [/\.map$/, /asset-manifest\.json$/, /LICENSE/],
+        // Bump up the default maximum size (2mb) that's precached,
+        // to make lazy-loading failure scenarios less likely.
+        // See https://github.com/cra-template/pwa/issues/13#issuecomment-722667270
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      }),
     // isDevelopment && new ReactRefreshWebpackPlugin(),
   ].filter(Boolean),
 

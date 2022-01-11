@@ -11,6 +11,7 @@ TODO
 - users list
 
 ### Longer term
+- minify webpack
 - gdoc / gdrive sync
 - dropbox sync
 - output files
