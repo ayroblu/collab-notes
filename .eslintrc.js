@@ -8,8 +8,8 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: ["import", "@typescript-eslint"],
-  extends: ["react-app"],
+  plugins: ["import", "react", "@typescript-eslint"],
+  // extends: ["react-app"],
   settings: {
     react: {
       version: "detect",
