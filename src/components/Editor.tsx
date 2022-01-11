@@ -57,7 +57,7 @@ function createMonacoEditor(
   fileName: string
 ) {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
-  const { provider, ydoc, files } = getRoom(room.id, room.password);
+  const { files, provider, ydoc } = getRoom(room.id, room.password);
   const filesArr = files.toArray();
   let file = filesArr.find(({ name }) => name === fileName);
   if (!file) {
@@ -115,7 +115,7 @@ function setupYjsMonacoCursorData(
       ([clientId, { user }]) => ({ clientId, ...user })
     );
 
-    const mainCursorStyles = cursorData.map(({ clientId, name, colour }) => {
+    const mainCursorStyles = cursorData.map(({ clientId, colour, name }) => {
       return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour}}`;
     });
     const tempCursorStyles = cursorData
@@ -141,7 +141,7 @@ function setupVimBindings(
 ) {
   initVimMode(editor);
   const parsedVimrc = parseVimrc(vimrc);
-  parsedVimrc?.forEach(({ mode, before, after }) => {
+  parsedVimrc?.forEach(({ after, before, mode }) => {
     VimMode.Vim.map(before, after, mode);
   });
 }

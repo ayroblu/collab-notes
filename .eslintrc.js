@@ -8,7 +8,7 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: ["import", "react", "@typescript-eslint"],
+  plugins: ["import", "react", "sort-destructure-keys", "@typescript-eslint"],
   // extends: ["react-app"],
   settings: {
     react: {
@@ -47,5 +47,6 @@ module.exports = {
         checkFragmentShorthand: true,
       },
     ],
+    "sort-destructure-keys/sort-destructure-keys": "error",
   },
 };

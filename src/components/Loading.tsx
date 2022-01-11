@@ -8,9 +8,9 @@ type LoadingProps = {
   error: React.ReactElement | null;
 };
 export const Loading: React.FC<LoadingProps> = ({
-  func,
   children,
   error,
+  func,
   loading,
 }) => {
   const [loadingState, setLoadingState] = React.useState<LoadingState>(

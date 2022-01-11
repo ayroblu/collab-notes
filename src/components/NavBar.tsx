@@ -29,8 +29,8 @@ type RoomShareButtonProps = {
   fileName: string;
 };
 const RoomShareButton: React.FC<RoomShareButtonProps> = ({
-  room,
   fileName,
+  room,
 }) => {
   const params = {
     roomId: room.id,

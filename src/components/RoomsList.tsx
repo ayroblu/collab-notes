@@ -5,7 +5,7 @@ import { getRoom } from "../modules/documents";
 import { SettingsContext } from "./Contexts";
 
 export const RoomsList = () => {
-  const { settings, setSettings } = React.useContext(SettingsContext);
+  const { setSettings, settings } = React.useContext(SettingsContext);
   React.useEffect(() => {
     const roomNames = settings.rooms.map(
       ({ id, password }) => getRoom(id, password).name

@@ -9,8 +9,8 @@ type InputFieldProps = {
   errorText: string;
 };
 export const InputField: React.FC<InputFieldProps> = ({
-  label,
   errorText,
+  label,
   ...inputProps
 }) => (
   <label className={styles.input}>
@@ -28,8 +28,8 @@ type TextAreaProps = {
   errorText: string;
 };
 export const TextArea: React.FC<TextAreaProps> = ({
-  label,
   errorText,
+  label,
   ...inputProps
 }) => (
   <label className={styles.input}>

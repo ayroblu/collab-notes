@@ -8,8 +8,8 @@ import { SettingsContext } from "./Contexts";
 import { InputField, TextArea } from "./InputField";
 
 export const Settings: React.FC = () => {
-  const { settings, setSettings } = React.useContext(SettingsContext);
-  const { isVim, vimrc, name, theme } = settings;
+  const { setSettings, settings } = React.useContext(SettingsContext);
+  const { isVim, name, theme, vimrc } = settings;
   const adjustedSettings = {
     isVim,
     vimrc,
@@ -40,7 +40,7 @@ export const Settings: React.FC = () => {
             required: true,
             adaptor,
             meta: { label: "Nickname: " },
-          })(({ meta: { label }, errorText, ...props }) => (
+          })(({ errorText, meta: { label }, ...props }) => (
             <InputField label={label} {...props} errorText={errorText || ""} />
           ))}
         </div>
@@ -68,7 +68,7 @@ export const Settings: React.FC = () => {
                 ? null
                 : "Failed to parse vimrc, syntax should match: imap jk <Esc>";
             },
-          })(({ name, onChange, value, errorText }) => (
+          })(({ errorText, name, onChange, value }) => (
             <TextArea
               label="vimrc"
               value={value}
@@ -80,7 +80,7 @@ export const Settings: React.FC = () => {
         {form.createFormItem("theme", {
           required: true,
           adaptor,
-        })(({ onChange, value, name }) => (
+        })(({ name, onChange, value }) => (
           <div>
             <select name={name} onChange={onChange} value={value}>
               {themes.map(({ label, value }) => (
