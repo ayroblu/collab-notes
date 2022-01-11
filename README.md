@@ -6,10 +6,8 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Add new files
-- Support change file type
 - setup eslint
-- Make prettier
+- Make UI prettier
   - slidy drawer, side nav rather than top nav
 - users list
 
