@@ -6,7 +6,6 @@ import { getRoom } from "../modules/documents";
 
 import { Loading } from "./Loading";
 
-
 const defaultSettings: Settings = {
   isVim: true,
   vimrc: "imap jk <Esc>",

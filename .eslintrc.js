@@ -47,6 +47,10 @@ module.exports = {
         checkFragmentShorthand: true,
       },
     ],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { prefer: "type-imports" },
+    ],
     "sort-destructure-keys/sort-destructure-keys": "error",
   },
 };

@@ -9,8 +9,6 @@ import { generatePassword, slugify } from "../modules/utils";
 import { SettingsContext } from "./Contexts";
 import { InputField } from "./InputField";
 
-
-
 export const Home: React.FC = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);
   const [initialSetup, setInitialSetup] = React.useState({

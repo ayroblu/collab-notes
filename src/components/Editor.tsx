@@ -3,13 +3,13 @@ import { VimMode, initVimMode } from "monaco-vim";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
-import { WebrtcProvider } from "y-webrtc";
+import type { WebrtcProvider } from "y-webrtc";
 
 import { getDocument, getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 
-
-import { Settings, SettingsContext } from "./Contexts";
+import type { Settings } from "./Contexts";
+import { SettingsContext } from "./Contexts";
 import styles from "./Editor.module.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";

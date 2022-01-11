@@ -2,7 +2,8 @@ import qs from "query-string";
 import React from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
-import { Room, SettingsContext } from "./Contexts";
+import type { Room } from "./Contexts";
+import { SettingsContext } from "./Contexts";
 import styles from "./NavBar.module.css";
 
 export const NavBar: React.FC = () => {
