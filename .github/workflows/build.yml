@@ -38,6 +38,9 @@ jobs:
     - name: Grab dependencies
       run: yarn --frozen-lockfile
 
+    - name: Lint
+      run: yarn lint
+
     - name: Build
       run: yarn build
 
