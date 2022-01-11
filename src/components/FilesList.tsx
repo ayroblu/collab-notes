@@ -53,6 +53,7 @@ const NewFile: React.FC = () => {
   const [isNewFileInput, setIsNewFileInput] = React.useState(false);
   const { settings } = React.useContext(SettingsContext);
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
+  if (!room) return null;
   const { files } = getRoom(room.id, room.password);
   const handleNewFile = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsNewFileInput(false);
