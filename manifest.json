@@ -1,0 +1,9 @@
+{
+  "short_name": "Collab Notes",
+  "name": "Collab Notes",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#55bbff",
+  "background_color": "#333333"
+}
