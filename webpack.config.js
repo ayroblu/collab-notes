@@ -1,4 +1,5 @@
 const path = require("path");
+
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 // const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
@@ -21,6 +22,9 @@ module.exports = {
   devtool: "eval-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   output: {
     globalObject: "self",
