@@ -6,7 +6,6 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- setup eslint
 - Make UI prettier
   - slidy drawer, side nav rather than top nav
 - users list
