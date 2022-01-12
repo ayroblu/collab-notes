@@ -51,6 +51,7 @@ module.exports = {
       "error",
       { prefer: "type-imports" },
     ],
+    "@typescript-eslint/sort-type-union-intersection-members": "error",
     "sort-destructure-keys/sort-destructure-keys": "error",
   },
 };

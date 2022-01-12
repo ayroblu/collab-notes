@@ -1,3 +1,10 @@
+import {
+  adjectives,
+  animals,
+  colors,
+  uniqueNamesGenerator,
+} from "unique-names-generator";
+
 export function getRandomColor() {
   // return "#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0");
   return generateHslaColor();
@@ -66,7 +73,7 @@ export function generatePassword({
 
 export const uniqBy = <T>(
   arr: T[],
-  predicate: ((el: T) => string) | string
+  predicate: string | ((el: T) => string)
 ) => {
   const cb =
     typeof predicate === "function"
@@ -94,4 +101,16 @@ export function keys<T>(o: T): Exclude<keyof T, number>[] {
   /* tslint:disable:ban */
   return Object.keys(o) as any;
   /* tslint:enable:ban */
+}
+
+export function cn(
+  ...args: (string | "" | 0 | false | null | undefined)[]
+): string {
+  return args.filter((a) => a).join(" ");
+}
+
+export function getRandomName() {
+  return uniqueNamesGenerator({
+    dictionaries: [adjectives, colors, animals],
+  });
 }

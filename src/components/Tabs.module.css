@@ -1,0 +1,9 @@
+.tabs {
+  display: flex;
+}
+.tab {
+  display: flex;
+}
+.tabFocus {
+  display: flex;
+}
