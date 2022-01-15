@@ -15,6 +15,7 @@ export const Tabs: React.FC<Props> = ({ setTabIndex, tabIndex, tabs }) => {
       {tabs.map(({ name }, i) => (
         <Tab
           name={name}
+          key={name}
           focused={tabIndex === i}
           onChange={() => setTabIndex(i)}
         />

@@ -24,7 +24,7 @@ register({
     const waitingServiceWorker = registration.waiting;
 
     interface ServiceWorkerEvent extends Event {
-      target: (Partial<ServiceWorker> & EventTarget) | null;
+      target: (EventTarget & Partial<ServiceWorker>) | null;
     }
 
     if (waitingServiceWorker) {
