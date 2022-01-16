@@ -71,7 +71,7 @@ export const Contexts: React.FC = ({ children }) => {
         return;
       }
     }
-    if (!savedSettings) {
+    if (!savedSettings || !savedSettings.rooms.length) {
       const roomId = generatePassword();
       const roomName = getRandomName();
       setSettings({
