@@ -102,6 +102,7 @@ export const Settings: React.FC = () => {
           </FormLabelWrapper>
         ))}
         <div className={styles.buttonRow}>
+          <FormLabel />
           <input
             type="submit"
             value="Save"
