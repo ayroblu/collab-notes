@@ -1,3 +1,4 @@
+import isEqual from "lodash/isEqual";
 import themeList from "monaco-themes/themes/themelist.json";
 import React from "react";
 import { useForm } from "use-form-ts";
@@ -5,7 +6,12 @@ import { useForm } from "use-form-ts";
 import { keys } from "../modules/utils";
 
 import { SettingsContext } from "./Contexts";
-import { InputField, TextArea } from "./InputField";
+import {
+  FormLabel,
+  FormLabelWrapper,
+  InputField,
+  TextArea,
+} from "./InputField";
 import styles from "./Settings.module.css";
 
 export const Settings: React.FC = () => {
@@ -32,6 +38,8 @@ export const Settings: React.FC = () => {
   const cancelHandler = () => {
     setTempSettings(adjustedSettings);
   };
+  const isNoChanges = isEqual({ isVim, vimrc, name, theme }, tempSettings);
+
   return (
     <section className={styles.settings}>
       <h2>Settings</h2>
@@ -50,15 +58,15 @@ export const Settings: React.FC = () => {
             adaptor: checkedAdaptor,
             meta: { label: "Vim Mode enabled: " },
           })(({ meta: { label }, name, onChange, value }) => (
-            <label>
-              {label}
+            <FormLabelWrapper>
+              <FormLabel>{label}</FormLabel>
               <input
                 type="checkbox"
                 name={name}
                 onChange={onChange}
                 checked={value}
               />
-            </label>
+            </FormLabelWrapper>
           ))}
         </div>
         {tempSettings.isVim &&
@@ -82,8 +90,8 @@ export const Settings: React.FC = () => {
           required: true,
           adaptor,
         })(({ name, onChange, value }) => (
-          <label>
-            Theme:
+          <FormLabelWrapper>
+            <FormLabel>Theme:</FormLabel>
             <select name={name} onChange={onChange} value={value}>
               {themes.map(({ label, value }) => (
                 <option key={value} value={label}>
@@ -91,11 +99,21 @@ export const Settings: React.FC = () => {
                 </option>
               ))}
             </select>
-          </label>
+          </FormLabelWrapper>
         ))}
-        <div>
-          <input type="submit" value="Save!" />
-          <button type="button" onClick={cancelHandler}>
+        <div className={styles.buttonRow}>
+          <input
+            type="submit"
+            value="Save"
+            className={styles.submit}
+            disabled={isNoChanges}
+          />
+          <button
+            type="button"
+            onClick={cancelHandler}
+            className={styles.cancel}
+            disabled={isNoChanges}
+          >
             Cancel
           </button>
         </div>

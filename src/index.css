@@ -64,7 +64,9 @@ a {
   color: var(--text-color);
   text-decoration: none;
 }
-input {
+input,
+textarea,
+select {
   font-size: inherit;
   background: var(--darker-color);
   color: var(--text-color);
@@ -72,7 +74,9 @@ input {
   border-radius: var(--button-border-radius);
   padding: var(--spacing-4) var(--spacing-4);
 }
-input:focus {
+input:focus,
+textarea:focus,
+select:focus {
   border: 1px solid var(--primary-color);
 }
 /* From: https://css-tricks.com/overriding-default-button-styles/ */

@@ -6,7 +6,8 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Edit group / room name
+- Edit group / room name, + add delete
+- Edit file name
 - Settings prettier
 
 ### Longer term

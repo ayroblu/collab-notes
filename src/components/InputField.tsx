@@ -14,7 +14,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   ...inputProps
 }) => (
   <label className={styles.input}>
-    <span className={styles.inputLabel}>{label}</span>
+    <FormLabel>{label}</FormLabel>
     <input {...inputProps} />
     <span className={styles.error}>{errorText}</span>
   </label>
@@ -33,8 +33,16 @@ export const TextArea: React.FC<TextAreaProps> = ({
   ...inputProps
 }) => (
   <label className={styles.input}>
-    <span className={styles.inputLabel}>{label}</span>
+    <FormLabel>{label}</FormLabel>
     <textarea {...inputProps} />
     <span className={styles.error}>{errorText}</span>
   </label>
 );
+
+export const FormLabel: React.FC = ({ children }) => {
+  return <span className={styles.formLabel}>{children}</span>;
+};
+
+export const FormLabelWrapper: React.FC = ({ children }) => {
+  return <label className={styles.input}>{children}</label>;
+};

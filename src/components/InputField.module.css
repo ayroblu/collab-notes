@@ -2,10 +2,13 @@
   padding: var(--spacing-4) var(--spacing-4);
   display: block;
 }
-.inputLabel {
-  margin-right: var(--spacing-4);
-}
 .error {
   color: red;
   display: block;
+}
+.formLabel {
+  width: 200px;
+  margin-right: var(--spacing-4);
+  display: inline-block;
+  vertical-align: top;
 }
