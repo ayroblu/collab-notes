@@ -21,6 +21,7 @@ import type { FileMetaData } from "../modules/documents";
 import { getDocument } from "../modules/documents";
 import { deduplicateFiles, getRoom } from "../modules/documents";
 
+import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./FilesList.module.css";
 
@@ -55,14 +56,28 @@ export const FilesList = () => {
     <section className={styles.fileslist}>
       <div className={styles.headingBar}>
         <h2>Files</h2>
-        <button onClick={handleDelete}>
-          <VscTrash />
-        </button>
+        {getIsFileActive(fileName, settings) && (
+          <button onClick={handleDelete}>
+            <VscTrash />
+          </button>
+        )}
       </div>
       <FileNamesList />
     </section>
   );
 };
+
+function getIsFileActive(fileName: string | null, settings: Settings): boolean {
+  if (!fileName) return false;
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  if (!room) return false;
+  const { files } = getRoom(room.id, room.password);
+  const file = (files.toJSON() as FileMetaData[]).find(
+    ({ name }) => name === fileName
+  );
+  return !!file;
+}
+
 const FileNamesList = () => {
   const { settings } = React.useContext(SettingsContext);
   const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);

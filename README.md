@@ -6,9 +6,8 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Make UI prettier
-  - slidy drawer, side nav rather than top nav
-- users list
+- Edit group / room name
+- Settings prettier
 
 ### Longer term
 - minify webpack
