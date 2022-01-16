@@ -1,15 +1,20 @@
 :root {
   --light-background-color: #eee;
   --light-text-color: black;
+  --light-subtle-text-color: #555;
 
   --dark-background-color: #333;
   --dark-text-color: white;
+  --dark-subtle-text-color: #aaa;
 
-  --primary: #5bf;
+  --darker-color: rgba(0, 0, 0, 0.2);
+  --lighter-color: rgba(255, 255, 255, 0.1);
+
+  --primary-color: #5bf;
   --background-color: var(--dark-background-color);
   --text-color: var(--dark-text-color);
+  --subtle-text-color: var(--dark-subtle-text-color);
   --standard-font-size: 20px;
-  --font-size-75pct: 0.75rem;
 
   --spacing-1: 1px;
   --spacing-2: 2px;
@@ -19,16 +24,22 @@
   --spacing-16: 16px;
   --spacing-32: 32px;
 
+  --button-border-radius: 8px;
+
   --nav-bar-height: 40px;
   --default-files-width: 150px;
 
-  --font-size-h1: 2rem;
-  --font-size-h2: 1.8rem;
-  --font-size-h3: 1.6rem;
-  --font-size-h4: 1.4rem;
-  --font-size-h5: 1.2rem;
-  --font-size-h6: 1rem;
-  --font-size-h7: 0.8rem;
+  --font-size-3-0: 3rem;
+  --font-size-2-2: 2.2rem;
+  --font-size-2-0: 2rem;
+  --font-size-1-8: 1.8rem;
+  --font-size-1-6: 1.6rem;
+  --font-size-1-4: 1.4rem;
+  --font-size-1-2: 1.2rem;
+  --font-size-1-0: 1rem;
+  --font-size-0-8: 0.8rem;
+  --font-size-0-7: 0.7rem;
+  --font-size-0-6: 0.6rem;
 }
 
 html {
@@ -47,10 +58,21 @@ body {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-weight: 400;
 }
 a {
   color: var(--text-color);
   text-decoration: none;
+}
+input {
+  font-size: inherit;
+  background: none;
+  color: var(--text-color);
+  border: none;
+  padding: var(--spacing-4) var(--spacing-4);
+}
+input:focus {
+  border: 1px solid var(--primary-color);
 }
 /* From: https://css-tricks.com/overriding-default-button-styles/ */
 button,
@@ -76,17 +98,6 @@ button,
 [type="reset"],
 [type="submit"] {
   -webkit-appearance: button;
-}
-button:hover,
-button:focus {
-  background: rgba(255, 255, 255, 0.1);
-}
-button:focus {
-  outline: 1px solid #fff;
-  outline-offset: -4px;
-}
-button:active {
-  transform: scale(0.99);
 }
 /* end css reset */
 

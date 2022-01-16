@@ -1,6 +1,7 @@
 import qs from "query-string";
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { VscLiveShare } from "react-icons/vsc";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import type { Room } from "./Contexts";
 import { SettingsContext } from "./Contexts";
@@ -10,7 +11,8 @@ export const NavBar: React.FC = () => {
   const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
-  const pathname = window.location.pathname;
+  const location = useLocation();
+  const pathname = location.pathname;
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
   const shouldShowShare = room && fileName && pathname === filesRoute;
   return (
@@ -19,7 +21,6 @@ export const NavBar: React.FC = () => {
         <Link to="/">Collab Notes</Link>
       </h1>
       {shouldShowShare && <RoomShareButton room={room} fileName={fileName} />}
-      <Link to="/settings">Settings</Link>
     </header>
   );
 };
@@ -42,7 +43,12 @@ const RoomShareButton: React.FC<RoomShareButtonProps> = ({
   const shareHandler = () => {
     copyToClipboard(link);
   };
-  return <button onClick={shareHandler}>Share</button>;
+  return (
+    <button onClick={shareHandler} className={styles.shareButton}>
+      Share
+      <VscLiveShare />
+    </button>
+  );
 };
 
 function copyToClipboard(text: string) {

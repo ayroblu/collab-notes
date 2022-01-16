@@ -4,13 +4,31 @@
   justify-content: space-between;
   flex-direction: column;
   height: 100vh;
+  background: var(--lighter-color);
 }
 .leftNavButton {
   display: flex;
-  height: 50px;
+  min-height: 50px;
   width: 100%;
   min-width: 50px;
-  font-size: var(--font-size-75pct);
+  font-size: var(--font-size-0-6);
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  padding: var(--spacing-8) var(--spacing-8);
+}
+.leftNavButton svg {
+  font-size: var(--font-size-1-4);
+  margin-bottom: var(--spacing-2);
+}
+.leftNavButton:hover,
+.leftNavButton:focus {
+  background: var(--lighter-color);
+}
+.leftNavButton:focus {
+  outline: 1px solid #fff;
+  outline-offset: -4px;
+}
+.leftNavButton:active {
+  transform: scale(0.99);
 }

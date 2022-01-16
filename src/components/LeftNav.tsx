@@ -1,4 +1,10 @@
 import React from "react";
+import {
+  VscFiles,
+  VscOrganization,
+  VscRefresh,
+  VscSettingsGear,
+} from "react-icons/vsc";
 import { Link } from "react-router-dom";
 
 import { timeoutPromiseSuccess } from "@/modules/utils";
@@ -22,11 +28,13 @@ export const LeftNav = () => {
         <ul>
           <li>
             <NavButton onClick={setSettingsLeftNav(LeftNavEnum.files)}>
+              <VscFiles />
               Files
             </NavButton>
           </li>
           <li>
             <NavButton onClick={setSettingsLeftNav(LeftNavEnum.rooms)}>
+              <VscOrganization />
               Rooms
             </NavButton>
           </li>
@@ -35,10 +43,14 @@ export const LeftNav = () => {
       <section>
         <ul>
           <li>
-            <NavButton onClick={reloadPage}>Refresh</NavButton>
+            <NavButton onClick={reloadPage}>
+              <VscRefresh />
+              Refresh
+            </NavButton>
           </li>
           <li>
             <Link to="/settings" className={styles.leftNavButton}>
+              <VscSettingsGear />
               Settings
             </Link>
           </li>

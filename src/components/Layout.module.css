@@ -1,6 +1,8 @@
 .layout {
   display: flex;
 }
-.flexGrow {
-  flex: 1 1 auto;
+.grid {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
 }

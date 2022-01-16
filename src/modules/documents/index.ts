@@ -8,16 +8,18 @@ import * as Y from "yjs";
 // };
 // const docs: { [key: string]: Document } = {};
 
-type Room = {
+export type Room = {
   provider: WebrtcProvider;
   ydoc: Y.Doc;
-  files: Y.Array<File>;
+  files: Y.Array<FileMetaData>;
   name: Y.Text;
   initialDbPromise: Promise<void>;
 };
-type File = {
+export type FileMetaData = {
   name: string;
   tags: string[];
+  lastUpdated: string;
+  dateCreated: string;
 };
 const rooms: { [roomId: string]: Room } = {};
 const roomDocs: { [roomId: string]: { [name: string]: Y.Text } } = {};
@@ -31,7 +33,7 @@ export function getRoom(roomId: string, password: string): Room {
   // @ts-expect-error - types are wrong
   const provider = new WebrtcProvider(roomId, ydoc, { password });
   const persistence = new IndexeddbPersistence(roomId, ydoc);
-  const files = ydoc.getArray<File>(roomId);
+  const files = ydoc.getArray<FileMetaData>(roomId);
   const name = ydoc.getText("name");
   const initialDbPromise = new Promise<void>((resolve) =>
     persistence.once("synced", () => resolve())
@@ -58,7 +60,7 @@ export function getDocument(
   return text;
 }
 
-export function deduplicateFiles(files: Y.Array<File>) {
+export function deduplicateFiles(files: Y.Array<FileMetaData>) {
   const seenSet = new Set();
   for (let i = 0; i < files.length; ++i) {
     const { name } = files.get(i);

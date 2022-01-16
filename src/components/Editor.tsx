@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 
+import type { FileMetaData } from "../modules/documents";
 import { getDocument, getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 
@@ -27,15 +28,32 @@ export const Editor: React.FC = () => {
     if (!divElRef.current) {
       return;
     }
-    const { editor, model } = createMonacoEditor(
+    const { editor, model, text } = createMonacoEditor(
       divElRef.current,
       setCursorStyles,
       settings,
       fileName!
     );
+    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+    if (!room) return;
+    const { files, ydoc } = getRoom(room.id, room.password);
+    const changeListener = () => {
+      const index = (files.toJSON() as FileMetaData[]).findIndex(
+        ({ name }) => name === fileName
+      );
+      const file = files.get(index);
+      ydoc.transact(() => {
+        files.delete(index, 1);
+        files.insert(index, [
+          { ...file, lastUpdated: new Date().toISOString() },
+        ]);
+      });
+    };
+    text.observe(changeListener);
     return () => {
       editor.dispose();
       model.dispose();
+      text.unobserve(changeListener);
     };
   }, [fileName]);
 
@@ -45,7 +63,7 @@ export const Editor: React.FC = () => {
   return (
     <>
       <style>{cursorStyles.join("")}</style>
-      <div className={styles.editor} ref={divElRef}></div>;
+      <div className={styles.editor} ref={divElRef}></div>
     </>
   );
 };
@@ -61,7 +79,8 @@ function createMonacoEditor(
   const filesArr = files.toArray();
   let file = filesArr.find(({ name }) => name === fileName);
   if (!file) {
-    file = { name: fileName, tags: [] };
+    const now = new Date().toISOString();
+    file = { name: fileName, tags: [], lastUpdated: now, dateCreated: now };
     files.push([file]);
   }
   const text = getDocument(room.id, ydoc, file.name);
@@ -77,6 +96,8 @@ function createMonacoEditor(
     // language: "markdown",
     theme: "vs-dark", // vs-light by default
     automaticLayout: true, // false by default, autoresizes
+    fontSize: 16,
+    scrollBeyondLastLine: false,
     minimap: {
       enabled: false,
     },
@@ -94,7 +115,7 @@ function createMonacoEditor(
   setupThemes(settings.theme);
 
   editor.focus();
-  return { editor, model };
+  return { editor, model, text };
 }
 
 const randomColour = getRandomColor();

@@ -4,11 +4,16 @@ import { unreachable } from "@/modules/utils";
 
 import { LeftNavEnum, SettingsContext } from "./Contexts";
 import { FilesList } from "./FilesList";
+import styles from "./LeftNavPane.module.css";
 import { RoomsList } from "./RoomsList";
 
 export const LeftNavPane: React.FC = () => {
   const { settings } = React.useContext(SettingsContext);
-  return <section>{getLeftNavPanePart(settings.leftNav)}</section>;
+  return (
+    <section className={styles.leftNavPane}>
+      {getLeftNavPanePart(settings.leftNav)}
+    </section>
+  );
 };
 
 function getLeftNavPanePart(type: LeftNavEnum | null) {

@@ -9,10 +9,12 @@ export const Layout: React.FC = () => {
   return (
     <div className={styles.layout}>
       <LeftNav />
-      <LeftNavPane />
-      <div className={styles.flexGrow}>
-        <NavBar />
-        <Outlet />
+      <div className={styles.grid}>
+        <LeftNavPane />
+        <div>
+          <NavBar />
+          <Outlet />
+        </div>
       </div>
     </div>
   );
