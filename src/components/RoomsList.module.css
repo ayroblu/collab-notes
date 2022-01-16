@@ -1,0 +1,16 @@
+.roomButton {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-4) var(--spacing-8);
+  text-align: start;
+}
+.roomButton:hover {
+  background: var(--darker-color);
+}
+.subtitle {
+  color: var(--subtle-text-color);
+  font-size: var(--font-size-0-6);
+}
+.active {
+  background-color: var(--darker-color);
+}

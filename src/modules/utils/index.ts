@@ -122,3 +122,15 @@ export function timeoutPromiseSuccess<T>(promise: Promise<T>, timeout = 1000) {
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, timeout));
   return Promise.race([promise, timeoutPromise]);
 }
+
+export function dateTimeFormatter(dateString: Date | string) {
+  const date = dateString instanceof Date ? dateString : new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(+date - +now);
+  const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+  if (diffHours > 12) {
+    return date.toLocaleDateString();
+  } else {
+    return date.toLocaleTimeString();
+  }
+}

@@ -18,13 +18,33 @@ import { parseVimrc } from "./Settings";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
-  const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
+  const [cursorStyles] = React.useState<string[]>([]);
+  const { settings } = React.useContext(SettingsContext);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const hasRoom =
+    fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
+
+  useMonacoEditor(divElRef);
+
+  if (!hasRoom) {
+    return <NoMatchFile />;
+  }
+  return (
+    <>
+      <NavBar />
+      <style>{cursorStyles.join("")}</style>
+      <div className={styles.editor} ref={divElRef}></div>
+    </>
+  );
+};
+
+function useMonacoEditor(divElRef: React.RefObject<HTMLDivElement>) {
+  const [, setCursorStyles] = React.useState<string[]>([]);
   const { settings } = React.useContext(SettingsContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const isNewUser = searchParams.get("newUser");
-  const hasRoom =
-    fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
 
   React.useEffect(() => {
     if (!divElRef.current) {
@@ -65,19 +85,8 @@ export const Editor: React.FC = () => {
       model.dispose();
       text.unobserve(changeListener);
     };
-  }, [fileName]);
-
-  if (!hasRoom) {
-    return <NoMatchFile />;
-  }
-  return (
-    <>
-      <NavBar />
-      <style>{cursorStyles.join("")}</style>
-      <div className={styles.editor} ref={divElRef}></div>
-    </>
-  );
-};
+  }, [fileName, settings.activeRoomId]);
+}
 
 function createMonacoEditor(
   divEl: HTMLDivElement,

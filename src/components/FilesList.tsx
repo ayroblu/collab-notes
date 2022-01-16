@@ -15,7 +15,7 @@ import {
 import { VscNewFile, VscTrash } from "react-icons/vsc";
 import { createSearchParams, Link, useSearchParams } from "react-router-dom";
 
-import { cn } from "@/modules/utils";
+import { cn, dateTimeFormatter } from "@/modules/utils";
 
 import type { FileMetaData } from "../modules/documents";
 import { getDocument } from "../modules/documents";
@@ -116,18 +116,6 @@ const FileNamesList = () => {
     </ul>
   );
 };
-
-function dateTimeFormatter(dateString: string) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = Math.abs(+date - +now);
-  const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-  if (diffHours > 12) {
-    return date.toLocaleDateString();
-  } else {
-    return date.toLocaleTimeString();
-  }
-}
 
 const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
   const match = /(\.\w+)$/g.exec(name);
