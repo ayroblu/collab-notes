@@ -5,6 +5,7 @@ import { timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
 import { LeftNavEnum, SettingsContext } from "./Contexts";
+import styles from "./LeftNav.module.css";
 
 export const LeftNav = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);
@@ -16,23 +17,44 @@ export const LeftNav = () => {
     }
   };
   return (
-    <nav>
-      <ul>
-        <li>
-          <button onClick={setSettingsLeftNav(LeftNavEnum.files)}>Files</button>
-        </li>
-        <li>
-          <button onClick={setSettingsLeftNav(LeftNavEnum.rooms)}>Rooms</button>
-        </li>
-        <li>
-          <button onClick={reloadPage}>Refresh</button>
-        </li>
-        <li>
-          <Link to="/settings">Settings</Link>
-        </li>
-      </ul>
+    <nav className={styles.leftNav}>
+      <section>
+        <ul>
+          <li>
+            <NavButton onClick={setSettingsLeftNav(LeftNavEnum.files)}>
+              Files
+            </NavButton>
+          </li>
+          <li>
+            <NavButton onClick={setSettingsLeftNav(LeftNavEnum.rooms)}>
+              Rooms
+            </NavButton>
+          </li>
+        </ul>
+      </section>
+      <section>
+        <ul>
+          <li>
+            <NavButton onClick={reloadPage}>Refresh</NavButton>
+          </li>
+          <li>
+            <Link to="/settings" className={styles.leftNavButton}>
+              Settings
+            </Link>
+          </li>
+        </ul>
+      </section>
     </nav>
   );
+};
+
+const NavButton: React.FC<
+  React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >
+> = (props) => {
+  return <button className={styles.leftNavButton} {...props} />;
 };
 
 const reloadPage = async () => {

@@ -8,6 +8,8 @@
   --primary: #5bf;
   --background-color: var(--dark-background-color);
   --text-color: var(--dark-text-color);
+  --standard-font-size: 20px;
+  --font-size-75pct: 0.75rem;
 
   --spacing-1: 1px;
   --spacing-2: 2px;
@@ -29,14 +31,17 @@
   --font-size-h7: 0.8rem;
 }
 
+html {
+  font-size: var(--standard-font-size);
+  /* https://www.quora.com/What-font-does-Twitter-use */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu, "Helvetica Neue", sans-serif;
+}
 body {
   padding: 0;
   margin: 0;
   background-color: var(--background-color);
   color: var(--text-color);
-  /* https://www.quora.com/What-font-does-Twitter-use */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Ubuntu, "Helvetica Neue", sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -46,6 +51,53 @@ body {
 a {
   color: var(--text-color);
   text-decoration: none;
+}
+/* From: https://css-tricks.com/overriding-default-button-styles/ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+}
+button,
+input {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+}
+button:hover,
+button:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+button:focus {
+  outline: 1px solid #fff;
+  outline-offset: -4px;
+}
+button:active {
+  transform: scale(0.99);
+}
+/* end css reset */
+
+button {
+  border: none;
+  background: none;
+  color: var(--text-color);
+  cursor: pointer;
+}
+ul {
+  list-style-type: none;
 }
 
 .yRemoteSelection {
