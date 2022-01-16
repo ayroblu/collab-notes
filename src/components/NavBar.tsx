@@ -15,7 +15,6 @@ export const NavBar: React.FC = () => {
   const shouldShowShare = room && fileName && pathname === filesRoute;
   return (
     <header className={styles.nav}>
-      <button>Files</button>
       <h1 className={styles.pageTitle}>
         <Link to="/">Collab Notes</Link>
       </h1>

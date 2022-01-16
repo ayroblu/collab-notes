@@ -114,3 +114,10 @@ export function getRandomName() {
     dictionaries: [adjectives, colors, animals],
   });
 }
+
+export function unreachable(_: never) {}
+
+export function timeoutPromiseSuccess<T>(promise: Promise<T>, timeout = 1000) {
+  const timeoutPromise = new Promise((resolve) => setTimeout(resolve, timeout));
+  return Promise.race([promise, timeoutPromise]);
+}

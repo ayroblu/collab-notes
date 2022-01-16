@@ -2,6 +2,8 @@ import { get, set } from "idb-keyval";
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import { getRandomName } from "@/modules/utils";
+
 import { getRoom } from "../modules/documents";
 
 import { Loading } from "./Loading";
@@ -9,10 +11,11 @@ import { Loading } from "./Loading";
 const defaultSettings: Settings = {
   isVim: true,
   vimrc: "imap jk <Esc>",
-  name: "",
+  name: getRandomName(),
   theme: "Monokai",
   rooms: [],
   activeRoomId: null,
+  leftNav: null,
 };
 type SettingsContext = {
   settings: Settings;
@@ -37,9 +40,8 @@ export const Contexts: React.FC = ({ children }) => {
     const savedSettings: Settings | undefined = await get(dbKey);
     if (!savedSettings) {
       if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
-        const name =
-          prompt("Enter your nickname") ||
-          `User${(Math.random() * 1000).toFixed()}`;
+        const randomName = getRandomName();
+        const name = prompt("Enter your nickname", randomName) || randomName;
         setSettings({
           ...settings,
           name,
@@ -106,4 +108,9 @@ export type Settings = {
   theme: string;
   activeRoomId: string | null;
   rooms: Room[];
+  leftNav: LeftNavEnum | null;
 };
+export enum LeftNavEnum {
+  files = "files",
+  rooms = "rooms",
+}

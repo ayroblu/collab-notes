@@ -1,15 +1,15 @@
 import { Outlet } from "react-router-dom";
 
-import { FilesList } from "./FilesList";
 import styles from "./Layout.module.css";
+import { LeftNav } from "./LeftNav";
+import { LeftNavPane } from "./LeftNavPane";
 import { NavBar } from "./NavBar";
-import { RoomsList } from "./RoomsList";
 
 export const Layout: React.FC = () => {
   return (
     <div className={styles.layout}>
-      <RoomsList />
-      <FilesList />
+      <LeftNav />
+      <LeftNavPane />
       <div className={styles.flexGrow}>
         <NavBar />
         <Outlet />

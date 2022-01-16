@@ -38,16 +38,19 @@ export const RoomsList = () => {
       });
     };
   }, [settings.rooms.length]);
-  if (settings.rooms.length < 2) {
-    return null;
-  }
+
+  const makeRoomActiveHandler = (id: string) => () => {
+    setSettings({ ...settings, activeRoomId: id });
+  };
 
   return (
     <section>
       <h2>Rooms</h2>
       <ul>
         {settings.rooms.map(({ id, name }) => (
-          <li key={id}>{name}</li>
+          <li key={id}>
+            <button onClick={makeRoomActiveHandler(id)}>{name}</button>
+          </li>
         ))}
       </ul>
     </section>
