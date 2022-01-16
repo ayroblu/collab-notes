@@ -35,7 +35,7 @@ export const LeftNav = () => {
           <li>
             <NavButton onClick={setSettingsLeftNav(LeftNavEnum.rooms)}>
               <VscOrganization />
-              Rooms
+              Groups
             </NavButton>
           </li>
         </ul>

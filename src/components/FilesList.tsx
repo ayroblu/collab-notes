@@ -62,7 +62,7 @@ export const FilesList = () => {
 const FileNamesList = () => {
   const { settings } = React.useContext(SettingsContext);
   const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     const { files } = getRoom(room.id, room.password);

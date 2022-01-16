@@ -66,9 +66,10 @@ a {
 }
 input {
   font-size: inherit;
-  background: none;
+  background: var(--darker-color);
   color: var(--text-color);
-  border: none;
+  border: 1px solid var(--darker-color);
+  border-radius: var(--button-border-radius);
   padding: var(--spacing-4) var(--spacing-4);
 }
 input:focus {

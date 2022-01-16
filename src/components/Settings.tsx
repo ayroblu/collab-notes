@@ -6,6 +6,7 @@ import { keys } from "../modules/utils";
 
 import { SettingsContext } from "./Contexts";
 import { InputField, TextArea } from "./InputField";
+import styles from "./Settings.module.css";
 
 export const Settings: React.FC = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);
@@ -32,7 +33,7 @@ export const Settings: React.FC = () => {
     setTempSettings(adjustedSettings);
   };
   return (
-    <section>
+    <section className={styles.settings}>
       <h2>Settings</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -81,7 +82,8 @@ export const Settings: React.FC = () => {
           required: true,
           adaptor,
         })(({ name, onChange, value }) => (
-          <div>
+          <label>
+            Theme:
             <select name={name} onChange={onChange} value={value}>
               {themes.map(({ label, value }) => (
                 <option key={value} value={label}>
@@ -89,12 +91,14 @@ export const Settings: React.FC = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </label>
         ))}
-        <input type="submit" value="Save!" />
-        <button type="button" onClick={cancelHandler}>
-          Cancel
-        </button>
+        <div>
+          <input type="submit" value="Save!" />
+          <button type="button" onClick={cancelHandler}>
+            Cancel
+          </button>
+        </div>
       </form>
     </section>
   );

@@ -1,0 +1,9 @@
+.settings {
+  background: var(--lighter-color);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.settings form {
+  flex: 1 1 auto;
+}

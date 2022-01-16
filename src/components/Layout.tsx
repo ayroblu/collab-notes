@@ -11,7 +11,7 @@ export const Layout: React.FC = () => {
       <LeftNav />
       <div className={styles.grid}>
         <LeftNavPane />
-        <div>
+        <div className={styles.flexFill}>
           <NavBar />
           <Outlet />
         </div>

@@ -45,7 +45,7 @@ export const RoomsList = () => {
 
   return (
     <section>
-      <h2>Rooms</h2>
+      <h2>Groups</h2>
       <ul>
         {settings.rooms.map(({ id, name }) => (
           <li key={id}>
