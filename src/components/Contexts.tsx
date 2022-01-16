@@ -1,8 +1,12 @@
 import { get, set } from "idb-keyval";
 import React from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
-import { getRandomName } from "@/modules/utils";
+import { generatePassword, getRandomName } from "@/modules/utils";
 
 import { getRoom } from "../modules/documents";
 
@@ -27,55 +31,74 @@ const dbKey = "settings";
 export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const [searchParams] = useSearchParams();
-  const paramRoomId = searchParams.get("roomId");
-  const paramRoomName = searchParams.get("roomName");
-  const paramRoomPassword = searchParams.get("roomPassword");
-  const paramFileName = searchParams.get("fileName");
+  const paramRoomId = searchParams.get("id");
+  const paramRoomName = searchParams.get("groupName");
+  const paramRoomPassword = searchParams.get("password");
+  const paramFileName = searchParams.get("name");
   const navigate = useNavigate();
   const setSettings = React.useCallback((settings: Settings) => {
     setSettingsState(settings);
     set(dbKey, settings);
   }, []);
+
   const func = React.useCallback(async () => {
+    // if route params -> add room to rooms list and switch
+    // If new user -> create new room + readme.md
     const savedSettings: Settings | undefined = await get(dbKey);
-    if (!savedSettings) {
-      if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
-        const randomName = getRandomName();
-        const name = prompt("Enter your nickname", randomName) || randomName;
+    if (paramRoomId && paramFileName) {
+      const rooms = savedSettings?.rooms || settings.rooms;
+      if (!rooms.find(({ id }) => id === paramRoomId)) {
         setSettings({
-          ...settings,
-          name,
+          ...(savedSettings || settings),
           rooms: [
+            ...rooms,
             {
               id: paramRoomId,
-              name: paramRoomName,
-              password: paramRoomPassword,
+              name: paramRoomName || "",
+              password: paramRoomPassword || paramRoomId,
             },
           ],
           activeRoomId: paramRoomId,
         });
-        navigate(`files?name=${encodeURIComponent(paramFileName)}`);
+        // navigate({
+        //   pathname: "/files",
+        //   search: `?${createSearchParams({
+        //     name: paramFileName,
+        //     id: paramRoomId,
+        //   })}`,
+        // });
+        // navigate should be unnecessary due to the params already being there
+        return;
       }
+    }
+    if (!savedSettings) {
+      const roomId = generatePassword();
+      const roomName = getRandomName();
+      setSettings({
+        ...settings,
+        rooms: [
+          ...settings.rooms,
+          {
+            id: roomId,
+            name: getRandomName(),
+            password: roomId,
+          },
+        ],
+        activeRoomId: roomId,
+      });
+      const { name } = getRoom(roomId, roomId);
+      name.insert(0, roomName);
+      navigate({
+        pathname: "/files",
+        search: `?${createSearchParams({
+          name: "README.md",
+          id: roomId,
+          newUser: "1",
+        })}`,
+      });
       return;
     }
-    if (paramRoomId && paramRoomName && paramRoomPassword && paramFileName) {
-      const savedSettingsWithParam = {
-        ...savedSettings,
-        rooms: savedSettings.rooms
-          .filter(({ id }) => id !== paramRoomId)
-          .concat({
-            id: paramRoomId,
-            name: paramRoomName,
-            password: paramRoomPassword,
-          }),
-        activeRoomId: paramRoomId,
-      };
-      setSettings(savedSettingsWithParam);
-      // this navigation is fine to do now as everything after this still needs to wait for it to finish
-      navigate(`files?name=${encodeURIComponent(paramFileName)}`);
-    } else {
-      setSettings(savedSettings);
-    }
+    setSettings(savedSettings);
     const room = savedSettings.rooms.find(
       ({ id }) => id === savedSettings.activeRoomId
     );
@@ -83,6 +106,7 @@ export const Contexts: React.FC = ({ children }) => {
     const { initialDbPromise } = getRoom(room.id, room.password);
     await initialDbPromise;
   }, []);
+
   return (
     <Loading
       func={func}

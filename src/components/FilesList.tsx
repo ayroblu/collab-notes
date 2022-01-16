@@ -2,16 +2,20 @@ import React from "react";
 import {
   SiCss3,
   SiFiles,
+  SiGnubash,
   SiHtml5,
   SiJavascript,
   SiJson,
   SiMarkdown,
+  SiRuby,
   SiRust,
   SiScala,
   SiTypescript,
 } from "react-icons/si";
 import { VscNewFile, VscTrash } from "react-icons/vsc";
-import { Link, useSearchParams } from "react-router-dom";
+import { createSearchParams, Link, useSearchParams } from "react-router-dom";
+
+import { cn } from "@/modules/utils";
 
 import type { FileMetaData } from "../modules/documents";
 import { getDocument } from "../modules/documents";
@@ -62,8 +66,10 @@ export const FilesList = () => {
 const FileNamesList = () => {
   const { settings } = React.useContext(SettingsContext);
   const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
   React.useLayoutEffect(() => {
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     const { files } = getRoom(room.id, room.password);
     deduplicateFiles(files);
@@ -77,14 +83,20 @@ const FileNamesList = () => {
       files.unobserve(changeListener);
     };
   }, []);
+  if (!room) {
+    return null;
+  }
 
   return (
     <ul>
       {filesData.map(({ lastUpdated, name }) => (
         <li key={name}>
           <Link
-            className={styles.filesListItem}
-            to={`files?name=${encodeURIComponent(name)}`}
+            className={cn(
+              styles.filesListItem,
+              fileName === name && styles.highlight
+            )}
+            to={`files?${createSearchParams({ name, id: room.id })}`}
           >
             <div className={styles.file}>
               <FileTypeIcon name={name} />
@@ -120,7 +132,7 @@ function dateTimeFormatter(dateString: string) {
 const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
   const match = /(\.\w+)$/g.exec(name);
   if (!match) return <SiFiles />;
-  switch (name) {
+  switch (match[1]) {
     case ".md":
       return <SiMarkdown />;
     case ".ts":
@@ -132,6 +144,8 @@ const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
       return <SiJavascript />;
     case ".rs":
       return <SiRust />;
+    case ".rb":
+      return <SiRuby />;
     case ".css":
       return <SiCss3 />;
     case ".html":
@@ -141,6 +155,8 @@ const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
     case ".sc":
     case ".scala":
       return <SiScala />;
+    case ".sh":
+      return <SiGnubash />;
     default:
       return <SiFiles />;
   }

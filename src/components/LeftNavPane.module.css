@@ -1,3 +1,6 @@
 .leftNavPane {
   /* flex-basis: 200px; */
 }
+.fixedWidth {
+  min-width: 15vw;
+}

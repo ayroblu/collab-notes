@@ -1,56 +1,56 @@
-import qs from "query-string";
 import React from "react";
-import { VscLiveShare } from "react-icons/vsc";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
-import type { Room } from "./Contexts";
-import { SettingsContext } from "./Contexts";
 import styles from "./NavBar.module.css";
 
 export const NavBar: React.FC = () => {
-  const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
-  const location = useLocation();
-  const pathname = location.pathname;
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
-  const shouldShowShare = room && fileName && pathname === filesRoute;
+  if (!fileName) return null;
   return (
-    <header className={styles.nav}>
-      <h1 className={styles.pageTitle}>
-        <Link to="/">Collab Notes</Link>
-      </h1>
-      {shouldShowShare && <RoomShareButton room={room} fileName={fileName} />}
-    </header>
-  );
-};
-const filesRoute = "/files";
-type RoomShareButtonProps = {
-  room: Room;
-  fileName: string;
-};
-const RoomShareButton: React.FC<RoomShareButtonProps> = ({
-  fileName,
-  room,
-}) => {
-  const params = {
-    roomId: room.id,
-    roomName: room.name,
-    roomPassword: room.password,
-    fileName,
-  };
-  const link = `${window.location.origin}${filesRoute}?${qs.stringify(params)}`;
-  const shareHandler = () => {
-    copyToClipboard(link);
-  };
-  return (
-    <button onClick={shareHandler} className={styles.shareButton}>
-      Share
-      <VscLiveShare />
-    </button>
+    <section className={styles.nav}>
+      <h3 className={styles.pageTitle}>{fileName}</h3>
+      <FacePile />
+    </section>
   );
 };
 
-function copyToClipboard(text: string) {
-  window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
-}
+const FacePile: React.FC = () => {
+  const faces: Face[] = [
+    { name: "first", color: "red" },
+    { name: "second", color: "blue" },
+  ];
+  if (faces.length < 6) {
+    return (
+      <section className={styles.facepile}>
+        {faces.map(({ color, name }) => (
+          <FacePileFace key={`${name}${color}`} color={color} name={name} />
+        ))}
+      </section>
+    );
+  }
+  return (
+    <section className={styles.facepile}>
+      <CondensedFacePile faces={faces} />
+    </section>
+  );
+};
+
+const FacePileFace: React.FC<Face> = ({ color, name }) => {
+  const char = name.slice(0, 1);
+  return (
+    <section className={styles.face} style={{ color }}>
+      {char}
+    </section>
+  );
+};
+type Face = {
+  name: string;
+  color: string;
+};
+
+const CondensedFacePile: React.FC<{ faces: Face[] }> = ({ faces }) => {
+  // Top circle is number
+  // Subsequent circles are overlapping
+  return null;
+};

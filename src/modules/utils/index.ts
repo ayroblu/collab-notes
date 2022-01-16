@@ -112,6 +112,7 @@ export function cn(
 export function getRandomName() {
   return uniqueNamesGenerator({
     dictionaries: [adjectives, colors, animals],
+    separator: " ",
   });
 }
 

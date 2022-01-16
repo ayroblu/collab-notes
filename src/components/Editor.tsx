@@ -12,6 +12,7 @@ import { getRandomColor } from "../modules/utils";
 import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./Editor.module.css";
+import { NavBar } from "./NavBar";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 
@@ -19,8 +20,9 @@ export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const fileName = searchParams.get("name");
+  const isNewUser = searchParams.get("newUser");
   const hasRoom =
     fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
 
@@ -34,6 +36,14 @@ export const Editor: React.FC = () => {
       settings,
       fileName!
     );
+    if (isNewUser) {
+      if (!text.length) {
+        text.insert(0, initialText);
+      }
+      setSearchParams(
+        Object.fromEntries([...searchParams].filter(([k]) => k !== "newUser"))
+      );
+    }
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     const { files, ydoc } = getRoom(room.id, room.password);
@@ -62,6 +72,7 @@ export const Editor: React.FC = () => {
   }
   return (
     <>
+      <NavBar />
       <style>{cursorStyles.join("")}</style>
       <div className={styles.editor} ref={divElRef}></div>
     </>
@@ -197,3 +208,12 @@ self.MonacoEnvironment = {
     return "./editor.worker.bundle.js";
   },
 };
+
+const initialText = `
+Collab Notes
+============
+
+A scribble pad text editor for those who want to collaborate.
+
+Share this link with others and you can work on the same file together
+`.trim();

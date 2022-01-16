@@ -9,9 +9,10 @@ import { RoomsList } from "./RoomsList";
 
 export const LeftNavPane: React.FC = () => {
   const { settings } = React.useContext(SettingsContext);
+  const part = getLeftNavPanePart(settings.leftNav);
   return (
     <section className={styles.leftNavPane}>
-      {getLeftNavPanePart(settings.leftNav)}
+      {part && <div className={styles.fixedWidth}>{part}</div>}
     </section>
   );
 };

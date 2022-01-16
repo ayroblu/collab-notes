@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import styles from "./Layout.module.css";
 import { LeftNav } from "./LeftNav";
 import { LeftNavPane } from "./LeftNavPane";
-import { NavBar } from "./NavBar";
 
 export const Layout: React.FC = () => {
   return (
@@ -12,7 +11,6 @@ export const Layout: React.FC = () => {
       <div className={styles.grid}>
         <LeftNavPane />
         <div className={styles.flexFill}>
-          <NavBar />
           <Outlet />
         </div>
       </div>
