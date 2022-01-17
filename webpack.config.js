@@ -36,6 +36,9 @@ module.exports = {
     globalObject: "self",
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
+    chunkFilename: isProduction
+      ? "static/js/[name].[contenthash:8].chunk.js"
+      : isDevelopment && "static/js/[name].chunk.js",
   },
   module: {
     rules: [

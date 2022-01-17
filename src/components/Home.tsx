@@ -1,7 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { useForm } from "use-form-ts";
 
+import { getRoom } from "@/modules/documents";
 import { joinNewRoom } from "@/modules/onboarding";
 import { getRandomName } from "@/modules/utils";
 
@@ -35,6 +36,15 @@ export const Home: React.FC = () => {
       });
     }
   };
+  React.useEffect(() => {
+    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+    if (!room) return;
+    const { files } = getRoom(room.id, room.password);
+    if (!files.length) return;
+    const { name } = files.get(0);
+    navigate({ pathname: "files", search: `?${createSearchParams({ name })}` });
+  }, []);
+
   return (
     <section>
       <h1>Welcome to Collab Notes</h1>
