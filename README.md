@@ -8,7 +8,6 @@ TODO
 ### MVP
 - Edit group / room name, + add delete
 - Edit file name
-- Settings prettier
 
 ### Longer term
 - minify webpack
