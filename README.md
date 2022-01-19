@@ -8,6 +8,8 @@ TODO
 ### MVP
 - Edit group / room name, + add delete
 - Edit file name
+- order styles
+- design language (hover v active / focused etc)
 
 ### Longer term
 - minify webpack
