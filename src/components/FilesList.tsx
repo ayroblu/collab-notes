@@ -21,66 +21,35 @@ import type { FileMetaData } from "../modules/documents";
 import { getDocument } from "../modules/documents";
 import { deduplicateFiles, getRoom } from "../modules/documents";
 
+import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./FilesList.module.css";
 
 export const FilesList = () => {
-  const [isEdit, setIsEdit] = React.useState(false);
+  const { settings } = React.useContext(SettingsContext);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const handleDelete = useDeleteFile();
   return (
     <section className={styles.fileslist}>
       <div className={styles.headingBar}>
         <h2>Files</h2>
-        {isEdit ? (
-          <button onClick={() => setIsEdit(false)}>Done</button>
-        ) : (
-          <button onClick={() => setIsEdit(true)}>Edit</button>
+        {getIsFileActive(fileName, settings) && (
+          <button onClick={handleDelete}>
+            <VscTrash />
+          </button>
         )}
       </div>
-      <FileNamesList isEdit={isEdit} />
+      <FileNamesList />
     </section>
   );
 };
 
-const FileNamesList: React.FC<{
-  isEdit: boolean;
-}> = ({ isEdit }) => {
+const useDeleteFile = () => {
   const { settings } = React.useContext(SettingsContext);
-  const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isNameEdit, setIsNameEdit] = React.useState(false);
   const fileName = searchParams.get("name");
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
-  React.useLayoutEffect(() => {
-    if (!room) return;
-    const { files } = getRoom(room.id, room.password);
-    deduplicateFiles(files);
-    setFilesData(files.toArray());
-    const changeListener = () => {
-      deduplicateFiles(files);
-      setFilesData(files.toArray());
-    };
-    files.observe(changeListener);
-    return () => {
-      files.unobserve(changeListener);
-    };
-  }, []);
-  if (!room) {
-    return null;
-  }
-  const { files } = getRoom(room.id, room.password);
-  const setFileName = (fileNameBefore: string) => (text: string) => {
-    const filesArr = files.map((a) => a);
-    const index = filesArr.findIndex(({ name }) => name === fileNameBefore);
-    const file = filesArr[index];
-    if (!file) return;
-    files.delete(index, 1);
-    files.insert(index, [{ ...file, name: text }]);
-    if (fileNameBefore === fileName) {
-      setSearchParams({ name: text, id: settings.activeRoomId! });
-    }
-  };
-
-  const handleDelete = () => {
+  return () => {
     if (!fileName) return;
     const confirmation = confirm(
       `Are you sure you want to delete ${fileName}?`
@@ -100,78 +69,67 @@ const FileNamesList: React.FC<{
         files.delete(index, 1);
       }
       const newIndex = index >= files.length ? files.length - 1 : index;
-      setSearchParams({
-        name: files.get(newIndex).name,
-        id: settings.activeRoomId!,
-      });
+      setSearchParams({ name: files.get(newIndex).name });
     }
   };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    switch (e.key) {
-      case "Enter":
-      case "Escape":
-        return setIsNameEdit(false);
-    }
-  };
+};
+
+function getIsFileActive(fileName: string | null, settings: Settings): boolean {
+  if (!fileName) return false;
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  if (!room) return false;
+  const { files } = getRoom(room.id, room.password);
+  const file = (files.toJSON() as FileMetaData[]).find(
+    ({ name }) => name === fileName
+  );
+  return !!file;
+}
+
+const FileNamesList = () => {
+  const { settings } = React.useContext(SettingsContext);
+  const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  React.useLayoutEffect(() => {
+    if (!room) return;
+    const { files } = getRoom(room.id, room.password);
+    deduplicateFiles(files);
+    setFilesData(files.toArray());
+    const changeListener = () => {
+      deduplicateFiles(files);
+      setFilesData(files.toArray());
+    };
+    files.observe(changeListener);
+    return () => {
+      files.unobserve(changeListener);
+    };
+  }, []);
+  if (!room) {
+    return null;
+  }
 
   return (
     <ul>
-      {filesData.map(({ lastUpdated, name }, i) => (
+      {filesData.map(({ lastUpdated, name }) => (
         <li key={name}>
-          {isEdit ? (
-            <div className={styles.filesEditWrapper}>
-              {isNameEdit ? (
-                <button
-                  onClick={() => setIsNameEdit(true)}
-                  className={cn(
-                    styles.filesListItem,
-                    fileName === name && styles.highlight
-                  )}
-                >
-                  <div className={styles.file}>
-                    <FileTypeIcon name={name} />
-                    <div className={styles.fileDetails}>
-                      <h3 className={styles.fileName}>{name}</h3>
-                      <p className={styles.subtitle}>
-                        {dateTimeFormatter(lastUpdated)}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              ) : (
-                <input
-                  value={files.get(i).name}
-                  onChange={(e) => setFileName(e.currentTarget.value)}
-                  onBlur={() => setIsNameEdit(false)}
-                  onKeyDown={handleKeyDown}
-                  autoFocus
-                />
-              )}
-              {isEdit && !isNameEdit && (
-                <button className={styles.hoverDelete} onClick={handleDelete}>
-                  <VscTrash />
-                </button>
-              )}
-            </div>
-          ) : (
-            <Link
-              className={cn(
-                styles.filesListItem,
-                fileName === name && styles.highlight
-              )}
-              to={`files?${createSearchParams({ name, id: room.id })}`}
-            >
-              <div className={styles.file}>
-                <FileTypeIcon name={name} />
-                <div className={styles.fileDetails}>
-                  <h3 className={styles.fileName}>{name}</h3>
-                  <p className={styles.subtitle}>
-                    {dateTimeFormatter(lastUpdated)}
-                  </p>
-                </div>
+          <Link
+            className={cn(
+              styles.filesListItem,
+              fileName === name && styles.highlight
+            )}
+            to={`files?${createSearchParams({ name, id: room.id })}`}
+          >
+            <div className={styles.file}>
+              <FileTypeIcon name={name} />
+              <div className={styles.fileDetails}>
+                <h3 className={styles.fileName}>{name}</h3>
+                <p className={styles.subtitle}>
+                  {dateTimeFormatter(lastUpdated)}
+                </p>
               </div>
-            </Link>
-          )}
+            </div>
+          </Link>
         </li>
       ))}
       <li>
@@ -236,7 +194,7 @@ const NewFile: React.FC = () => {
           dateCreated: now,
         },
       ]);
-      setSearchParams({ name, id: settings.activeRoomId! });
+      setSearchParams({ name });
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

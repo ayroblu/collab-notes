@@ -32,3 +32,6 @@
 .leftNavButton:active {
   transform: scale(0.99);
 }
+.highlight {
+  background-color: var(--darker-color);
+}

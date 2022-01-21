@@ -39,3 +39,9 @@
 .hoverDelete:hover {
   filter: brightness(130%);
 }
+.heading {
+  margin-inline-end: var(--spacing-32);
+}
+.input {
+  width: 100%;
+}

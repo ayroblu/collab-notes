@@ -7,7 +7,7 @@ import {
 } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 
-import { timeoutPromiseSuccess } from "@/modules/utils";
+import { cn, timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
 import { LeftNavEnum, SettingsContext } from "./Contexts";
@@ -27,13 +27,19 @@ export const LeftNav = () => {
       <section>
         <ul>
           <li>
-            <NavButton onClick={setSettingsLeftNav(LeftNavEnum.files)}>
+            <NavButton
+              isHighlight={settings.leftNav === LeftNavEnum.files}
+              onClick={setSettingsLeftNav(LeftNavEnum.files)}
+            >
               <VscFiles />
               Files
             </NavButton>
           </li>
           <li>
-            <NavButton onClick={setSettingsLeftNav(LeftNavEnum.rooms)}>
+            <NavButton
+              isHighlight={settings.leftNav === LeftNavEnum.rooms}
+              onClick={setSettingsLeftNav(LeftNavEnum.rooms)}
+            >
               <VscOrganization />
               Groups
             </NavButton>
@@ -64,9 +70,14 @@ const NavButton: React.FC<
   React.DetailedHTMLProps<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
-  >
-> = (props) => {
-  return <button className={styles.leftNavButton} {...props} />;
+  > & { isHighlight?: boolean }
+> = ({ isHighlight, ...props }) => {
+  return (
+    <button
+      className={cn(styles.leftNavButton, isHighlight && styles.highlight)}
+      {...props}
+    />
+  );
 };
 
 const reloadPage = async () => {

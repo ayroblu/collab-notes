@@ -17,7 +17,7 @@ export const RoomsList = () => {
   return (
     <section>
       <div className={styles.headingBar}>
-        <h2>Groups</h2>
+        <h2 className={styles.heading}>Groups</h2>
         {isEdit ? (
           <button onClick={() => setIsEdit(false)}>Done</button>
         ) : (
@@ -107,6 +107,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
       >
         {isEdit && isNameEdit ? (
           <input
+            className={styles.input}
             value={yname.toString()}
             onChange={(e) => setRoomName(e.currentTarget.value)}
             onBlur={() => setIsNameEdit(false)}
