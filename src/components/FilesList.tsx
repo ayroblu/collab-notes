@@ -17,9 +17,9 @@ import { createSearchParams, Link, useSearchParams } from "react-router-dom";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
-import type { FileMetaData } from "../modules/documents";
+import type { FileMetaData} from "../modules/documents";
+import { getAllFilesMetaData } from "../modules/documents";
 import { createNewFile } from "../modules/documents";
-import { getAllFileMetaData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
 import { SettingsContext } from "./Contexts";
@@ -70,7 +70,7 @@ const useSyncFilesListState = () => {
   React.useLayoutEffect(() => {
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
-    const filesMetaData = getAllFileMetaData(room.id, room.password);
+    const filesMetaData = getAllFilesMetaData(room.id, room.password);
     setFilesData(filesMetaData);
     const changeListener = () => {
       setFilesData(filesMetaData);

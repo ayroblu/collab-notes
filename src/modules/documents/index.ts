@@ -42,7 +42,7 @@ export function getFileMetaData(
     .find(({ name }) => name === fileName);
 }
 
-export function getAllFileMetaData(
+export function getAllFilesMetaData(
   roomId: string,
   roomPassword: string
 ): FileMetaData[] {
