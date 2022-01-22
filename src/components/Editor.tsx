@@ -12,20 +12,21 @@ import { getRandomColor } from "../modules/utils";
 import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./Editor.module.css";
+import "./Editor.css";
 import { NavBar } from "./NavBar";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 
 export const Editor: React.FC = () => {
   const divElRef = React.useRef<HTMLDivElement>(null);
-  const [cursorStyles] = React.useState<string[]>([]);
+  const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const hasRoom =
     fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
 
-  useMonacoEditor(divElRef);
+  useMonacoEditor(divElRef, setCursorStyles);
 
   if (!hasRoom) {
     return <NoMatchFile />;
@@ -39,8 +40,10 @@ export const Editor: React.FC = () => {
   );
 };
 
-function useMonacoEditor(divElRef: React.RefObject<HTMLDivElement>) {
-  const [, setCursorStyles] = React.useState<string[]>([]);
+function useMonacoEditor(
+  divElRef: React.RefObject<HTMLDivElement>,
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
+) {
   const { settings } = React.useContext(SettingsContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const fileName = searchParams.get("name");
@@ -128,7 +131,7 @@ function createMonacoEditor(
     new Set([editor]),
     provider.awareness
   );
-  setupYjsMonacoCursorData(provider, setCursorStyles, settings);
+  setupYjsMonacoCursorData(editor, provider, setCursorStyles, settings);
   if (settings.isVim) {
     setupVimBindings(editor, settings.vimrc);
   }
@@ -141,6 +144,7 @@ function createMonacoEditor(
 const randomColour = getRandomColor();
 
 function setupYjsMonacoCursorData(
+  editor: monaco.editor.IStandaloneCodeEditor,
   provider: WebrtcProvider,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings
@@ -148,17 +152,36 @@ function setupYjsMonacoCursorData(
   provider.awareness.setLocalStateField("user", {
     name: settings.name,
     colour: randomColour,
+    lineNumber: editor.getPosition()?.lineNumber,
+  });
+  editor.onDidChangeCursorPosition(() => {
+    provider.awareness.setLocalStateField("user", {
+      name: settings.name,
+      colour: randomColour,
+      lineNumber: editor.getPosition()?.lineNumber,
+    });
   });
 
   let timeoutIds: { [clientId: string]: number } = {};
-  provider.awareness.on("change", ({ updated }: any) => {
+  type AwarenessEvent = {
+    updated: string[];
+    added: string[];
+    removed: string[];
+  };
+  provider.awareness.on("change", ({ updated }: AwarenessEvent) => {
     const cursorData = Array.from(provider.awareness.getStates()).map(
       ([clientId, { user }]) => ({ clientId, ...user })
     );
 
-    const mainCursorStyles = cursorData.map(({ clientId, colour, name }) => {
-      return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour}}`;
-    });
+    const mainCursorStyles = cursorData.map(
+      ({ clientId, colour, lineNumber, name }) => {
+        const translate =
+          lineNumber === 1
+            ? "transform: translate(0, 100%);inset-block-end: 0"
+            : "transform: translate(0, -100%);inset-block-start: 0";
+        return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour};${translate}}`;
+      }
+    );
     const tempCursorStyles = cursorData
       .filter(({ clientId }) => updated.includes(clientId))
       .map(({ clientId }) => {

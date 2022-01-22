@@ -115,37 +115,3 @@ button {
 ul {
   list-style-type: none;
 }
-
-.yRemoteSelection {
-  background-color: rgb(250, 129, 0, 0.5);
-}
-.yRemoteSelectionHead {
-  position: absolute;
-  border-left: currentColor solid 2px;
-  border-top: currentColor solid 2px;
-  border-bottom: currentColor solid 2px;
-  height: 100%;
-}
-.yRemoteSelectionHead::before {
-  position: absolute;
-  content: " ";
-  border: 3px solid currentColor;
-  border-radius: 4px;
-  left: -4px;
-  top: -5px;
-}
-.yRemoteSelectionHead::after {
-  position: absolute;
-  color: white;
-  border: 2px solid currentColor;
-  border-radius: 4px;
-  transform: translate(0, -100%);
-  top: 0;
-  left: -4px;
-  pointer-events: none;
-  opacity: 0;
-  padding: 0 4px;
-}
-.yRemoteSelectionHead:hover::after {
-  opacity: 1;
-}
