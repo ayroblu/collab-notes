@@ -4,6 +4,9 @@
   flex-direction: column;
   flex: 1 1 auto;
 }
+.heading {
+  padding: var(--spacing-4) var(--spacing-8);
+}
 .settings form {
   flex: 1 1 auto;
 }

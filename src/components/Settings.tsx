@@ -43,7 +43,7 @@ export const Settings: React.FC = () => {
 
   return (
     <section className={styles.settings}>
-      <h2>Settings</h2>
+      <h2 className={styles.heading}>Settings</h2>
       <form onSubmit={handleSubmit}>
         <div>
           {form.createFormItem("name", {
