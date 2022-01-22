@@ -6,10 +6,9 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Edit group / room name, + add delete
-- Edit file name
 - order styles
 - design language (hover v active / focused etc)
+- comments?
 
 ### Longer term
 - minify webpack
@@ -17,3 +16,5 @@ TODO
 - dropbox sync
 - output files
 - local file sync
+- whiteboard?
+- image uploads?
