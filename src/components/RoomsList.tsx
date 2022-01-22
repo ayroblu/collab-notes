@@ -2,7 +2,7 @@ import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { createSearchParams, useNavigate } from "react-router-dom";
 
-import { getRoom } from "@/modules/documents";
+import { getRoom, getYFileMetaData } from "@/modules/documents";
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
 import type { Room } from "./Contexts";
@@ -52,10 +52,14 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   const makeRoomActiveHandler = (id: string, password: string) => () => {
     setSettings({ ...settings, activeRoomId: id });
     const { files } = getRoom(id, password);
-    const file = files.slice(0, 1)[0]?.metadata.get("metadata");
+    const file = files.slice(0, 1)[0];
+    const metadata = file && getYFileMetaData(file);
     navigate({
       pathname: "files",
-      search: `?${createSearchParams({ name: file?.name || "README.md", id })}`,
+      search: `?${createSearchParams({
+        name: metadata?.name || "README.md",
+        id,
+      })}`,
     });
   };
   const { name: yname } = getRoom(id, password);
@@ -133,7 +137,7 @@ function getSubtitle(room: Room) {
   const numFiles = files.length;
   const lastUpdated = Math.max(
     ...files
-      .map(({ metadata }) => metadata.get("metadata")?.lastUpdated)
+      .map((file) => getYFileMetaData(file).lastUpdated)
       .map((lastUpdated) => new Date(lastUpdated!).getTime())
   );
   const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));

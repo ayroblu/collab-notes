@@ -4,14 +4,9 @@ import type * as Y from "yjs";
 export type YRoom = {
   provider: WebrtcProvider;
   ydoc: Y.Doc;
-  files: Y.Array<YFile>;
+  files: Y.Array<Y.Map<any>>;
   name: Y.Text;
   initialDbPromise: Promise<void>;
-};
-export type YFile = {
-  metadata: Y.Map<FileMetaData>;
-  comments: Y.Array<CommentData>;
-  text: Y.Text;
 };
 export type FileMetaData = {
   name: string;

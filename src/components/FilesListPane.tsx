@@ -2,7 +2,12 @@ import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
 
-import { deleteFile, getFileFromFileName, getRoom } from "@/modules/documents";
+import {
+  deleteFile,
+  getFileFromFileName,
+  getRoom,
+  getYFileMetaData,
+} from "@/modules/documents";
 
 import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
@@ -49,7 +54,7 @@ const useDeleteFile = () => {
       const { files } = getRoom(room.id, room.password);
       const newIndex = index >= files.length ? files.length - 1 : index;
       setSearchParams({
-        name: files.get(newIndex).metadata.get("metadata")!.name,
+        name: getYFileMetaData(files.get(newIndex)).name,
       });
     }
   };

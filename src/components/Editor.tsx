@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 
-import { getYFileMetaDataWithDefault } from "../modules/documents";
+import { getYFileMetaData, getYFileText } from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
@@ -74,10 +74,11 @@ function useMonacoEditor(
     if (!room) return;
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
-      const metadata = getYFileMetaDataWithDefault(file, fileName);
+      if (!file) return;
+      const metadata = getYFileMetaData(file);
 
       const now = new Date().toISOString();
-      file.metadata.set("metadata", {
+      file.set("metadata", {
         ...metadata,
         lastUpdated: now,
       });
@@ -110,7 +111,7 @@ function createMonacoEditor(
   if (!file) {
     file = createNewFile(room.id, room.password, fileName);
   }
-  const text = file.text;
+  const text = getYFileText(file);
   // https://stackoverflow.com/questions/56681345/how-to-dynamically-set-language-according-to-file-extension-in-monaco-editor
   const model = monaco.editor.createModel(
     "",

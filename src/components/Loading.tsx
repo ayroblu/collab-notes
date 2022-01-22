@@ -20,7 +20,10 @@ export const Loading: React.FC<LoadingProps> = ({
   React.useEffect(() => {
     func()
       .then(() => getIsMounted() && setLoadingState(LoadingState.loaded))
-      .catch(() => getIsMounted() && setLoadingState(LoadingState.failed));
+      .catch((err) => {
+        getIsMounted() && setLoadingState(LoadingState.failed);
+        console.error(err);
+      });
     setLoadingState(LoadingState.loading);
   }, []);
   switch (loadingState) {

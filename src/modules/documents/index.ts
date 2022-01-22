@@ -4,7 +4,7 @@ import * as Y from "yjs";
 
 import { nonNullable } from "../utils";
 
-import type { CommentData, FileMetaData, YFile, YRoom } from "./types";
+import type { CommentData, FileMetaData, YRoom } from "./types";
 
 export * from "./types";
 
@@ -20,7 +20,7 @@ export function getRoom(roomId: string, password: string): YRoom {
   // @ts-expect-error - types are wrong
   const provider = new WebrtcProvider(roomId, ydoc, { password });
   const persistence = new IndexeddbPersistence(roomId, ydoc);
-  const files = ydoc.getArray<YFile>("files");
+  const files = ydoc.getArray<Y.Map<any>>("files");
   const name = ydoc.getText("name");
   const initialDbPromise = new Promise<void>((resolve) =>
     persistence.once("synced", () => resolve())
@@ -37,7 +37,7 @@ export function getFileMetaData(
 ): FileMetaData | void {
   const { files } = getRoom(roomId, roomPassword);
   return files
-    .map(({ metadata }) => metadata.get("metadata"))
+    .map((file) => getYFileMetaData(file))
     .filter(nonNullable)
     .find(({ name }) => name === fileName);
 }
@@ -47,19 +47,17 @@ export function getAllFilesMetaData(
   roomPassword: string
 ): FileMetaData[] {
   const { files } = getRoom(roomId, roomPassword);
-  return files
-    .map(({ metadata }) => metadata.get("metadata"))
-    .filter(nonNullable);
+  return files.map((file) => getYFileMetaData(file)).filter(nonNullable);
 }
 
 export function getFileFromFileName(
   roomId: string,
   roomPassword: string,
   fileName: string
-): YFile {
+): Y.Map<any> | undefined {
   const { files } = getRoom(roomId, roomPassword);
   const index = files
-    .map(({ metadata }) => metadata.get("metadata"))
+    .map((file) => getYFileMetaData(file))
     .filter(nonNullable)
     .findIndex(({ name }) => name === fileName);
   return files.get(index);
@@ -71,26 +69,25 @@ export function getFileIndexFromFileName(
 ): number | void {
   const { files } = getRoom(roomId, roomPassword);
   return files
-    .map(({ metadata }) => metadata.get("metadata"))
+    .map((file) => getYFileMetaData(file))
     .filter(nonNullable)
     .findIndex(({ name }) => name === fileName);
 }
-export function getYFileMetaDataWithDefault(file: YFile, fileName: string) {
-  const now = new Date().toISOString();
-  const metadata = file.metadata.get("metadata") || {
-    name: fileName,
-    tags: [],
-    lastUpdated: now,
-    dateCreated: now,
-  };
-  return metadata;
+export function getYFileMetaData(file: Y.Map<any>): FileMetaData {
+  return file.get("metadata");
+}
+export function getYFileComments(file: Y.Map<any>): Y.Array<CommentData> {
+  return file.get("comments");
+}
+export function getYFileText(file: Y.Map<any>): Y.Text {
+  return file.get("text");
 }
 
 export function createNewFile(
   roomId: string,
   roomPassword: string,
   fileName: string
-): YFile {
+): Y.Map<any> {
   const { files } = getRoom(roomId, roomPassword);
   const metadataMap = new Y.Map<FileMetaData>();
   const now = new Date().toISOString();
@@ -101,11 +98,15 @@ export function createNewFile(
     lastUpdated: now,
     dateCreated: now,
   });
-  const file = {
-    metadata: metadataMap,
-    comments: new Y.Array<CommentData>(),
-    text: new Y.Text(),
-  };
+  const file = new Y.Map();
+  file.set("metadata", {
+    name: fileName,
+    tags: [],
+    lastUpdated: now,
+    dateCreated: now,
+  });
+  file.set("comments", new Y.Array<CommentData>());
+  file.set("text", new Y.Text());
   files.push([file]);
   return file;
 }
@@ -127,22 +128,24 @@ export function getDocument(
   fileName: string
 ): Y.Text | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
-  return file?.text;
+  if (!file) return;
+  return getYFileText(file);
 }
 
 export function getComments(
   roomId: string,
   roomPassword: string,
   fileName: string
-): Y.Array<CommentData> {
+): Y.Array<CommentData> | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
-  return file?.comments;
+  if (!file) return;
+  return getYFileComments(file);
 }
 
-export function deduplicateFiles(files: Y.Array<FileMetaData>) {
+export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   const seenSet = new Set();
   for (let i = 0; i < files.length; ++i) {
-    const { name } = files.get(i);
+    const { name } = getYFileMetaData(files.get(i));
     if (seenSet.has(name) || !name) {
       files.delete(i, 1);
       --i;

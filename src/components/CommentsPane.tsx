@@ -29,6 +29,7 @@ const useComments = () => {
     if (!room) return;
     if (!fileName) return;
     const yComments = getComments(room.id, room.password, fileName);
+    if (!yComments) return;
     setComments(yComments.toArray());
 
     const changeListener = () => {

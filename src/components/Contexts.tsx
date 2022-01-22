@@ -48,7 +48,7 @@ export const Contexts: React.FC = ({ children }) => {
   const func = React.useCallback(async () => {
     // if route params -> add room to rooms list and switch
     // If new user -> create new room + readme.md
-    const savedSettings: Settings | undefined = await idbGetWithMigrations();
+    const savedSettings: Settings | void = await idbGetWithMigrations();
     if (paramRoomId && paramFileName) {
       const rooms = savedSettings?.rooms || settings.rooms;
       if (!rooms.find(({ id }) => id === paramRoomId)) {
@@ -106,7 +106,7 @@ export const Contexts: React.FC = ({ children }) => {
   return (
     <Loading
       func={func}
-      error={<p>Faied to fetch data locally, are you on incognito?</p>}
+      error={<p>Failed to fetch data locally, are you on incognito?</p>}
       loading={<p>Loading...</p>}
     >
       <SettingsContext.Provider value={{ settings, setSettings }}>
@@ -116,8 +116,9 @@ export const Contexts: React.FC = ({ children }) => {
   );
 };
 
-async function idbGetWithMigrations() {
-  const settings = await get(dbKey);
+async function idbGetWithMigrations(): Promise<Settings | void> {
+  const settings: Settings | void = await get(dbKey);
+  if (!settings) return;
   // Mutate with migrations
   if (!settings.id) {
     settings.id = uuidv4();

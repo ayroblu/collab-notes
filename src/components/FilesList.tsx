@@ -17,7 +17,8 @@ import { createSearchParams, Link, useSearchParams } from "react-router-dom";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
-import type { FileMetaData} from "../modules/documents";
+import type { FileMetaData } from "../modules/documents";
+import { deduplicateFiles } from "../modules/documents";
 import { getAllFilesMetaData } from "../modules/documents";
 import { createNewFile } from "../modules/documents";
 import { getRoom } from "../modules/documents";
@@ -70,13 +71,15 @@ const useSyncFilesListState = () => {
   React.useLayoutEffect(() => {
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
+    const { files } = getRoom(room.id, room.password);
+    deduplicateFiles(files);
+
     const filesMetaData = getAllFilesMetaData(room.id, room.password);
     setFilesData(filesMetaData);
     const changeListener = () => {
+      deduplicateFiles(files);
       setFilesData(filesMetaData);
     };
-    // TODO: check if this actually works
-    const { files } = getRoom(room.id, room.password);
     files.observe(changeListener);
     return () => {
       files.unobserve(changeListener);
