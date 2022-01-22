@@ -18,7 +18,9 @@ import { createSearchParams, Link, useSearchParams } from "react-router-dom";
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
 import type { FileMetaData } from "../modules/documents";
-import { deduplicateFiles, getRoom } from "../modules/documents";
+import { createNewFile } from "../modules/documents";
+import { getAllFileMetaData } from "../modules/documents";
+import { getRoom } from "../modules/documents";
 
 import { SettingsContext } from "./Contexts";
 import styles from "./FilesList.module.css";
@@ -68,13 +70,13 @@ const useSyncFilesListState = () => {
   React.useLayoutEffect(() => {
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
-    const { files } = getRoom(room.id, room.password);
-    deduplicateFiles(files);
-    setFilesData(files.toArray());
+    const filesMetaData = getAllFileMetaData(room.id, room.password);
+    setFilesData(filesMetaData);
     const changeListener = () => {
-      deduplicateFiles(files);
-      setFilesData(files.toArray());
+      setFilesData(filesMetaData);
     };
+    // TODO: check if this actually works
+    const { files } = getRoom(room.id, room.password);
     files.observe(changeListener);
     return () => {
       files.unobserve(changeListener);
@@ -122,22 +124,13 @@ const NewFile: React.FC = () => {
   const { settings } = React.useContext(SettingsContext);
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
   if (!room) return null;
-  const { files } = getRoom(room.id, room.password);
   const handleNewFileFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     handleNewFile(e.currentTarget.value.trim());
   };
   const handleNewFile = (name: string) => {
     setIsNewFileInput(false);
     if (name) {
-      const now = new Date().toISOString();
-      files.push([
-        {
-          name,
-          tags: [],
-          lastUpdated: now,
-          dateCreated: now,
-        },
-      ]);
+      createNewFile(room.id, room.password, name);
       setSearchParams({ name });
     }
   };

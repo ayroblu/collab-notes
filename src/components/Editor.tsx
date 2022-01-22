@@ -5,8 +5,9 @@ import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 
-import type { FileMetaData } from "../modules/documents";
-import { getDocument, getRoom } from "../modules/documents";
+import { getYFileMetaDataWithDefault } from "../modules/documents";
+import { createNewFile, getFileFromFileName } from "../modules/documents";
+import { getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 
 import type { Settings } from "./Contexts";
@@ -51,7 +52,7 @@ function useMonacoEditor(
   const isNewUser = searchParams.get("newUser");
 
   React.useEffect(() => {
-    if (!divElRef.current) {
+    if (!divElRef.current || !fileName) {
       return;
     }
     const { editor, model, text } = createMonacoEditor(
@@ -71,17 +72,14 @@ function useMonacoEditor(
     }
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
-    const { files, ydoc } = getRoom(room.id, room.password);
     const changeListener = () => {
-      const index = (files.toJSON() as FileMetaData[]).findIndex(
-        ({ name }) => name === fileName
-      );
-      const file = files.get(index);
-      ydoc.transact(() => {
-        files.delete(index, 1);
-        files.insert(index, [
-          { ...file, lastUpdated: new Date().toISOString() },
-        ]);
+      const file = getFileFromFileName(room.id, room.password, fileName);
+      const metadata = getYFileMetaDataWithDefault(file, fileName);
+
+      const now = new Date().toISOString();
+      file.metadata.set("metadata", {
+        ...metadata,
+        lastUpdated: now,
       });
     };
     text.observe(changeListener);
@@ -107,15 +105,12 @@ function createMonacoEditor(
   fileName: string
 ) {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
-  const { files, provider, ydoc } = getRoom(room.id, room.password);
-  const filesArr = files.toArray();
-  let file = filesArr.find(({ name }) => name === fileName);
+  const { provider } = getRoom(room.id, room.password);
+  let file = getFileFromFileName(room.id, room.password, fileName);
   if (!file) {
-    const now = new Date().toISOString();
-    file = { name: fileName, tags: [], lastUpdated: now, dateCreated: now };
-    files.push([file]);
+    file = createNewFile(room.id, room.password, fileName);
   }
-  const text = getDocument(room.id, ydoc, file.name);
+  const text = file.text;
   // https://stackoverflow.com/questions/56681345/how-to-dynamically-set-language-according-to-file-extension-in-monaco-editor
   const model = monaco.editor.createModel(
     "",

@@ -42,6 +42,16 @@ export function getFileMetaData(
     .find(({ name }) => name === fileName);
 }
 
+export function getAllFileMetaData(
+  roomId: string,
+  roomPassword: string
+): FileMetaData[] {
+  const { files } = getRoom(roomId, roomPassword);
+  return files
+    .map(({ metadata }) => metadata.get("metadata"))
+    .filter(nonNullable);
+}
+
 export function getFileFromFileName(
   roomId: string,
   roomPassword: string,
@@ -65,7 +75,40 @@ export function getFileIndexFromFileName(
     .filter(nonNullable)
     .findIndex(({ name }) => name === fileName);
 }
+export function getYFileMetaDataWithDefault(file: YFile, fileName: string) {
+  const now = new Date().toISOString();
+  const metadata = file.metadata.get("metadata") || {
+    name: fileName,
+    tags: [],
+    lastUpdated: now,
+    dateCreated: now,
+  };
+  return metadata;
+}
 
+export function createNewFile(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): YFile {
+  const { files } = getRoom(roomId, roomPassword);
+  const metadataMap = new Y.Map<FileMetaData>();
+  const now = new Date().toISOString();
+
+  metadataMap.set("metadata", {
+    name: fileName,
+    tags: [],
+    lastUpdated: now,
+    dateCreated: now,
+  });
+  const file = {
+    metadata: metadataMap,
+    comments: new Y.Array<CommentData>(),
+    text: new Y.Text(),
+  };
+  files.push([file]);
+  return file;
+}
 export function deleteFile(
   roomId: string,
   roomPassword: string,
