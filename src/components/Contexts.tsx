@@ -5,6 +5,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 import { generatePassword, getRandomName } from "@/modules/utils";
 
@@ -22,6 +23,7 @@ const defaultSettings: Settings = {
   rooms: [],
   activeRoomId: null,
   leftNav: null,
+  id: uuidv4(),
 };
 type SettingsContext = {
   settings: Settings;
@@ -46,7 +48,7 @@ export const Contexts: React.FC = ({ children }) => {
   const func = React.useCallback(async () => {
     // if route params -> add room to rooms list and switch
     // If new user -> create new room + readme.md
-    const savedSettings: Settings | undefined = await get(dbKey);
+    const savedSettings: Settings | undefined = await idbGetWithMigrations();
     if (paramRoomId && paramFileName) {
       const rooms = savedSettings?.rooms || settings.rooms;
       if (!rooms.find(({ id }) => id === paramRoomId)) {
@@ -62,14 +64,6 @@ export const Contexts: React.FC = ({ children }) => {
           ],
           activeRoomId: paramRoomId,
         });
-        // navigate({
-        //   pathname: "/files",
-        //   search: `?${createSearchParams({
-        //     name: paramFileName,
-        //     id: paramRoomId,
-        //   })}`,
-        // });
-        // navigate should be unnecessary due to the params already being there
         return;
       }
     }
@@ -122,6 +116,16 @@ export const Contexts: React.FC = ({ children }) => {
   );
 };
 
+async function idbGetWithMigrations() {
+  const settings = await get(dbKey);
+  // Mutate with migrations
+  if (!settings.id) {
+    settings.id = uuidv4();
+  }
+
+  return settings;
+}
+
 export type Room = {
   id: string;
   name: string;
@@ -136,6 +140,7 @@ export type Settings = {
   activeRoomId: string | null;
   rooms: Room[];
   leftNav: LeftNavEnum | null;
+  id: string;
 };
 export enum LeftNavEnum {
   files = "files",

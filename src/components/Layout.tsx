@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 
+import { CommentsPane } from "./CommentsPane";
 import styles from "./Layout.module.css";
 import { LeftNav } from "./LeftNav";
 import { LeftNavPane } from "./LeftNavPane";
@@ -13,6 +14,7 @@ export const Layout: React.FC = () => {
         <div className={styles.flexFill}>
           <Outlet />
         </div>
+        <CommentsPane />
       </div>
     </div>
   );

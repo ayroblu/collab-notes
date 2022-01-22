@@ -25,24 +25,10 @@ import styles from "./FilesList.module.css";
 
 export const FilesList = () => {
   const { settings } = React.useContext(SettingsContext);
-  const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
-  React.useLayoutEffect(() => {
-    if (!room) return;
-    const { files } = getRoom(room.id, room.password);
-    deduplicateFiles(files);
-    setFilesData(files.toArray());
-    const changeListener = () => {
-      deduplicateFiles(files);
-      setFilesData(files.toArray());
-    };
-    files.observe(changeListener);
-    return () => {
-      files.unobserve(changeListener);
-    };
-  }, []);
+  const filesData = useSyncFilesListState();
   if (!room) {
     return null;
   }
@@ -75,6 +61,26 @@ export const FilesList = () => {
       </li>
     </ul>
   );
+};
+const useSyncFilesListState = () => {
+  const { settings } = React.useContext(SettingsContext);
+  const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
+  React.useLayoutEffect(() => {
+    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+    if (!room) return;
+    const { files } = getRoom(room.id, room.password);
+    deduplicateFiles(files);
+    setFilesData(files.toArray());
+    const changeListener = () => {
+      deduplicateFiles(files);
+      setFilesData(files.toArray());
+    };
+    files.observe(changeListener);
+    return () => {
+      files.unobserve(changeListener);
+    };
+  }, []);
+  return filesData;
 };
 
 const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
