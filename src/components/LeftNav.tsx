@@ -5,13 +5,13 @@ import {
   VscRefresh,
   VscSettingsGear,
 } from "react-icons/vsc";
-import { Link } from "react-router-dom";
 
-import { cn, timeoutPromiseSuccess } from "@/modules/utils";
+import { timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
 import { LeftNavEnum, SettingsContext } from "./Contexts";
 import styles from "./LeftNav.module.css";
+import { LeftNavButton, LeftNavButtonLink } from "./LeftNavButton";
 
 export const LeftNav = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);
@@ -27,56 +27,42 @@ export const LeftNav = () => {
       <section>
         <ul>
           <li>
-            <NavButton
+            <LeftNavButton
               isHighlight={settings.leftNav === LeftNavEnum.files}
               onClick={setSettingsLeftNav(LeftNavEnum.files)}
             >
               <VscFiles />
               Files
-            </NavButton>
+            </LeftNavButton>
           </li>
           <li>
-            <NavButton
+            <LeftNavButton
               isHighlight={settings.leftNav === LeftNavEnum.rooms}
               onClick={setSettingsLeftNav(LeftNavEnum.rooms)}
             >
               <VscOrganization />
               Groups
-            </NavButton>
+            </LeftNavButton>
           </li>
         </ul>
       </section>
       <section>
         <ul>
           <li>
-            <NavButton onClick={reloadPage}>
+            <LeftNavButton onClick={reloadPage}>
               <VscRefresh />
               Refresh
-            </NavButton>
+            </LeftNavButton>
           </li>
           <li>
-            <Link to="/settings" className={styles.leftNavButton}>
+            <LeftNavButtonLink to="/settings">
               <VscSettingsGear />
               Settings
-            </Link>
+            </LeftNavButtonLink>
           </li>
         </ul>
       </section>
     </nav>
-  );
-};
-
-const NavButton: React.FC<
-  React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > & { isHighlight?: boolean }
-> = ({ isHighlight, ...props }) => {
-  return (
-    <button
-      className={cn(styles.leftNavButton, isHighlight && styles.highlight)}
-      {...props}
-    />
   );
 };
 
