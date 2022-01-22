@@ -2,7 +2,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CommentData } from "@/modules/documents";
-import { getComments, getRoom } from "@/modules/documents";
+import { getComments } from "@/modules/documents";
 
 import { Comment } from "./Comment";
 import styles from "./CommentsPane.module.css";
@@ -27,9 +27,8 @@ const useComments = () => {
   React.useEffect(() => {
     const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
-    const { ydoc } = getRoom(room.id, room.password);
     if (!fileName) return;
-    const yComments = getComments(room.id, ydoc, fileName);
+    const yComments = getComments(room.id, room.password, fileName);
     setComments(yComments.toArray());
 
     const changeListener = () => {
@@ -39,7 +38,7 @@ const useComments = () => {
     return () => {
       yComments.unobserve(changeListener);
     };
-  }, []);
+  }, [settings.activeRoomId]);
 
   return comments;
 };

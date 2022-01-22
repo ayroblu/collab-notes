@@ -52,7 +52,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   const makeRoomActiveHandler = (id: string, password: string) => () => {
     setSettings({ ...settings, activeRoomId: id });
     const { files } = getRoom(id, password);
-    const file = files.slice(0, 1)[0];
+    const file = files.slice(0, 1)[0]?.metadata.get("metadata");
     navigate({
       pathname: "files",
       search: `?${createSearchParams({ name: file?.name || "README.md", id })}`,
@@ -132,7 +132,9 @@ function getSubtitle(room: Room) {
   const { files } = getRoom(room.id, room.password);
   const numFiles = files.length;
   const lastUpdated = Math.max(
-    ...files.map(({ lastUpdated }) => new Date(lastUpdated).getTime())
+    ...files
+      .map(({ metadata }) => metadata.get("metadata")?.lastUpdated)
+      .map((lastUpdated) => new Date(lastUpdated!).getTime())
   );
   const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
   return `${formattedDateTime} - ${numFiles} files`;

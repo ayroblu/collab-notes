@@ -2,16 +2,14 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
 
+import { nonNullable } from "../utils";
+
 import type { CommentData, FileMetaData, YFile, YRoom } from "./types";
 
 export * from "./types";
 
 // Singleton caching
 const rooms: { [roomId: string]: YRoom } = {};
-const roomDocs: { [roomId: string]: { [name: string]: Y.Text } } = {};
-const roomComments: {
-  [roomId: string]: { [commentId: string]: Y.Array<CommentData> };
-} = {};
 
 export function getRoom(roomId: string, password: string): YRoom {
   const myRoom = rooms[roomId];
@@ -32,38 +30,70 @@ export function getRoom(roomId: string, password: string): YRoom {
   return rooms[roomId]!;
 }
 
+export function getFileMetaData(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): FileMetaData | void {
+  const { files } = getRoom(roomId, roomPassword);
+  return files
+    .map(({ metadata }) => metadata.get("metadata"))
+    .filter(nonNullable)
+    .find(({ name }) => name === fileName);
+}
+
+export function getFileFromFileName(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): YFile {
+  const { files } = getRoom(roomId, roomPassword);
+  const index = files
+    .map(({ metadata }) => metadata.get("metadata"))
+    .filter(nonNullable)
+    .findIndex(({ name }) => name === fileName);
+  return files.get(index);
+}
+export function getFileIndexFromFileName(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): number | void {
+  const { files } = getRoom(roomId, roomPassword);
+  return files
+    .map(({ metadata }) => metadata.get("metadata"))
+    .filter(nonNullable)
+    .findIndex(({ name }) => name === fileName);
+}
+
+export function deleteFile(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): number | void {
+  const { files } = getRoom(roomId, roomPassword);
+  const index = getFileIndexFromFileName(roomId, roomPassword, fileName);
+
+  if (typeof index === "number") files.delete(index, 1);
+  return index;
+}
+
 export function getDocument(
   roomId: string,
-  ydoc: Y.Doc,
+  roomPassword: string,
   fileName: string
-): Y.Text {
-  const textDoc = roomDocs[roomId]?.[fileName];
-  if (textDoc) {
-    return textDoc;
-  }
-  const text = ydoc.getText(fileName);
-  if (!roomDocs[roomId]) {
-    roomDocs[roomId] = {};
-  }
-  roomDocs[roomId]![fileName] = text;
-  return text;
+): Y.Text | void {
+  const file = getFileFromFileName(roomId, roomPassword, fileName);
+  return file?.text;
 }
 
 export function getComments(
   roomId: string,
-  ydoc: Y.Doc,
+  roomPassword: string,
   fileName: string
 ): Y.Array<CommentData> {
-  const cachedComments = roomComments[roomId]?.[fileName];
-  if (cachedComments) {
-    return cachedComments;
-  }
-  const comments = ydoc.getArray<CommentData>(fileName);
-  if (!roomComments[roomId]) {
-    roomComments[roomId] = {};
-  }
-  roomComments[roomId]![fileName] = comments;
-  return comments;
+  const file = getFileFromFileName(roomId, roomPassword, fileName);
+  return file?.comments;
 }
 
 export function deduplicateFiles(files: Y.Array<FileMetaData>) {

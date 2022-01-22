@@ -134,3 +134,6 @@ export function dateTimeFormatter(dateString: Date | string) {
     return date.toLocaleTimeString();
   }
 }
+
+export const nonNullable = <T>(item: T | null | undefined): item is T =>
+  item !== null && item !== undefined;

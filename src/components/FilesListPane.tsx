@@ -2,7 +2,7 @@ import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
 
-import { getDocument, getRoom } from "@/modules/documents";
+import { deleteFile, getRoom } from "@/modules/documents";
 import type { FileMetaData } from "@/modules/documents";
 
 import type { Settings } from "./Contexts";
@@ -44,17 +44,14 @@ const useDeleteFile = () => {
         ({ id }) => id === settings.activeRoomId
       );
       if (!room) return;
-      const { files, ydoc } = getRoom(room.id, room.password);
-      const index = (files.toJSON() as FileMetaData[]).findIndex(
-        ({ name }) => name === fileName
-      );
-      const text = getDocument(room.id, ydoc, fileName);
-      text.delete(0, text.length);
-      if (files.length > 1) {
-        files.delete(index, 1);
-      }
+      const index = deleteFile(room.id, room.password, fileName);
+      if (typeof index !== "number") return;
+
+      const { files } = getRoom(room.id, room.password);
       const newIndex = index >= files.length ? files.length - 1 : index;
-      setSearchParams({ name: files.get(newIndex).name });
+      setSearchParams({
+        name: files.get(newIndex).metadata.get("metadata")!.name,
+      });
     }
   };
 };
