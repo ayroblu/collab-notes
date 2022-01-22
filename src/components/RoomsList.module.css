@@ -8,7 +8,7 @@
   text-align: start;
 }
 .roomButton:hover {
-  background: var(--darker-color);
+  background: var(--lighter-color);
 }
 .subtitle {
   color: var(--subtle-text-color);
