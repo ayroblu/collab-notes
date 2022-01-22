@@ -3,7 +3,7 @@ import React from "react";
 import { unreachable } from "@/modules/utils";
 
 import { LeftNavEnum, SettingsContext } from "./Contexts";
-import { FilesList } from "./FilesList";
+import { FilesListPane } from "./FilesListPane";
 import styles from "./LeftNavPane.module.css";
 import { RoomsList } from "./RoomsList";
 
@@ -33,7 +33,7 @@ function getLeftNavPanePart(type: LeftNavEnum | null) {
 }
 
 const LeftNavFiles: React.FC = () => {
-  return <FilesList />;
+  return <FilesListPane />;
 };
 const LeftNavRooms: React.FC = () => {
   return <RoomsList />;
