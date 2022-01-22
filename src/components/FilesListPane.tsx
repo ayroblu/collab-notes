@@ -2,8 +2,7 @@ import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
 
-import { deleteFile, getRoom } from "@/modules/documents";
-import type { FileMetaData } from "@/modules/documents";
+import { deleteFile, getFileFromFileName, getRoom } from "@/modules/documents";
 
 import type { Settings } from "./Contexts";
 import { SettingsContext } from "./Contexts";
@@ -60,9 +59,6 @@ function getIsFileActive(fileName: string | null, settings: Settings): boolean {
   if (!fileName) return false;
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
   if (!room) return false;
-  const { files } = getRoom(room.id, room.password);
-  const file = (files.toJSON() as FileMetaData[]).find(
-    ({ name }) => name === fileName
-  );
+  const file = getFileFromFileName(room.id, room.password, fileName);
   return !!file;
 }
