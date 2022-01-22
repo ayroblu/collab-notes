@@ -45,6 +45,7 @@ function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const { settings } = React.useContext(SettingsContext);
+  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const [searchParams, setSearchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const isNewUser = searchParams.get("newUser");
@@ -59,6 +60,7 @@ function useMonacoEditor(
       settings,
       fileName!
     );
+    editorRef.current = editor;
     if (isNewUser) {
       if (!text.length) {
         text.insert(0, initialText);
@@ -89,6 +91,13 @@ function useMonacoEditor(
       text.unobserve(changeListener);
     };
   }, [fileName, settings.activeRoomId]);
+
+  React.useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.layout({ width: 300, height: 300 });
+    editor.layout();
+  });
 }
 
 function createMonacoEditor(

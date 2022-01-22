@@ -3,6 +3,7 @@
   justify-content: space-between;
   align-items: center;
   min-height: 40px;
+  padding: 0 var(--spacing-8);
 }
 .headingBar svg {
   font-size: var(--font-size-1-2);
@@ -14,7 +15,6 @@
   padding: var(--spacing-8);
 }
 .fileslist {
-  padding: 0 var(--spacing-4);
   background: var(--darker-color);
   height: 100vh;
 }
