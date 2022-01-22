@@ -110,11 +110,20 @@ export const Settings: React.FC = () => {
           <FormLabelWrapper>
             <FormLabel>Theme:</FormLabel>
             <select name={name} onChange={onChange} value={value}>
-              {themes.map(({ label, value }) => (
-                <option key={value} value={label}>
-                  {label}
-                </option>
-              ))}
+              <optgroup label="Built in themes">
+                {builtInThemes.map(({ label, value }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Custom themes">
+                {themes.map(({ label, value }) => (
+                  <option key={value} value={label}>
+                    {label}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </FormLabelWrapper>
         ))}
@@ -139,6 +148,11 @@ export const Settings: React.FC = () => {
     </section>
   );
 };
+export const builtInThemes = [
+  { label: "VS Code light", value: "vs" },
+  { label: "VS Code dark", value: "vs-dark" },
+  { label: "High Contrast Black", value: "hc-black" },
+];
 
 const adaptor: <T = string>(
   e: React.ChangeEvent<

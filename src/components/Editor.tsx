@@ -122,11 +122,12 @@ function createMonacoEditor(
     undefined, // language
     monaco.Uri.file(fileName) // uri
   );
+  const isBuiltInTheme = builtInThemes.includes(settings.theme);
   const editor = monaco.editor.create(divEl, {
     model,
     // value: "",
     // language: "markdown",
-    theme: "vs-dark", // vs-light by default
+    theme: settings.theme, // vs-light by default
     automaticLayout: true, // false by default, autoresizes
     fontSize: 16,
     scrollBeyondLastLine: false,
@@ -145,11 +146,12 @@ function createMonacoEditor(
   if (settings.isVim) {
     setupVimBindings(editor, settings.vimrc);
   }
-  setupThemes(settings.theme);
+  !isBuiltInTheme && setupThemes(settings.theme);
 
   editor.focus();
   return { editor, model, text };
 }
+const builtInThemes = ["vs", "vs-dark", "hc-black"];
 
 const randomColour = getRandomColor();
 

@@ -12,12 +12,13 @@ import { getRoom } from "../modules/documents";
 
 import { Loading } from "./Loading";
 
+const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 const defaultSettings: Settings = {
   isVim: false,
   vimrc: "imap jk <Esc>\nimap jj <Esc>",
   wordWrap: true,
   name: getRandomName(),
-  theme: "Monokai",
+  theme: isDark ? "vs-dark" : "vs",
   rooms: [],
   activeRoomId: null,
   leftNav: null,
