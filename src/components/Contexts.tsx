@@ -15,6 +15,7 @@ import { Loading } from "./Loading";
 const defaultSettings: Settings = {
   isVim: false,
   vimrc: "imap jk <Esc>\nimap jj <Esc>",
+  wordWrap: true,
   name: getRandomName(),
   theme: "Monokai",
   rooms: [],
@@ -128,6 +129,7 @@ export type Room = {
 export type Settings = {
   isVim: boolean;
   vimrc: string;
+  wordWrap: boolean;
   name: string;
   theme: string;
   activeRoomId: string | null;

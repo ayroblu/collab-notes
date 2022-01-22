@@ -16,12 +16,13 @@ import styles from "./Settings.module.css";
 
 export const Settings: React.FC = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);
-  const { isVim, name, theme, vimrc } = settings;
+  const { isVim, name, theme, vimrc, wordWrap } = settings;
   const adjustedSettings = {
     isVim,
     vimrc,
     name,
     theme,
+    wordWrap,
   };
   const [tempSettings, setTempSettings] = React.useState(adjustedSettings);
   const form = useForm({
@@ -51,6 +52,22 @@ export const Settings: React.FC = () => {
             meta: { label: "Nickname: " },
           })(({ errorText, meta: { label }, ...props }) => (
             <InputField label={label} {...props} errorText={errorText || ""} />
+          ))}
+        </div>
+        <div>
+          {form.createFormItem("wordWrap", {
+            adaptor: checkedAdaptor,
+            meta: { label: "Word wrap enabled: " },
+          })(({ meta: { label }, name, onChange, value }) => (
+            <FormLabelWrapper>
+              <FormLabel>{label}</FormLabel>
+              <input
+                type="checkbox"
+                name={name}
+                onChange={onChange}
+                checked={value}
+              />
+            </FormLabelWrapper>
           ))}
         </div>
         <div>

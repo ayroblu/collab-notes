@@ -130,6 +130,7 @@ function createMonacoEditor(
     automaticLayout: true, // false by default, autoresizes
     fontSize: 16,
     scrollBeyondLastLine: false,
+    wordWrap: settings.wordWrap ? "on" : "off",
     minimap: {
       enabled: false,
     },
