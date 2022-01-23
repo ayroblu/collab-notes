@@ -1,0 +1,9 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.editorWithComments {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+}

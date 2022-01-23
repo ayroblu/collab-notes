@@ -1,4 +1,5 @@
 import { get, set } from "idb-keyval";
+import type * as monaco from "monaco-editor";
 import React from "react";
 import {
   createSearchParams,
@@ -30,21 +31,49 @@ type SettingsContext = {
   setSettings: (settings: Settings) => void;
 };
 export const SettingsContext = React.createContext<SettingsContext>({} as any);
+type EditorContext = {
+  editorRef: React.MutableRefObject<
+    monaco.editor.IStandaloneCodeEditor | undefined
+  >;
+};
+export const EditorContext = React.createContext<EditorContext>({} as any);
 
 const dbKey = "settings";
 export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
+  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
+
+  const setSettings = React.useCallback((settings: Settings) => {
+    setSettingsState(settings);
+    set(dbKey, settings);
+  }, []);
+  const func = useSetupFunc(settings, setSettings);
+
+  return (
+    <Loading
+      func={func}
+      error={<p>Failed to fetch data locally, are you on incognito?</p>}
+      loading={<p>Loading...</p>}
+    >
+      <SettingsContext.Provider value={{ settings, setSettings }}>
+        <EditorContext.Provider value={{ editorRef }}>
+          {children}
+        </EditorContext.Provider>
+      </SettingsContext.Provider>
+    </Loading>
+  );
+};
+
+function useSetupFunc(
+  settings: Settings,
+  setSettings: (settings: Settings) => void
+) {
   const [searchParams] = useSearchParams();
   const paramRoomId = searchParams.get("id");
   const paramRoomName = searchParams.get("groupName");
   const paramRoomPassword = searchParams.get("password");
   const paramFileName = searchParams.get("name");
   const navigate = useNavigate();
-  const setSettings = React.useCallback((settings: Settings) => {
-    setSettingsState(settings);
-    set(dbKey, settings);
-  }, []);
-
   const func = React.useCallback(async () => {
     // if route params -> add room to rooms list and switch
     // If new user -> create new room + readme.md
@@ -102,19 +131,8 @@ export const Contexts: React.FC = ({ children }) => {
     const { initialDbPromise } = getRoom(room.id, room.password);
     await initialDbPromise;
   }, []);
-
-  return (
-    <Loading
-      func={func}
-      error={<p>Failed to fetch data locally, are you on incognito?</p>}
-      loading={<p>Loading...</p>}
-    >
-      <SettingsContext.Provider value={{ settings, setSettings }}>
-        {children}
-      </SettingsContext.Provider>
-    </Loading>
-  );
-};
+  return func;
+}
 
 async function idbGetWithMigrations(): Promise<Settings | void> {
   const settings: Settings | void = await get(dbKey);

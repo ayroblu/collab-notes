@@ -22,9 +22,9 @@ export const FilesListPane = () => {
   return (
     <section className={styles.fileslist}>
       <div className={styles.headingBar}>
-        <h2>Files</h2>
+        <h2 className={styles.heading}>Files</h2>
         {getIsFileActive(fileName, settings) && (
-          <button onClick={handleDelete}>
+          <button className={styles.deleteButton} onClick={handleDelete}>
             <VscTrash />
           </button>
         )}

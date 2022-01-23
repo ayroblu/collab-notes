@@ -45,23 +45,6 @@
   margin-block-start: var(--spacing-8);
   width: 100%;
 }
-.hoverDelete {
-  position: absolute;
-  top: 50%;
-  inset-inline-end: var(--spacing-16);
-  transform: translateY(-50%);
-  background: var(--background-color);
-  border: 1px solid currentColor;
-  border-radius: var(--button-border-radius);
-  padding: var(--spacing-4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #e71313;
-}
-.hoverDelete:hover {
-  filter: brightness(130%);
-}
 .filesEditWrapper {
   position: relative;
 }

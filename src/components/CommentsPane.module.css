@@ -1,3 +1,15 @@
 .commentsPane {
-  width: 200px;
+  min-width: 200px;
+  position: relative;
+}
+.commentButton {
+  padding: 8px;
+  padding: var(--spacing-8);
+  position: absolute;
+  inset-inline-start: 0;
+  transform: translateY(-50%);
+  border-radius: var(--button-border-radius);
+}
+.commentButton:hover {
+  background-color: var(--lighter-color);
 }

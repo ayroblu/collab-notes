@@ -5,16 +5,22 @@ import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 
-import { getYFileMetaData, getYFileText } from "../modules/documents";
+import { useIsMounted } from "@/hooks/useIsMounted";
+
+import {
+  getComments,
+  getYFileMetaData,
+  getYFileText,
+} from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 import { getRandomColor } from "../modules/utils";
 
 import type { Settings } from "./Contexts";
+import { EditorContext } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./Editor.module.css";
 import "./Editor.css";
-import { NavBar } from "./NavBar";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 
@@ -34,7 +40,6 @@ export const Editor: React.FC = () => {
   }
   return (
     <>
-      <NavBar />
       <style>{cursorStyles.join("")}</style>
       <div className={styles.editor} ref={divElRef}></div>
     </>
@@ -46,10 +51,11 @@ function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const { settings } = React.useContext(SettingsContext);
-  const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
+  const { editorRef } = React.useContext(EditorContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const isNewUser = searchParams.get("newUser");
+  const getIsMounted = useIsMounted();
 
   React.useEffect(() => {
     if (!divElRef.current || !fileName) {
@@ -59,7 +65,8 @@ function useMonacoEditor(
       divElRef.current,
       setCursorStyles,
       settings,
-      fileName!
+      fileName!,
+      getIsMounted
     );
     editorRef.current = editor;
     if (isNewUser) {
@@ -90,6 +97,7 @@ function useMonacoEditor(
       text.unobserve(changeListener);
     };
   }, [fileName, settings.activeRoomId]);
+  useCommentSelections();
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -99,11 +107,65 @@ function useMonacoEditor(
   });
 }
 
+const useCommentSelections = () => {
+  const [searchParams] = useSearchParams();
+  const { editorRef } = React.useContext(EditorContext);
+  const [decorations, setDecorations] = React.useState<string[]>([]);
+  const fileName = searchParams.get("name");
+  const { settings } = React.useContext(SettingsContext);
+  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  if (!room) return;
+  if (!fileName) return;
+  React.useEffect(() => {
+    const yComments = getComments(room.id, room.password, fileName);
+    if (!yComments) return;
+    const newDecorations = yComments.map(
+      ({ endColumn, endLineNumber, startColumn, startLineNumber }) => {
+        return {
+          range: new monaco.Range(
+            startLineNumber,
+            startColumn,
+            endLineNumber,
+            endColumn
+          ),
+          options: {
+            className: styles.selection,
+            beforeContentClassName: styles.selection,
+            afterContentClassName: styles.selection,
+          },
+        };
+      }
+    );
+    const editor = editorRef.current;
+    if (!editor) return;
+    setDecorations(editor.deltaDecorations(decorations, newDecorations));
+    // editor.getTopForPosition
+    // editor.onDidChangeCursorSelection((e) => {
+    //   const sel = e.selection;
+    //   if (
+    //     sel.selectionStartLineNumber === sel.positionLineNumber &&
+    //     sel.selectionStartColumn === sel.positionColumn
+    //   ) {
+    //     return;
+    //   }
+    //   // const sel = monaco.Selection.createWithDirection(
+    //   //   2,
+    //   //   3,
+    //   //   2,
+    //   //   6,
+    //   //   monaco.SelectionDirection.LTR
+    //   // );
+    //   // editor.setSelection(sel);
+    // });
+  });
+};
+
 function createMonacoEditor(
   divEl: HTMLDivElement,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings,
-  fileName: string
+  fileName: string,
+  getIsMounted: () => boolean
 ) {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
   const { provider } = getRoom(room.id, room.password);
@@ -138,7 +200,13 @@ function createMonacoEditor(
     new Set([editor]),
     provider.awareness
   );
-  setupYjsMonacoCursorData(editor, provider, setCursorStyles, settings);
+  setupYjsMonacoCursorData(
+    editor,
+    provider,
+    setCursorStyles,
+    settings,
+    getIsMounted
+  );
   if (settings.isVim) {
     setupVimBindings(editor, settings.vimrc);
   }
@@ -155,7 +223,8 @@ function setupYjsMonacoCursorData(
   editor: monaco.editor.IStandaloneCodeEditor,
   provider: WebrtcProvider,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
-  settings: Settings
+  settings: Settings,
+  getIsMounted: () => boolean
 ) {
   provider.awareness.setLocalStateField("user", {
     name: settings.name,
@@ -199,6 +268,7 @@ function setupYjsMonacoCursorData(
     cursorData.forEach(({ clientId }) => {
       clearTimeout(timeoutIds[clientId]);
       timeoutIds[clientId] = window.setTimeout(() => {
+        if (!getIsMounted()) return;
         setCursorStyles((cursorStyles) =>
           cursorStyles.filter((c) => !tempCursorStyles.includes(c))
         );

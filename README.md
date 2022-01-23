@@ -9,6 +9,7 @@ TODO
 - order styles
 - design language (hover v active / focused etc)
 - comments?
+- editor selection doesn't work due to react rendering
 
 ### Longer term
 - minify webpack

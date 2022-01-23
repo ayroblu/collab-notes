@@ -3,3 +3,6 @@
   height: calc(100vh - var(--nav-bar-height));
   border: none;
 }
+.selection {
+  background: red;
+}

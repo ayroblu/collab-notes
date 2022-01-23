@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { Contexts } from "./Contexts";
-import { Editor } from "./Editor";
+import { EditorWithComments } from "./EditorWithComments";
 import { Home } from "./Home";
 import { Layout } from "./Layout";
 import { Settings } from "./Settings";
@@ -21,7 +21,7 @@ const RouteGroup: React.FC = () => {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="files">
-          <Route index element={<Editor />} />
+          <Route index element={<EditorWithComments />} />
         </Route>
         <Route path="settings" element={<Settings />} />
         <Route path="*" element={<NoMatch />} />

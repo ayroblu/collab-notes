@@ -21,4 +21,8 @@ export type CommentData = {
   byName: string; // May be outdated, could be theoretically reconciled IF connected via awareness
   dateCreated: string;
   dateUpdated: string;
+  startLineNumber: number;
+  endLineNumber: number;
+  startColumn: number;
+  endColumn: number;
 };
