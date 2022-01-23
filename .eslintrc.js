@@ -8,7 +8,13 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: ["import", "react", "sort-destructure-keys", "@typescript-eslint"],
+  plugins: [
+    "import",
+    "react",
+    "sort-destructure-keys",
+    "@typescript-eslint",
+    "css-modules",
+  ],
   // extends: ["react-app"],
   settings: {
     react: {
@@ -53,5 +59,6 @@ module.exports = {
     ],
     "@typescript-eslint/sort-type-union-intersection-members": "error",
     "sort-destructure-keys/sort-destructure-keys": "error",
+    "css-modules/no-unused-class": "error",
   },
 };

@@ -1,11 +1,3 @@
-.shareButton svg {
-  margin-inline-start: var(--spacing-8);
-}
-.shareButton {
-  display: flex;
-  align-items: center;
-}
-
 .facepile {
   display: flex;
 }
