@@ -2,7 +2,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
 
-import { nonNullable } from "../utils";
+import { nonNullable, sortBy } from "../utils";
 
 import type { CommentData, FileMetaData, YRoom } from "./types";
 
@@ -143,14 +143,28 @@ export function getComments(
 }
 
 export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
-  const seenSet = new Set();
-  for (let i = 0; i < files.length; ++i) {
-    const { name } = getYFileMetaData(files.get(i));
-    if (seenSet.has(name) || !name) {
-      files.delete(i, 1);
-      --i;
-      continue;
+  const seenMap: { [fileName: string]: { index: number; length: number }[] } =
+    {};
+  files.forEach((file, index) => {
+    const { name } = getYFileMetaData(file);
+    const arr = seenMap[name];
+    const data = { index, length: getYFileText(file).length };
+    if (arr) {
+      arr.push(data);
+    } else {
+      seenMap[name] = [data];
     }
-    seenSet.add(name);
-  }
+  });
+  const indexesToDelete: number[] = [];
+  Object.entries(seenMap).forEach(([, entries]) => {
+    if (entries.length > 1) {
+      const sortedEntries = entries.sort(
+        sortBy(({ length }) => length, "desc")
+      );
+      indexesToDelete.push(...sortedEntries.slice(1).map(({ index }) => index));
+    }
+  });
+  indexesToDelete.sort(sortBy((a) => a, "desc")).forEach((index) => {
+    files.delete(index, 1);
+  });
 }

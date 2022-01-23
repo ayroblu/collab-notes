@@ -137,3 +137,15 @@ export function dateTimeFormatter(dateString: Date | string) {
 
 export const nonNullable = <T>(item: T | null | undefined): item is T =>
   item !== null && item !== undefined;
+
+export const sortBy = <T>(
+  func: (a: T) => number | string,
+  order: "asc" | "desc" = "asc"
+) => {
+  return (a: T, b: T) => {
+    const aResult = func(a);
+    const bResult = func(b);
+    const val = aResult > bResult ? 1 : bResult > aResult ? -1 : 0;
+    return order === "desc" ? val * -1 : val;
+  };
+};
