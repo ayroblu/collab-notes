@@ -11,18 +11,19 @@ export const FacePile: React.FC = () => {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
   React.useEffect(() => {
     if (!room) return;
-    const { provider } = getRoom(room.id, room.password);
+    const { provider, ydoc } = getRoom(room.id, room.password);
     provider.awareness.on("change", () => {
       const faces = Array.from(provider.awareness.getStates())
         .slice(1)
         .map(
           ([
-            ,
+            clientId,
             {
               user: { colour, name },
             },
-          ]) => ({ name, color: colour })
-        );
+          ]) => ({ clientId, name, color: colour })
+        )
+        .filter(({ clientId }) => clientId !== ydoc.clientID);
       setFaces(faces);
     });
   }, []);

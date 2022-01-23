@@ -4,6 +4,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
+import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 
@@ -104,7 +105,7 @@ function useMonacoEditor(
     if (!editor) return;
     editor.layout({ width: 300, height: 300 });
     editor.layout();
-  });
+  }, [settings]);
 }
 
 const useCommentSelections = () => {
@@ -139,24 +140,6 @@ const useCommentSelections = () => {
     const editor = editorRef.current;
     if (!editor) return;
     setDecorations(editor.deltaDecorations(decorations, newDecorations));
-    // editor.getTopForPosition
-    // editor.onDidChangeCursorSelection((e) => {
-    //   const sel = e.selection;
-    //   if (
-    //     sel.selectionStartLineNumber === sel.positionLineNumber &&
-    //     sel.selectionStartColumn === sel.positionColumn
-    //   ) {
-    //     return;
-    //   }
-    //   // const sel = monaco.Selection.createWithDirection(
-    //   //   2,
-    //   //   3,
-    //   //   2,
-    //   //   6,
-    //   //   monaco.SelectionDirection.LTR
-    //   // );
-    //   // editor.setSelection(sel);
-    // });
   });
 };
 
@@ -168,7 +151,7 @@ function createMonacoEditor(
   getIsMounted: () => boolean
 ) {
   const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
-  const { provider } = getRoom(room.id, room.password);
+  const { provider, ydoc } = getRoom(room.id, room.password);
   let file = getFileFromFileName(room.id, room.password, fileName);
   if (!file) {
     file = createNewFile(room.id, room.password, fileName);
@@ -202,6 +185,7 @@ function createMonacoEditor(
   );
   setupYjsMonacoCursorData(
     editor,
+    ydoc,
     provider,
     setCursorStyles,
     settings,
@@ -221,6 +205,7 @@ const randomColour = getRandomColor();
 
 function setupYjsMonacoCursorData(
   editor: monaco.editor.IStandaloneCodeEditor,
+  ydoc: Y.Doc,
   provider: WebrtcProvider,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings,
@@ -246,9 +231,9 @@ function setupYjsMonacoCursorData(
     removed: string[];
   };
   provider.awareness.on("change", ({ updated }: AwarenessEvent) => {
-    const cursorData = Array.from(provider.awareness.getStates()).map(
-      ([clientId, { user }]) => ({ clientId, ...user })
-    );
+    const cursorData = Array.from(provider.awareness.getStates())
+      .map(([clientId, { user }]) => ({ clientId, ...user }))
+      .filter(({ clientId }) => clientId !== ydoc.clientID);
 
     const mainCursorStyles = cursorData.map(
       ({ clientId, colour, lineNumber, name }) => {
