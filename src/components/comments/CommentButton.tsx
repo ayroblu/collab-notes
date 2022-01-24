@@ -8,14 +8,18 @@ import type { SelectionRange } from "./types";
 
 type CommentButtonProps = {
   onClick: (selection: SelectionRange) => void;
+  offset: number;
 };
-export const CommentButton: React.FC<CommentButtonProps> = ({ onClick }) => {
+export const CommentButton: React.FC<CommentButtonProps> = ({
+  offset,
+  onClick,
+}) => {
   const { position, selection } = useShowCommentButton();
   return (
     <button
       className={styles.commentButton}
       style={{
-        insetBlockStart: position ?? undefined,
+        top: (position ?? 0) + offset,
         display: position === null ? "none" : undefined,
       }}
       onClick={() => selection && onClick(selection)}

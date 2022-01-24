@@ -59,6 +59,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
           className={styles.textarea}
           value={commentText}
           onChange={(e) => setCommentText(e.currentTarget.value)}
+          autoFocus
         />
         <div className={styles.flexEnd}>
           <SubmitButton value="Save" disabled={!commentText} />
@@ -73,9 +74,9 @@ export const AddComment: React.FC<AddCommentProps> = ({
 
 const usePosition = (selection: SelectionRange) => {
   const { editorRef } = React.useContext(EditorContext);
-
   const editor = editorRef.current;
   if (!editor) return;
+
   const top = editor.getTopForPosition(
     selection.startLineNumber,
     selection.startColumn

@@ -18,16 +18,22 @@ export const CommentsPane: React.FC = () => {
     SelectionRange[]
   >([]);
   const { editorDivRef } = React.useContext(EditorContext);
+  const { setFocusCommentId } = React.useContext(CommentsContext);
   const comments = useCommentsSync();
   const createComment = useCreateComment();
-  const offsets = useCommentOffsets();
+  const { extraOffset, offsets } = useCommentOffsets(inProgressSelections);
   const editorHeight = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
-  useEditorScrollSync(commentsPaneRef);
+  useEditorScrollSync(commentsPaneRef, extraOffset);
 
   const editorDivHeight = editorDivRef.current
     ? editorDivRef.current.getBoundingClientRect().height
-    : undefined;
+    : window.innerHeight;
+
+  const addInProgressComment = (selection: SelectionRange) => {
+    setInProgressSelections([...inProgressSelections, selection]);
+    setFocusCommentId(getInProgressId(inProgressSelections.length));
+  };
   const createCommentFn =
     (selection: SelectionRange, index: number) => (text: string) => {
       setInProgressSelections(
@@ -41,35 +47,38 @@ export const CommentsPane: React.FC = () => {
   return (
     <section
       className={styles.commentsPane}
-      style={{ height: editorDivHeight }}
+      style={{ height: editorDivHeight + extraOffset }}
       ref={commentsPaneRef}
     >
       <ul style={{ height: editorHeight }}>
         {comments.map((comment) => (
           <li key={comment.id}>
-            <Comment offset={offsets[comment.id]} {...comment} />
+            <Comment
+              offset={(offsets[comment.id] ?? 0) + extraOffset}
+              {...comment}
+            />
           </li>
         ))}
         {inProgressSelections.map((sel, i) => (
           <li key={JSON.stringify(sel)}>
             <AddComment
               selection={sel}
-              offset={offsets[`add-comment-${i}`]}
-              id={`add-comment-${i}`}
+              offset={(offsets[getInProgressId(i)] ?? 0) + extraOffset}
+              id={getInProgressId(i)}
               onSubmit={createCommentFn(sel, i)}
               onCancel={cancelCommentFn(i)}
             />
           </li>
         ))}
       </ul>
-      <CommentButton
-        onClick={(selection) =>
-          setInProgressSelections([...inProgressSelections, selection])
-        }
-      />
+      <CommentButton offset={extraOffset} onClick={addInProgressComment} />
     </section>
   );
 };
+
+function getInProgressId(i: number) {
+  return `add-comment-${i}`;
+}
 
 const useCommentsSync = () => {
   const { settings } = React.useContext(SettingsContext);
@@ -122,10 +131,11 @@ const useCreateComment = () => {
 };
 
 const commentGap = 8;
-const useCommentOffsets = () => {
+const useCommentOffsets = (inProgressSelections: SelectionRange[]) => {
   const { commentRefs, comments, focusCommentId } =
     React.useContext(CommentsContext);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
+  const [extraOffset, setExtraOffset] = React.useState<number>(0);
   React.useEffect(() => {
     const commentDetails = Object.entries(commentRefs.current)
       .map(([id, { el, height, top }]) => {
@@ -150,22 +160,31 @@ const useCommentOffsets = () => {
       const belowComment = commentDetails[i + 1]!;
       const comment = commentDetails[i]!;
       const commentBottom = comment.top + comment.height + commentGap;
-      if (commentBottom > belowComment.top) {
-        newOffsets[comment.id] = -(commentBottom - belowComment.top);
+      const adjustedBelowCommentTop =
+        belowComment.top + (newOffsets[belowComment.id] ?? 0);
+      if (commentBottom > adjustedBelowCommentTop) {
+        newOffsets[comment.id] = -(commentBottom - adjustedBelowCommentTop);
+        if (i === 0) {
+          const topOffset = comment.top + newOffsets[comment.id]! - commentGap;
+          setExtraOffset(topOffset < 0 ? -topOffset : 0);
+        }
       }
     }
     for (let i = focusCommentIndex + 1; i < commentDetails.length; ++i) {
       const aboveComment = commentDetails[i - 1]!;
       const comment = commentDetails[i]!;
       const aboveCommentBottom =
-        aboveComment.top + aboveComment.height + commentGap;
+        aboveComment.top +
+        aboveComment.height +
+        commentGap +
+        (newOffsets[aboveComment.id] || 0);
       if (aboveCommentBottom > comment.top) {
         newOffsets[comment.id] = aboveCommentBottom - comment.top;
       }
     }
     setOffsets(newOffsets);
-  }, [comments]);
-  return offsets;
+  }, [comments, inProgressSelections]);
+  return { offsets, extraOffset };
 };
 
 const useEditorHeight = () => {
@@ -174,7 +193,10 @@ const useEditorHeight = () => {
   if (!editor) return;
   return editor.getContentHeight();
 };
-const useEditorScrollSync = (commentsPaneRef: React.RefObject<HTMLElement>) => {
+const useEditorScrollSync = (
+  commentsPaneRef: React.RefObject<HTMLElement>,
+  extraOffset: number
+) => {
   const { editorRef } = React.useContext(EditorContext);
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -182,13 +204,24 @@ const useEditorScrollSync = (commentsPaneRef: React.RefObject<HTMLElement>) => {
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
 
-    console.log("hi");
+    let rafId = 0;
     const { dispose } = editor.onDidScrollChange((e) => {
-      console.log("scroll!!");
-      commentsPane.scrollTop = e.scrollTop;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        commentsPane.scrollTop = e.scrollTop + extraOffset;
+      });
     });
     return () => {
       dispose();
     };
-  }, []);
+  }, [extraOffset]);
+
+  // For when comments are created specifically
+  React.useEffect(() => {
+    const editor = editorRef.current;
+    const commentsPane = commentsPaneRef.current;
+    if (!editor) return;
+    if (!commentsPane) return;
+    commentsPane.scrollTop = editor.getScrollTop() + extraOffset;
+  }, [extraOffset]);
 };

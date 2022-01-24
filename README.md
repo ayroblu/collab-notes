@@ -6,10 +6,11 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- order styles
-- design language (hover v active / focused etc)
-- comments?
-- editor selection doesn't work due to react rendering
+- comments
+  - comments scroll -> editor scroll
+    - end of page issues
+  - hide monaco scrollbar maybe?
+  - Cancel button for addComment
 
 ### Longer term
 - minify webpack
@@ -19,3 +20,4 @@ TODO
 - local file sync
 - whiteboard?
 - image uploads?
+- design language (hover v active / focused etc)
