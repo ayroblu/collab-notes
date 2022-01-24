@@ -1,0 +1,14 @@
+.commentButton {
+  padding: 8px;
+  padding: var(--spacing-8);
+  position: absolute;
+  inset-inline-start: 0;
+  transform: translateY(-50%);
+  border-radius: var(--button-border-radius);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.commentButton:hover {
+  background-color: var(--lighter-color);
+}

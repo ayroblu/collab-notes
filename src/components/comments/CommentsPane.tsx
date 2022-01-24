@@ -1,14 +1,16 @@
 import React from "react";
-import { VscComment } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { getComments } from "@/modules/documents";
 
-import { Button, SubmitButton } from "./Button";
+import { CommentsContext, SettingsContext } from "../Contexts";
+
+import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
+import { CommentButton } from "./CommentButton";
 import styles from "./CommentsPane.module.css";
-import { CommentsContext, EditorContext, SettingsContext } from "./Contexts";
+import type { SelectionRange } from "./types";
 
 export const CommentsPane: React.FC = () => {
   const [inProgressSelections, setInProgressSelections] = React.useState<
@@ -100,100 +102,4 @@ const useCreateComment = () => {
       },
     ]);
   };
-};
-
-type CommentButtonProps = {
-  onClick: (selection: SelectionRange) => void;
-};
-const CommentButton: React.FC<CommentButtonProps> = ({ onClick }) => {
-  const { position, selection } = useShowCommentButton();
-  return (
-    <button
-      className={styles.commentButton}
-      style={{
-        insetBlockStart: position ?? undefined,
-        display: position === null ? "none" : undefined,
-      }}
-      onClick={() => selection && onClick(selection)}
-    >
-      <VscComment />
-    </button>
-  );
-};
-
-const useShowCommentButton = () => {
-  const { editorRef } = React.useContext(EditorContext);
-  const [position, setPosition] = React.useState<number | null>(null);
-  const [selection, setSelection] = React.useState<SelectionRange | null>(null);
-  React.useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    const { dispose } = editor.onDidChangeCursorSelection((e) => {
-      const sel = e.selection;
-      if (
-        sel.selectionStartLineNumber === sel.positionLineNumber &&
-        sel.selectionStartColumn === sel.positionColumn
-      ) {
-        setPosition(null);
-        setSelection(null);
-        return;
-      }
-      const selection = {
-        startLineNumber: sel.startLineNumber,
-        endLineNumber: sel.endLineNumber,
-        startColumn: sel.startColumn,
-        endColumn: sel.endColumn,
-      };
-      const top = editor.getTopForPosition(
-        sel.startLineNumber,
-        sel.startColumn
-      );
-      const lineHeight = editor.getRawOptions().lineHeight || 24;
-      setPosition(top + lineHeight / 2);
-      setSelection(selection);
-    });
-    return () => {
-      dispose();
-    };
-  }, []);
-  return { position, selection };
-};
-
-type AddCommentProps = {
-  onSubmit: (text: string) => void;
-  onCancel: () => void;
-};
-const AddComment: React.FC<AddCommentProps> = ({ onCancel, onSubmit }) => {
-  const [commentText, setCommentText] = React.useState("");
-  const handleSubmit = () => {
-    console.log("submit");
-    onSubmit(commentText);
-  };
-  const handleCancel = () => {
-    console.log("cancel");
-    onCancel();
-  };
-  return (
-    <section className={styles.addComment}>
-      <form onSubmit={handleSubmit}>
-        <textarea
-          className={styles.textarea}
-          value={commentText}
-          onChange={(e) => setCommentText(e.currentTarget.value)}
-        />
-        <div className={styles.flexEnd}>
-          <SubmitButton value="Save" disabled={!commentText} />
-          <Button buttonType="form" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </section>
-  );
-};
-export type SelectionRange = {
-  startLineNumber: number;
-  endLineNumber: number;
-  startColumn: number;
-  endColumn: number;
 };

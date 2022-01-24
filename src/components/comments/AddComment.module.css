@@ -1,0 +1,16 @@
+.addComment {
+  padding: var(--spacing-8);
+  margin-inline-start: var(--spacing-40);
+  background-color: var(--lighter-color);
+  border-radius: var(--button-border-radius);
+}
+.textarea {
+  width: 100%;
+}
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+.flexEnd > *:not(:first-child) {
+  margin-inline-start: var(--spacing-8);
+}

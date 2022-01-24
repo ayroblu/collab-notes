@@ -1,0 +1,5 @@
+.commentsPane {
+  min-width: 200px;
+  position: relative;
+  background-color: var(--darker-color);
+}
