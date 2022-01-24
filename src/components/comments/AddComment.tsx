@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, SubmitButton } from "../Button";
+import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./AddComment.module.css";
 

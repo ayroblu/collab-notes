@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useIsMounted } from "../hooks/useIsMounted";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 type LoadingProps = {
   func: () => Promise<void>;

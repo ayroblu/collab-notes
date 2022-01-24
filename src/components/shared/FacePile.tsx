@@ -2,7 +2,8 @@ import React from "react";
 
 import { getRoom } from "@/modules/documents";
 
-import { SettingsContext } from "./Contexts";
+import { SettingsContext } from "../Contexts";
+
 import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {

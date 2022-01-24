@@ -4,7 +4,7 @@ import type { CommentData } from "@/modules/documents/types";
 import { getRandomColor } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
-import { FacePileFace } from "../FacePile";
+import { FacePileFace } from "../shared/FacePile";
 
 import styles from "./Comment.module.css";
 import type { SelectionRange } from "./types";

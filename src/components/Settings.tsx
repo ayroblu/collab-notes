@@ -6,13 +6,13 @@ import { useForm } from "use-form-ts";
 import { keys } from "../modules/utils";
 
 import { SettingsContext } from "./Contexts";
+import styles from "./Settings.module.css";
 import {
   FormLabel,
   FormLabelWrapper,
   InputField,
   TextArea,
-} from "./InputField";
-import styles from "./Settings.module.css";
+} from "./shared/InputField";
 
 export const Settings: React.FC = () => {
   const { setSettings, settings } = React.useContext(SettingsContext);

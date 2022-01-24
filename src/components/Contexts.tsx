@@ -13,7 +13,7 @@ import { generatePassword, getRandomName } from "@/modules/utils";
 import type { CommentData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
-import { Loading } from "./Loading";
+import { Loading } from "./shared/Loading";
 
 const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 const defaultSettings: Settings = {
