@@ -44,7 +44,7 @@ export const FacePile: React.FC = () => {
   );
 };
 
-const FacePileFace: React.FC<Face> = ({ color, name }) => {
+export const FacePileFace: React.FC<Face> = ({ color, name }) => {
   const char = name.slice(0, 1).toLocaleUpperCase();
   return (
     <section

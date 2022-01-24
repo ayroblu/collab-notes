@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { generatePassword, getRandomName } from "@/modules/utils";
 
+import type { CommentData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
 import { Loading } from "./Loading";
@@ -37,11 +38,19 @@ type EditorContext = {
   >;
 };
 export const EditorContext = React.createContext<EditorContext>({} as any);
+type CommentsContext = {
+  comments: CommentData[];
+  setComments: React.Dispatch<React.SetStateAction<CommentData[]>>;
+  commentRefs: React.MutableRefObject<{ [key: string]: HTMLElement }>;
+};
+export const CommentsContext = React.createContext<CommentsContext>({} as any);
 
 const dbKey = "settings";
 export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
+  const [comments, setComments] = React.useState<CommentData[]>([]);
+  const commentRefs = React.useRef<{ [key: string]: HTMLElement }>({});
 
   const setSettings = React.useCallback((settings: Settings) => {
     setSettingsState(settings);
@@ -57,7 +66,11 @@ export const Contexts: React.FC = ({ children }) => {
     >
       <SettingsContext.Provider value={{ settings, setSettings }}>
         <EditorContext.Provider value={{ editorRef }}>
-          {children}
+          <CommentsContext.Provider
+            value={{ comments, setComments, commentRefs }}
+          >
+            {children}
+          </CommentsContext.Provider>
         </EditorContext.Provider>
       </SettingsContext.Provider>
     </Loading>

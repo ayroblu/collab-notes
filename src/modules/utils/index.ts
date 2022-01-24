@@ -10,12 +10,9 @@ export function getRandomColor() {
   return generateHslaColor();
 }
 function generateHslaColor(saturation = 100, lightness = 40, alpha = 1) {
-  let colors = [];
   const hue = (Math.random() * 360).toFixed();
 
-  colors.push(`hsla(${hue},${saturation}%,${lightness}%,${alpha})`);
-
-  return colors;
+  return `hsla(${hue},${saturation}%,${lightness}%,${alpha})`;
 }
 
 export function slugify(str: string) {

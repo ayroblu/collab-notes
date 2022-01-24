@@ -1,6 +1,7 @@
 .commentsPane {
   min-width: 200px;
   position: relative;
+  background-color: var(--darker-color);
 }
 .commentButton {
   padding: 8px;
@@ -15,4 +16,20 @@
 }
 .commentButton:hover {
   background-color: var(--lighter-color);
+}
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+.flexEnd > *:not(:first-child) {
+  margin-inline-start: var(--spacing-8);
+}
+.addComment {
+  padding: var(--spacing-8);
+  margin-inline-start: var(--spacing-40);
+  background-color: var(--lighter-color);
+  border-radius: var(--button-border-radius);
+}
+.textarea {
+  width: 100%;
 }

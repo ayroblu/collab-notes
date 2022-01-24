@@ -1,2 +1,21 @@
 .comment {
+  margin-inline-start: var(--spacing-40);
+  position: absolute;
+  transform: translateY(-50%);
+  background-color: var(--lighter-color);
+  padding: var(--spacing-4) var(--spacing-8);
+  border-radius: var(--button-border-radius);
+  inset-inline-start: var(--spacing-8);
+  inset-inline-end: var(--spacing-8);
+  border: 1px solid var(--lighter-color);
+}
+.userHeading {
+  display: flex;
+}
+.userNameHeading {
+  margin-inline-start: var(--spacing-8);
+  font-weight: 500;
+}
+.text {
+  margin-block-start: var(--spacing-8);
 }

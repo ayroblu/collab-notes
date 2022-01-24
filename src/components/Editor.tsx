@@ -8,16 +8,13 @@ import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 
-import {
-  getComments,
-  getYFileMetaData,
-  getYFileText,
-} from "../modules/documents";
+import { getYFileMetaData, getYFileText } from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
-import { getRandomColor } from "../modules/utils";
+import { cn, getRandomColor } from "../modules/utils";
 
 import type { Settings } from "./Contexts";
+import { CommentsContext } from "./Contexts";
 import { EditorContext } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./Editor.module.css";
@@ -99,6 +96,7 @@ function useMonacoEditor(
     };
   }, [fileName, settings.activeRoomId]);
   useCommentSelections();
+  useCommentHighlights();
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -109,19 +107,19 @@ function useMonacoEditor(
 }
 
 const useCommentSelections = () => {
-  const [searchParams] = useSearchParams();
   const { editorRef } = React.useContext(EditorContext);
+  const { comments } = React.useContext(CommentsContext);
   const [decorations, setDecorations] = React.useState<string[]>([]);
-  const fileName = searchParams.get("name");
-  const { settings } = React.useContext(SettingsContext);
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
-  if (!room) return;
-  if (!fileName) return;
   React.useEffect(() => {
-    const yComments = getComments(room.id, room.password, fileName);
-    if (!yComments) return;
-    const newDecorations = yComments.map(
-      ({ endColumn, endLineNumber, startColumn, startLineNumber }) => {
+    const newDecorations = comments.map(
+      ({
+        endColumn,
+        endLineNumber,
+        id,
+        startColumn,
+        startLineNumber,
+        text,
+      }) => {
         return {
           range: new monaco.Range(
             startLineNumber,
@@ -130,9 +128,8 @@ const useCommentSelections = () => {
             endColumn
           ),
           options: {
-            className: styles.selection,
-            beforeContentClassName: styles.selection,
-            afterContentClassName: styles.selection,
+            inlineClassName: cn(styles.selection, `comment-${id}`),
+            hoverMessage: { value: text },
           },
         };
       }
@@ -140,8 +137,85 @@ const useCommentSelections = () => {
     const editor = editorRef.current;
     if (!editor) return;
     setDecorations(editor.deltaDecorations(decorations, newDecorations));
-  });
+  }, [comments]);
 };
+
+// const useCommentHighlights = () => {
+//   const { comments } = React.useContext(CommentsContext);
+//   React.useEffect(() => {
+//     let rafId = 0;
+//     const mouseMove = (e: MouseEvent) => {
+//       cancelAnimationFrame(rafId);
+//       rafId = requestAnimationFrame(() => {
+//         [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
+//           const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
+//           if (isIn && !v.classList.contains(styles.selectionHover)) {
+//             v.classList.add(styles.selectionHover);
+//           } else if (!isIn && v.classList.contains(styles.selectionHover)) {
+//             v.classList.remove(styles.selectionHover);
+//           }
+//         });
+//       });
+//     };
+//     document.body.addEventListener("mousemove", mouseMove);
+//     return () => {
+//       document.body.removeEventListener("mousemove", mouseMove);
+//     };
+//   }, []);
+// };
+const useCommentHighlights = () => {
+  const { commentRefs, comments } = React.useContext(CommentsContext);
+  const { editorRef } = React.useContext(EditorContext);
+  React.useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    let disposes: (() => void)[] = [];
+    const { dispose } = editor.onDidChangeModelDecorations(() => {
+      if (disposes.length === comments.length) return;
+      disposes.forEach((d) => d());
+      disposes = [...document.querySelectorAll(`.${styles.selection}`)].map(
+        (v) => {
+          const mouseEnter = () => {
+            const classes = [...v.classList];
+            const commentClass = classes.find((c) => c.startsWith("comment-"));
+            if (!commentClass) return;
+            const commentId = commentClass.replace("comment-", "");
+            const el = commentRefs.current[commentId];
+            if (!el) return;
+            el.classList.add(styles.commentHover);
+          };
+          const mouseLeave = () => {
+            const classes = [...v.classList];
+            const commentClass = classes.find((c) => c.startsWith("comment-"));
+            if (!commentClass) return;
+            const commentId = commentClass.replace("comment-", "");
+            const el = commentRefs.current[commentId];
+            if (!el) return;
+            el.classList.remove(styles.commentHover);
+          };
+          v.addEventListener("mouseenter", mouseEnter);
+          v.addEventListener("mouseleave", mouseLeave);
+          return () => {
+            v.removeEventListener("mouseenter", mouseEnter);
+            v.removeEventListener("mouseenter", mouseLeave);
+          };
+        }
+      );
+    });
+    return () => {
+      dispose();
+    };
+  }, [comments]);
+};
+
+// function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
+//   const isIn =
+//     e.clientX > r.left &&
+//     e.clientX < r.right &&
+//     e.clientY > r.top &&
+//     e.clientY < r.bottom;
+//   return isIn;
+// }
 
 function createMonacoEditor(
   divEl: HTMLDivElement,

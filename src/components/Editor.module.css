@@ -4,5 +4,15 @@
   border: none;
 }
 .selection {
-  background: red;
+  background: rgba(213, 169, 45, 0.3);
+  /* position: absolute; */
+  /* inset: 0; */
+  /* opacity: 0.3; */
+  /* pointer-events: none; */
+}
+.selection:hover {
+  background: rgba(213, 169, 45, 0.6);
+}
+.commentHover {
+  border: 1px solid var(--text-color);
 }
