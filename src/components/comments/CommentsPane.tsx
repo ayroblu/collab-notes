@@ -53,6 +53,9 @@ export const CommentsPane: React.FC = () => {
         {inProgressSelections.map((sel, i) => (
           <li key={JSON.stringify(sel)}>
             <AddComment
+              selection={sel}
+              offset={offsets[`add-comment-${i}`]}
+              id={`add-comment-${i}`}
               onSubmit={createCommentFn(sel, i)}
               onCancel={cancelCommentFn(i)}
             />

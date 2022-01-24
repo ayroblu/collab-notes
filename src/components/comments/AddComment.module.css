@@ -3,6 +3,10 @@
   margin-inline-start: var(--spacing-40);
   background-color: var(--lighter-color);
   border-radius: var(--button-border-radius);
+  position: absolute;
+  inset-inline-start: var(--spacing-8);
+  inset-inline-end: var(--spacing-8);
+  border: 1px solid var(--lighter-color);
 }
 .textarea {
   width: 100%;

@@ -50,7 +50,7 @@ export const Comment: React.FC<Props> = ({
       }
       className={styles.comment}
       style={{
-        insetBlockStart: offsetTop,
+        top: offsetTop,
         display: !nonNullable(position) ? "none" : undefined,
       }}
     >
@@ -72,6 +72,5 @@ const usePosition = (selection: SelectionRange) => {
     selection.startLineNumber,
     selection.startColumn
   );
-  const lineHeight = editor.getRawOptions().lineHeight || 24;
-  return top + lineHeight / 2;
+  return top - 12;
 };
