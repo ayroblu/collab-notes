@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getComments } from "@/modules/documents";
 import { sortBy } from "@/modules/utils";
 
-import { CommentsContext, SettingsContext } from "../Contexts";
+import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
@@ -17,9 +17,17 @@ export const CommentsPane: React.FC = () => {
   const [inProgressSelections, setInProgressSelections] = React.useState<
     SelectionRange[]
   >([]);
+  const { editorDivRef } = React.useContext(EditorContext);
   const comments = useCommentsSync();
   const createComment = useCreateComment();
   const offsets = useCommentOffsets();
+  const editorHeight = useEditorHeight();
+  const commentsPaneRef = React.useRef<HTMLElement>(null);
+  useEditorScrollSync(commentsPaneRef);
+
+  const editorDivHeight = editorDivRef.current
+    ? editorDivRef.current.getBoundingClientRect().height
+    : undefined;
   const createCommentFn =
     (selection: SelectionRange, index: number) => (text: string) => {
       setInProgressSelections(
@@ -31,8 +39,12 @@ export const CommentsPane: React.FC = () => {
     setInProgressSelections(inProgressSelections.filter((_, i) => i !== index));
   };
   return (
-    <section className={styles.commentsPane}>
-      <ul>
+    <section
+      className={styles.commentsPane}
+      style={{ height: editorDivHeight }}
+      ref={commentsPaneRef}
+    >
+      <ul style={{ height: editorHeight }}>
         {comments.map((comment) => (
           <li key={comment.id}>
             <Comment offset={offsets[comment.id]} {...comment} />
@@ -151,4 +163,29 @@ const useCommentOffsets = () => {
     setOffsets(newOffsets);
   }, [comments]);
   return offsets;
+};
+
+const useEditorHeight = () => {
+  const { editorRef } = React.useContext(EditorContext);
+  const editor = editorRef.current;
+  if (!editor) return;
+  return editor.getContentHeight();
+};
+const useEditorScrollSync = (commentsPaneRef: React.RefObject<HTMLElement>) => {
+  const { editorRef } = React.useContext(EditorContext);
+  React.useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const commentsPane = commentsPaneRef.current;
+    if (!commentsPane) return;
+
+    console.log("hi");
+    const { dispose } = editor.onDidScrollChange((e) => {
+      console.log("scroll!!");
+      commentsPane.scrollTop = e.scrollTop;
+    });
+    return () => {
+      dispose();
+    };
+  }, []);
 };

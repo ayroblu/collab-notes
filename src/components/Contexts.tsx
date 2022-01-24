@@ -36,6 +36,7 @@ type EditorContext = {
   editorRef: React.MutableRefObject<
     monaco.editor.IStandaloneCodeEditor | undefined
   >;
+  editorDivRef: React.RefObject<HTMLDivElement>;
 };
 export const EditorContext = React.createContext<EditorContext>({} as any);
 type CommentsContext = {
@@ -56,6 +57,7 @@ const dbKey = "settings";
 export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
+  const editorDivRef = React.useRef<HTMLDivElement>(null);
   const [comments, setComments] = React.useState<CommentData[]>([]);
   const commentRefs = React.useRef<{ [key: string]: CommentLayout }>({});
   const [focusCommentId, setFocusCommentId] = React.useState<string | null>(
@@ -75,7 +77,7 @@ export const Contexts: React.FC = ({ children }) => {
       loading={<p>Loading...</p>}
     >
       <SettingsContext.Provider value={{ settings, setSettings }}>
-        <EditorContext.Provider value={{ editorRef }}>
+        <EditorContext.Provider value={{ editorRef, editorDivRef }}>
           <CommentsContext.Provider
             value={{
               comments,

@@ -23,15 +23,15 @@ import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 
 export const Editor: React.FC = () => {
-  const divElRef = React.useRef<HTMLDivElement>(null);
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
+  const { editorDivRef } = React.useContext(EditorContext);
   const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const hasRoom =
     fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
 
-  useMonacoEditor(divElRef, setCursorStyles);
+  useMonacoEditor(setCursorStyles);
 
   if (!hasRoom) {
     return <NoMatchFile />;
@@ -39,15 +39,15 @@ export const Editor: React.FC = () => {
   return (
     <>
       <style>{cursorStyles.join("")}</style>
-      <div className={styles.editor} ref={divElRef}></div>
+      <div className={styles.editor} ref={editorDivRef}></div>
     </>
   );
 };
 
 function useMonacoEditor(
-  divElRef: React.RefObject<HTMLDivElement>,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
+  const { editorDivRef } = React.useContext(EditorContext);
   const { settings } = React.useContext(SettingsContext);
   const { editorRef } = React.useContext(EditorContext);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,11 +56,11 @@ function useMonacoEditor(
   const getIsMounted = useIsMounted();
 
   React.useEffect(() => {
-    if (!divElRef.current || !fileName) {
+    if (!editorDivRef.current || !fileName) {
       return;
     }
     const { editor, model, text } = createMonacoEditor(
-      divElRef.current,
+      editorDivRef.current,
       setCursorStyles,
       settings,
       fileName!,
