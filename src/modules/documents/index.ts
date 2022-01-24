@@ -159,12 +159,12 @@ export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   Object.entries(seenMap).forEach(([, entries]) => {
     if (entries.length > 1) {
       const sortedEntries = entries.sort(
-        sortBy(({ length }) => length, "desc")
+        sortBy([({ length }) => length], ["desc"])
       );
       indexesToDelete.push(...sortedEntries.slice(1).map(({ index }) => index));
     }
   });
-  indexesToDelete.sort(sortBy((a) => a, "desc")).forEach((index) => {
+  indexesToDelete.sort(sortBy([(a) => a], ["desc"])).forEach((index) => {
     files.delete(index, 1);
   });
 }

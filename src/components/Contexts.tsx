@@ -41,7 +41,14 @@ export const EditorContext = React.createContext<EditorContext>({} as any);
 type CommentsContext = {
   comments: CommentData[];
   setComments: React.Dispatch<React.SetStateAction<CommentData[]>>;
-  commentRefs: React.MutableRefObject<{ [key: string]: HTMLElement }>;
+  commentRefs: React.MutableRefObject<{ [key: string]: CommentLayout }>;
+  focusCommentId: string | null;
+  setFocusCommentId: React.Dispatch<React.SetStateAction<string | null>>;
+};
+type CommentLayout = {
+  el: HTMLElement;
+  height: number;
+  top: number;
 };
 export const CommentsContext = React.createContext<CommentsContext>({} as any);
 
@@ -50,7 +57,10 @@ export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const [comments, setComments] = React.useState<CommentData[]>([]);
-  const commentRefs = React.useRef<{ [key: string]: HTMLElement }>({});
+  const commentRefs = React.useRef<{ [key: string]: CommentLayout }>({});
+  const [focusCommentId, setFocusCommentId] = React.useState<string | null>(
+    null
+  );
 
   const setSettings = React.useCallback((settings: Settings) => {
     setSettingsState(settings);
@@ -67,7 +77,13 @@ export const Contexts: React.FC = ({ children }) => {
       <SettingsContext.Provider value={{ settings, setSettings }}>
         <EditorContext.Provider value={{ editorRef }}>
           <CommentsContext.Provider
-            value={{ comments, setComments, commentRefs }}
+            value={{
+              comments,
+              setComments,
+              commentRefs,
+              focusCommentId,
+              setFocusCommentId,
+            }}
           >
             {children}
           </CommentsContext.Provider>

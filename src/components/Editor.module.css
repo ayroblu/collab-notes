@@ -10,9 +10,12 @@
   /* opacity: 0.3; */
   /* pointer-events: none; */
 }
+.selectionHover {
+  background: rgba(213, 169, 45, 0.6);
+}
 .selection:hover {
   background: rgba(213, 169, 45, 0.6);
 }
 .commentHover {
-  border: 1px solid var(--text-color);
+  border: 1px solid var(--text-color) !important;
 }

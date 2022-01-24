@@ -128,7 +128,8 @@ const useCommentSelections = () => {
             endColumn
           ),
           options: {
-            inlineClassName: cn(styles.selection, `comment-${id}`),
+            // inlineClassName: cn(styles.selection, `comment-${id}`),
+            className: cn(styles.selection, `comment-${id}`),
             hoverMessage: { value: text },
           },
         };
@@ -140,82 +141,93 @@ const useCommentSelections = () => {
   }, [comments]);
 };
 
-// const useCommentHighlights = () => {
-//   const { comments } = React.useContext(CommentsContext);
-//   React.useEffect(() => {
-//     let rafId = 0;
-//     const mouseMove = (e: MouseEvent) => {
-//       cancelAnimationFrame(rafId);
-//       rafId = requestAnimationFrame(() => {
-//         [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
-//           const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
-//           if (isIn && !v.classList.contains(styles.selectionHover)) {
-//             v.classList.add(styles.selectionHover);
-//           } else if (!isIn && v.classList.contains(styles.selectionHover)) {
-//             v.classList.remove(styles.selectionHover);
-//           }
-//         });
-//       });
-//     };
-//     document.body.addEventListener("mousemove", mouseMove);
-//     return () => {
-//       document.body.removeEventListener("mousemove", mouseMove);
-//     };
-//   }, []);
-// };
 const useCommentHighlights = () => {
   const { commentRefs, comments } = React.useContext(CommentsContext);
-  const { editorRef } = React.useContext(EditorContext);
   React.useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    let disposes: (() => void)[] = [];
-    const { dispose } = editor.onDidChangeModelDecorations(() => {
-      if (disposes.length === comments.length) return;
-      disposes.forEach((d) => d());
-      disposes = [...document.querySelectorAll(`.${styles.selection}`)].map(
-        (v) => {
-          const mouseEnter = () => {
-            const classes = [...v.classList];
-            const commentClass = classes.find((c) => c.startsWith("comment-"));
-            if (!commentClass) return;
-            const commentId = commentClass.replace("comment-", "");
-            const el = commentRefs.current[commentId];
-            if (!el) return;
+    let rafId = 0;
+    const mouseMove = (e: MouseEvent) => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
+          const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
+          if (isIn && !v.classList.contains(styles.selectionHover)) {
+            v.classList.add(styles.selectionHover);
+          } else if (!isIn && v.classList.contains(styles.selectionHover)) {
+            v.classList.remove(styles.selectionHover);
+          }
+
+          const classes = [...v.classList];
+          const commentClass = classes.find((c) => c.startsWith("comment-"));
+          if (!commentClass) return;
+          const commentId = commentClass.replace("comment-", "");
+          const el = commentRefs.current[commentId]?.el;
+          if (!el) return;
+          if (isIn) {
             el.classList.add(styles.commentHover);
-          };
-          const mouseLeave = () => {
-            const classes = [...v.classList];
-            const commentClass = classes.find((c) => c.startsWith("comment-"));
-            if (!commentClass) return;
-            const commentId = commentClass.replace("comment-", "");
-            const el = commentRefs.current[commentId];
-            if (!el) return;
+          } else if (!isIn) {
             el.classList.remove(styles.commentHover);
-          };
-          v.addEventListener("mouseenter", mouseEnter);
-          v.addEventListener("mouseleave", mouseLeave);
-          return () => {
-            v.removeEventListener("mouseenter", mouseEnter);
-            v.removeEventListener("mouseenter", mouseLeave);
-          };
-        }
-      );
-    });
+          }
+        });
+      });
+    };
+    document.body.addEventListener("mousemove", mouseMove);
     return () => {
-      dispose();
+      document.body.removeEventListener("mousemove", mouseMove);
     };
   }, [comments]);
 };
-
-// function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
-//   const isIn =
-//     e.clientX > r.left &&
-//     e.clientX < r.right &&
-//     e.clientY > r.top &&
-//     e.clientY < r.bottom;
-//   return isIn;
-// }
+function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
+  const isIn =
+    e.clientX > r.left &&
+    e.clientX < r.right &&
+    e.clientY > r.top &&
+    e.clientY < r.bottom;
+  return isIn;
+}
+// const useCommentHighlights = () => {
+//   const { commentRefs, comments } = React.useContext(CommentsContext);
+//   const { editorRef } = React.useContext(EditorContext);
+//   React.useEffect(() => {
+//     const editor = editorRef.current;
+//     if (!editor) return;
+//     let disposes: (() => void)[] = [];
+//     const { dispose } = editor.onDidChangeModelDecorations(() => {
+//       if (disposes.length === comments.length) return;
+//       disposes.forEach((d) => d());
+//       disposes = [...document.querySelectorAll(`.${styles.selection}`)].map(
+//         (v) => {
+//           const mouseEnter = () => {
+//             const classes = [...v.classList];
+//             const commentClass = classes.find((c) => c.startsWith("comment-"));
+//             if (!commentClass) return;
+//             const commentId = commentClass.replace("comment-", "");
+//             const el = commentRefs.current[commentId]?.el;
+//             if (!el) return;
+//             el.classList.add(styles.commentHover);
+//           };
+//           const mouseLeave = () => {
+//             const classes = [...v.classList];
+//             const commentClass = classes.find((c) => c.startsWith("comment-"));
+//             if (!commentClass) return;
+//             const commentId = commentClass.replace("comment-", "");
+//             const el = commentRefs.current[commentId]?.el;
+//             if (!el) return;
+//             el.classList.remove(styles.commentHover);
+//           };
+//           v.addEventListener("mouseenter", mouseEnter);
+//           v.addEventListener("mouseleave", mouseLeave);
+//           return () => {
+//             v.removeEventListener("mouseenter", mouseEnter);
+//             v.removeEventListener("mouseenter", mouseLeave);
+//           };
+//         }
+//       );
+//     });
+//     return () => {
+//       dispose();
+//     };
+//   }, [comments]);
+// };
 
 function createMonacoEditor(
   divEl: HTMLDivElement,

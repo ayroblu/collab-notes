@@ -136,13 +136,19 @@ export const nonNullable = <T>(item: T | null | undefined): item is T =>
   item !== null && item !== undefined;
 
 export const sortBy = <T>(
-  func: (a: T) => number | string,
-  order: "asc" | "desc" = "asc"
+  funcs: ((a: T) => number | string)[],
+  orders: ("asc" | "desc")[]
 ) => {
   return (a: T, b: T) => {
-    const aResult = func(a);
-    const bResult = func(b);
-    const val = aResult > bResult ? 1 : bResult > aResult ? -1 : 0;
-    return order === "desc" ? val * -1 : val;
+    for (const [i, f] of funcs.entries()) {
+      const aResult = f(a);
+      const bResult = f(b);
+      const val = aResult > bResult ? 1 : bResult > aResult ? -1 : 0;
+      const sortVal = orders[i] === "desc" ? val * -1 : val;
+      if (sortVal !== 0) {
+        return sortVal;
+      }
+    }
+    return 0;
   };
 };

@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { CommentData } from "@/modules/documents/types";
-import { getRandomColor } from "@/modules/utils";
+import { getRandomColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
@@ -9,13 +9,16 @@ import { FacePileFace } from "../shared/FacePile";
 import styles from "./Comment.module.css";
 import type { SelectionRange } from "./types";
 
-type Props = CommentData;
+type Props = CommentData & {
+  offset: number | undefined;
+};
 
 export const Comment: React.FC<Props> = ({
   byName,
   endColumn,
   endLineNumber,
   id,
+  offset,
   startColumn,
   startLineNumber,
   text,
@@ -28,13 +31,27 @@ export const Comment: React.FC<Props> = ({
     endColumn,
   };
   const position = usePosition(selection);
+  const offsetTop =
+    nonNullable(position) && nonNullable(offset)
+      ? position + offset
+      : nonNullable(position)
+      ? position
+      : undefined;
   return (
     <section
-      ref={(r) => r && (commentRefs.current[id] = r)}
+      ref={(r) =>
+        r &&
+        typeof position === "number" &&
+        (commentRefs.current[id] = {
+          el: r,
+          top: position,
+          height: r.getBoundingClientRect().height,
+        })
+      }
       className={styles.comment}
       style={{
-        insetBlockStart: position ?? undefined,
-        display: position === null ? "none" : undefined,
+        insetBlockStart: offsetTop,
+        display: !nonNullable(position) ? "none" : undefined,
       }}
     >
       <div className={styles.userHeading}>

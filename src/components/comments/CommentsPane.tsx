@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { getComments } from "@/modules/documents";
+import { sortBy } from "@/modules/utils";
 
 import { CommentsContext, SettingsContext } from "../Contexts";
 
@@ -18,6 +19,7 @@ export const CommentsPane: React.FC = () => {
   >([]);
   const comments = useCommentsSync();
   const createComment = useCreateComment();
+  const offsets = useCommentOffsets();
   const createCommentFn =
     (selection: SelectionRange, index: number) => (text: string) => {
       setInProgressSelections(
@@ -33,7 +35,7 @@ export const CommentsPane: React.FC = () => {
       <ul>
         {comments.map((comment) => (
           <li key={comment.id}>
-            <Comment {...comment} />
+            <Comment offset={offsets[comment.id]} {...comment} />
           </li>
         ))}
         {inProgressSelections.map((sel, i) => (
@@ -102,4 +104,51 @@ const useCreateComment = () => {
       },
     ]);
   };
+};
+
+const commentGap = 8;
+const useCommentOffsets = () => {
+  const { commentRefs, comments, focusCommentId } =
+    React.useContext(CommentsContext);
+  const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
+  React.useEffect(() => {
+    const commentDetails = Object.entries(commentRefs.current)
+      .map(([id, { el, height, top }]) => {
+        return { id, el, top, height };
+      })
+      .sort(sortBy([({ top }) => top], ["asc"]));
+    if (commentDetails.length < 2) return;
+    function getFocusCommentIndex() {
+      if (typeof focusCommentId === "string") {
+        const index = commentDetails.findIndex(
+          ({ id }) => id === focusCommentId
+        );
+        if (index === -1) return 0;
+        return index;
+      } else {
+        return 0;
+      }
+    }
+    const newOffsets: { [key: string]: number } = {};
+    const focusCommentIndex = getFocusCommentIndex();
+    for (let i = focusCommentIndex - 1; i >= 0; --i) {
+      const belowComment = commentDetails[i + 1]!;
+      const comment = commentDetails[i]!;
+      const commentBottom = comment.top + comment.height + commentGap;
+      if (commentBottom > belowComment.top) {
+        newOffsets[comment.id] = -(commentBottom - belowComment.top);
+      }
+    }
+    for (let i = focusCommentIndex + 1; i < commentDetails.length; ++i) {
+      const aboveComment = commentDetails[i - 1]!;
+      const comment = commentDetails[i]!;
+      const aboveCommentBottom =
+        aboveComment.top + aboveComment.height + commentGap;
+      if (aboveCommentBottom > comment.top) {
+        newOffsets[comment.id] = aboveCommentBottom - comment.top;
+      }
+    }
+    setOffsets(newOffsets);
+  }, [comments]);
+  return offsets;
 };
