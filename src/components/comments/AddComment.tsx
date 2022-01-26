@@ -37,6 +37,13 @@ export const AddComment: React.FC<AddCommentProps> = ({
       : nonNullable(position)
       ? position
       : undefined;
+
+  const onBlur = () => {
+    if (!commentText) {
+      handleCancel();
+    }
+  };
+
   return (
     <section
       className={styles.addComment}
@@ -59,6 +66,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
           className={styles.textarea}
           value={commentText}
           onChange={(e) => setCommentText(e.currentTarget.value)}
+          onBlur={onBlur}
           autoFocus
         />
         <div className={styles.flexEnd}>

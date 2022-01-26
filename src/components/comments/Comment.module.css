@@ -8,6 +8,9 @@
   inset-inline-end: var(--spacing-8);
   border: 1px solid var(--lighter-color);
 }
+.comment:hover {
+  border: 1px solid var(--text-color) !important;
+}
 .userHeading {
   display: flex;
 }

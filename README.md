@@ -8,6 +8,9 @@ TODO
 ### MVP
 - comments
   - Focus highlights + selection highlights
+    - show selection for in progress
+  - unfocus new input if empty closes it
+  - don't show new button when pressed
   - Animation touches like scroll into view
 - Auto update settings without save button
 
