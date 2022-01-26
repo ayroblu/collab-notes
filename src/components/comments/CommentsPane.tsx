@@ -47,10 +47,10 @@ export const CommentsPane: React.FC = () => {
   return (
     <section
       className={styles.commentsPane}
-      style={{ height: editorDivHeight + extraOffset }}
+      style={{ height: editorDivHeight }}
       ref={commentsPaneRef}
     >
-      <ul style={{ height: editorHeight }}>
+      <ul style={{ height: editorHeight && editorHeight + extraOffset }}>
         {comments.map((comment) => (
           <li key={comment.id}>
             <Comment
@@ -193,6 +193,7 @@ const useEditorHeight = () => {
   if (!editor) return;
   return editor.getContentHeight();
 };
+
 const useEditorScrollSync = (
   commentsPaneRef: React.RefObject<HTMLElement>,
   extraOffset: number

@@ -262,6 +262,9 @@ function createMonacoEditor(
     minimap: {
       enabled: false,
     },
+    scrollbar: {
+      vertical: "hidden",
+    },
   });
   new MonacoBinding(
     text,
