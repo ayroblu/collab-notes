@@ -43,6 +43,7 @@ export const CommentsPane: React.FC = () => {
     };
   const cancelCommentFn = (index: number) => () => {
     setInProgressSelections(inProgressSelections.filter((_, i) => i !== index));
+    setFocusCommentId(null);
   };
   return (
     <section

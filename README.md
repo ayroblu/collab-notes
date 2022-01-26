@@ -7,10 +7,11 @@ TODO
 ----
 ### MVP
 - comments
-  - comments scroll -> editor scroll
-    - end of page issues
-  - hide monaco scrollbar maybe?
-  - Cancel button for addComment
+  - collapse users with the same indexeddb id to the same user (including facepile)
+  - update usernames when users change their names
+  - hash user name -> color for consistent colors
+  - Focus highlights + selection highlights
+  - Animation touches like scroll into view
 
 ### Longer term
 - minify webpack

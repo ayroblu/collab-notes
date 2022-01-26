@@ -300,17 +300,14 @@ function setupYjsMonacoCursorData(
   settings: Settings,
   getIsMounted: () => boolean
 ) {
-  provider.awareness.setLocalStateField("user", {
+  const getLocalState = () => ({
     name: settings.name,
     colour: randomColour,
     lineNumber: editor.getPosition()?.lineNumber,
   });
+  provider.awareness.setLocalStateField("user", getLocalState());
   editor.onDidChangeCursorPosition(() => {
-    provider.awareness.setLocalStateField("user", {
-      name: settings.name,
-      colour: randomColour,
-      lineNumber: editor.getPosition()?.lineNumber,
-    });
+    provider.awareness.setLocalStateField("user", getLocalState());
   });
 
   let timeoutIds: { [clientId: string]: number } = {};
