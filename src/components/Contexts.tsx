@@ -64,11 +64,17 @@ export const Contexts: React.FC = ({ children }) => {
     null
   );
 
-  const setSettings = React.useCallback((settings: Settings) => {
+  const setSettings = React.useCallback(async (settings: Settings) => {
+    setSettingsState(settings);
+    await set(dbKey, settings);
+    broadcastUpdate();
+  }, []);
+  const setSettingsLocal = React.useCallback((settings: Settings) => {
     setSettingsState(settings);
     set(dbKey, settings);
   }, []);
-  const func = useSetupFunc(settings, setSettings);
+  const func = useSetupFunc(settings, setSettingsLocal);
+  useBroadcastSync(setSettingsLocal);
 
   return (
     <Loading
@@ -94,6 +100,19 @@ export const Contexts: React.FC = ({ children }) => {
     </Loading>
   );
 };
+
+function useBroadcastSync(setSettings: (settings: Settings) => void) {
+  React.useEffect(() => {
+    listenToUpdates(async ({ message }) => {
+      if (message === SettingsMessagesEnum.update) {
+        const savedSettings: Settings | void = await idbGetWithMigrations();
+        // Theoretically there are a few edge cases that aren't desireable. May
+        // want to handle this in the future
+        savedSettings && setSettings(savedSettings);
+      }
+    });
+  }, []);
+}
 
 function useSetupFunc(
   settings: Settings,
@@ -196,3 +215,27 @@ export enum LeftNavEnum {
   files = "files",
   rooms = "rooms",
 }
+
+const bc = "BroadcastChannel" in self ? new BroadcastChannel(dbKey) : null;
+function broadcastUpdate() {
+  if (bc) {
+    const message: SettingsBroadcast = {
+      message: SettingsMessagesEnum.update,
+    };
+    bc.postMessage(message);
+  }
+}
+function listenToUpdates(func: (message: SettingsBroadcast) => void) {
+  if (bc) {
+    bc.onmessage = (ev) => {
+      const data: SettingsBroadcast = ev.data;
+      func(data);
+    };
+  }
+}
+enum SettingsMessagesEnum {
+  update = "update",
+}
+type SettingsBroadcast = {
+  message: SettingsMessagesEnum;
+};

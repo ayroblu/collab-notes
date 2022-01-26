@@ -8,13 +8,8 @@ import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 
-import type {
-  AwarenessStates,
-  LocalState} from "../modules/documents";
-import {
-  getYFileMetaData,
-  getYFileText
-} from "../modules/documents";
+import type { AwarenessStates, LocalState } from "../modules/documents";
+import { getYFileMetaData, getYFileText } from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 import { cn, getHashColor } from "../modules/utils";
@@ -323,6 +318,7 @@ function setupYjsMonacoCursorData(
     const cursorData = Array.from(
       provider.awareness.getStates() as AwarenessStates
     )
+      .filter(([, { user }]) => user)
       .map(([clientId, { user }]) => ({ clientId, ...user }))
       .filter(
         ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id

@@ -7,11 +7,9 @@ TODO
 ----
 ### MVP
 - comments
-  - collapse users with the same indexeddb id to the same user (including facepile)
-  - update usernames when users change their names
-  - hash user name -> color for consistent colors
   - Focus highlights + selection highlights
   - Animation touches like scroll into view
+- Auto update settings without save button
 
 ### Longer term
 - minify webpack

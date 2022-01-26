@@ -118,7 +118,11 @@ const useCommentNamesSync = () => {
     const yComments = getComments(room.id, room.password, fileName);
     if (!yComments) return;
 
-    syncCommentNamesFn(room.id, room.password, fileName)(settings.id, settings.name);
+    syncCommentNamesFn(
+      room.id,
+      room.password,
+      fileName
+    )(settings.id, settings.name);
   }, [settings.activeRoomId, settings.name, fileName]);
 };
 

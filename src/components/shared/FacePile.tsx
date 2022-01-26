@@ -20,6 +20,7 @@ export const FacePile: React.FC = () => {
         provider.awareness.getStates() as AwarenessStates
       )
         .slice(1)
+        .filter(([, { user }]) => user)
         .map(
           ([
             clientId,

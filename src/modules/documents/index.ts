@@ -147,7 +147,7 @@ export const syncCommentNamesFn = (
   roomPassword: string,
   fileName: string
 ) => {
-  const {ydoc} = getRoom(roomId, roomPassword);
+  const { ydoc } = getRoom(roomId, roomPassword);
   const comments = getComments(roomId, roomPassword, fileName);
 
   return (id: string, name: string) => {
@@ -158,11 +158,11 @@ export const syncCommentNamesFn = (
         toChange.push(i);
       }
     });
-    ydoc.transact(()=> {
+    ydoc.transact(() => {
       toChange.forEach((i) => {
         const comment = comments.get(i);
         comments.delete(i);
-        comments.insert(i, [{...comment, byName: name}]);
+        comments.insert(i, [{ ...comment, byName: name }]);
       });
     });
   };
