@@ -119,21 +119,19 @@ const useCommentSelections = () => {
         startColumn,
         startLineNumber,
         text,
-      }) => {
-        return {
-          range: new monaco.Range(
-            startLineNumber,
-            startColumn,
-            endLineNumber,
-            endColumn
-          ),
-          options: {
-            // inlineClassName: cn(styles.selection, `comment-${id}`),
-            className: cn(styles.selection, `comment-${id}`),
-            hoverMessage: { value: text },
-          },
-        };
-      }
+      }) => ({
+        range: new monaco.Range(
+          startLineNumber,
+          startColumn,
+          endLineNumber,
+          endColumn
+        ),
+        options: {
+          // inlineClassName: cn(styles.selection, `comment-${id}`),
+          className: cn(styles.selection, `comment-${id}`),
+          hoverMessage: { value: text },
+        },
+      })
     );
     const editor = editorRef.current;
     if (!editor) return;
@@ -332,9 +330,9 @@ function setupYjsMonacoCursorData(
     );
     const tempCursorStyles = cursorData
       .filter(({ clientId }) => updated.includes(clientId))
-      .map(({ clientId }) => {
-        return `.yRemoteSelectionHead-${clientId}::after{opacity:1}`;
-      });
+      .map(
+        ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
+      );
     setCursorStyles([...mainCursorStyles, ...tempCursorStyles]);
     cursorData.forEach(({ clientId }) => {
       clearTimeout(timeoutIds[clientId]);

@@ -39,10 +39,10 @@ export const TextArea: React.FC<TextAreaProps> = ({
   </label>
 );
 
-export const FormLabel: React.FC = ({ children }) => {
-  return <span className={styles.formLabel}>{children}</span>;
-};
+export const FormLabel: React.FC = ({ children }) => (
+  <span className={styles.formLabel}>{children}</span>
+);
 
-export const FormLabelWrapper: React.FC = ({ children }) => {
-  return <label className={styles.input}>{children}</label>;
-};
+export const FormLabelWrapper: React.FC = ({ children }) => (
+  <label className={styles.input}>{children}</label>
+);

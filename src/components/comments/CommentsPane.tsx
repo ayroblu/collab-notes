@@ -139,9 +139,7 @@ const useCommentOffsets = (inProgressSelections: SelectionRange[]) => {
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   React.useEffect(() => {
     const commentDetails = Object.entries(commentRefs.current)
-      .map(([id, { el, height, top }]) => {
-        return { id, el, top, height };
-      })
+      .map(([id, { el, height, top }]) => ({ id, el, top, height }))
       .sort(sortBy([({ top }) => top], ["asc"]));
     if (commentDetails.length < 2) return;
     function getFocusCommentIndex() {

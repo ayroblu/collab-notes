@@ -60,5 +60,6 @@ module.exports = {
     "@typescript-eslint/sort-type-union-intersection-members": "error",
     "sort-destructure-keys/sort-destructure-keys": "error",
     "css-modules/no-unused-class": "error",
+    "arrow-body-style": ["error", "as-needed"],
   },
 };

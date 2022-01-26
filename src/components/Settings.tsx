@@ -89,11 +89,10 @@ export const Settings: React.FC = () => {
         {tempSettings.isVim &&
           form.createFormItem("vimrc", {
             adaptor,
-            custom: (v) => {
-              return parseVimrc(v)
+            custom: (v) =>
+              parseVimrc(v)
                 ? null
-                : "Failed to parse vimrc, syntax should match: imap jk <Esc>";
-            },
+                : "Failed to parse vimrc, syntax should match: imap jk <Esc>",
           })(({ errorText, name, onChange, value }) => (
             <TextArea
               label="vimrc"
@@ -163,12 +162,10 @@ const checkedAdaptor: (e: React.ChangeEvent<HTMLInputElement>) => boolean = (
   e
 ) => e.target.checked;
 
-const themes = keys(themeList).map((key) => {
-  return {
-    label: themeList[key],
-    value: key,
-  };
-});
+const themes = keys(themeList).map((key) => ({
+  label: themeList[key],
+  value: key,
+}));
 export const parseVimrc = (vimrc: string) => {
   try {
     return vimrc

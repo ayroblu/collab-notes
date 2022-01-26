@@ -10,17 +10,13 @@ export const LeftNavButton: React.FC<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
   > & { isHighlight?: boolean }
-> = ({ isHighlight, ...props }) => {
-  return (
-    <button
-      className={cn(styles.leftNavButton, isHighlight && styles.highlight)}
-      {...props}
-    />
-  );
-};
+> = ({ isHighlight, ...props }) => (
+  <button
+    className={cn(styles.leftNavButton, isHighlight && styles.highlight)}
+    {...props}
+  />
+);
 
 export const LeftNavButtonLink: React.FC<
   LinkProps & React.RefAttributes<HTMLAnchorElement>
-> = (props) => {
-  return <Link {...props} className={styles.leftNavButton} />;
-};
+> = (props) => <Link {...props} className={styles.leftNavButton} />;

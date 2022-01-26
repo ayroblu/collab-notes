@@ -32,9 +32,5 @@ function getLeftNavPanePart(type: LeftNavEnum | null) {
   }
 }
 
-const LeftNavFiles: React.FC = () => {
-  return <FilesListPane />;
-};
-const LeftNavRooms: React.FC = () => {
-  return <RoomsList />;
-};
+const LeftNavFiles: React.FC = () => <FilesListPane />;
+const LeftNavRooms: React.FC = () => <RoomsList />;

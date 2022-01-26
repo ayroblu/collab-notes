@@ -35,8 +35,6 @@ type SubmitButtonProps = React.DetailedHTMLProps<
 export const SubmitButton: React.FC<SubmitButtonProps> = ({
   className,
   ...props
-}) => {
-  return (
-    <input type="submit" className={cn(styles.button, className)} {...props} />
-  );
-};
+}) => (
+  <input type="submit" className={cn(styles.button, className)} {...props} />
+);

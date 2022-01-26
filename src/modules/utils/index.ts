@@ -138,11 +138,9 @@ export const nullable = <T>(
   item: T | null | undefined
 ): item is null | undefined => item === null || item === undefined;
 
-export const sortBy = <T>(
-  funcs: ((a: T) => number | string)[],
-  orders: ("asc" | "desc")[]
-) => {
-  return (a: T, b: T) => {
+export const sortBy =
+  <T>(funcs: ((a: T) => number | string)[], orders: ("asc" | "desc")[]) =>
+  (a: T, b: T) => {
     for (const [i, f] of funcs.entries()) {
       const aResult = f(a);
       const bResult = f(b);
@@ -154,4 +152,3 @@ export const sortBy = <T>(
     }
     return 0;
   };
-};
