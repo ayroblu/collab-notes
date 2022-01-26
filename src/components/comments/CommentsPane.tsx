@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { getComments } from "@/modules/documents";
-import { sortBy } from "@/modules/utils";
+import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 
@@ -198,6 +198,8 @@ const useEditorScrollSync = (
   extraOffset: number
 ) => {
   const { editorRef } = React.useContext(EditorContext);
+  const lastEditorScrollRef = React.useRef<string | null>(null);
+  const lastCommentsPaneScrollRef = React.useRef<string | null>(null);
   React.useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -208,7 +210,10 @@ const useEditorScrollSync = (
     const { dispose } = editor.onDidScrollChange((e) => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        commentsPane.scrollTop = e.scrollTop + extraOffset;
+        if (!getIsRecent(lastCommentsPaneScrollRef.current, 100)) {
+          commentsPane.scrollTop = e.scrollTop + extraOffset;
+          lastEditorScrollRef.current = new Date().toISOString();
+        }
       });
     });
     return () => {
@@ -216,7 +221,33 @@ const useEditorScrollSync = (
     };
   }, [extraOffset]);
 
-  // For when comments are created specifically
+  React.useEffect(() => {
+    // For when commentspane scrolls, reflect in editor
+    const editor = editorRef.current;
+    if (!editor) return;
+    const commentsPane = commentsPaneRef.current;
+    if (!commentsPane) return;
+
+    let rafId = 0;
+    const handler = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (!getIsRecent(lastEditorScrollRef.current, 100)) {
+          editor.setScrollTop(commentsPane.scrollTop - extraOffset);
+          lastCommentsPaneScrollRef.current = new Date().toISOString();
+        }
+      });
+    };
+    commentsPane.addEventListener("scroll", handler);
+    const dispose = () => {
+      commentsPane.removeEventListener("scroll", handler);
+    };
+    return () => {
+      dispose();
+    };
+  }, [extraOffset]);
+
+  // For when focus comment changes usually
   React.useEffect(() => {
     const editor = editorRef.current;
     const commentsPane = commentsPaneRef.current;
@@ -225,3 +256,15 @@ const useEditorScrollSync = (
     commentsPane.scrollTop = editor.getScrollTop() + extraOffset;
   }, [extraOffset]);
 };
+
+function getIsRecent(date: string | null, diff: number): boolean {
+  const millis = getDateDiffMillis(date);
+  if (nullable(millis)) {
+    return false;
+  }
+  return millis < diff;
+}
+function getDateDiffMillis(date: string | null): number | null {
+  if (!date) return null;
+  return new Date().getTime() - new Date(date).getTime();
+}

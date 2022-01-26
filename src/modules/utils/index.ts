@@ -134,6 +134,9 @@ export function dateTimeFormatter(dateString: Date | string) {
 
 export const nonNullable = <T>(item: T | null | undefined): item is T =>
   item !== null && item !== undefined;
+export const nullable = <T>(
+  item: T | null | undefined
+): item is null | undefined => item === null || item === undefined;
 
 export const sortBy = <T>(
   funcs: ((a: T) => number | string)[],
