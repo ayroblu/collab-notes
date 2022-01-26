@@ -22,6 +22,7 @@ import styles from "./Editor.module.css";
 import "./Editor.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
+import { getInProgressId } from "./comments/CommentsPane";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -109,35 +110,50 @@ function useMonacoEditor(
 
 const useCommentSelections = () => {
   const { editorRef } = React.useContext(EditorContext);
-  const { comments } = React.useContext(CommentsContext);
+  const { comments, inProgressSelections } = React.useContext(CommentsContext);
   const [decorations, setDecorations] = React.useState<string[]>([]);
   React.useEffect(() => {
-    const newDecorations = comments.map(
-      ({
-        endColumn,
-        endLineNumber,
-        id,
-        startColumn,
-        startLineNumber,
-        text,
-      }) => ({
-        range: new monaco.Range(
-          startLineNumber,
-          startColumn,
+    const newDecorations = [
+      ...comments.map(
+        ({
+          endColumn,
           endLineNumber,
-          endColumn
-        ),
-        options: {
-          // inlineClassName: cn(styles.selection, `comment-${id}`),
-          className: cn(styles.selection, `comment-${id}`),
-          hoverMessage: { value: text },
-        },
-      })
-    );
+          id,
+          startColumn,
+          startLineNumber,
+          text,
+        }) => ({
+          range: new monaco.Range(
+            startLineNumber,
+            startColumn,
+            endLineNumber,
+            endColumn
+          ),
+          options: {
+            // inlineClassName: cn(styles.selection, `comment-${id}`),
+            className: cn(styles.selection, `comment-${id}`),
+            hoverMessage: { value: text },
+          },
+        })
+      ),
+      ...inProgressSelections.map(
+        ({ endColumn, endLineNumber, startColumn, startLineNumber }, i) => ({
+          range: new monaco.Range(
+            startLineNumber,
+            startColumn,
+            endLineNumber,
+            endColumn
+          ),
+          options: {
+            className: cn(styles.selection, `comment-${getInProgressId(i)}`),
+          },
+        })
+      ),
+    ];
     const editor = editorRef.current;
     if (!editor) return;
     setDecorations(editor.deltaDecorations(decorations, newDecorations));
-  }, [comments]);
+  }, [inProgressSelections, comments]);
 };
 
 const useCommentHighlights = () => {

@@ -7,9 +7,15 @@
   inset-inline-start: var(--spacing-8);
   inset-inline-end: var(--spacing-8);
   border: 1px solid var(--lighter-color);
+  top: 0;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  .comment {
+    transition: transform 0.2s;
+  }
 }
 .comment:hover {
-  border: 1px solid var(--text-color) !important;
+  border: 1px solid var(--text-color);
 }
 .userHeading {
   display: flex;
@@ -20,4 +26,7 @@
 }
 .text {
   margin-block-start: var(--spacing-8);
+}
+.focus {
+  border: 1px solid var(--text-color);
 }

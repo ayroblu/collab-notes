@@ -13,6 +13,7 @@ TODO
   - don't show new button when pressed
   - Animation touches like scroll into view
 - Auto update settings without save button
+- react hooks eslint
 
 ### Longer term
 - minify webpack

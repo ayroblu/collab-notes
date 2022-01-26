@@ -1,6 +1,6 @@
 import React from "react";
 
-import { nonNullable } from "@/modules/utils";
+import { cn, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { Button, SubmitButton } from "../shared/Button";
@@ -22,7 +22,8 @@ export const AddComment: React.FC<AddCommentProps> = ({
   onSubmit,
   selection,
 }) => {
-  const { commentRefs } = React.useContext(CommentsContext);
+  const { commentRefs, focusCommentId, setFocusCommentId } =
+    React.useContext(CommentsContext);
   const [commentText, setCommentText] = React.useState("");
   const handleSubmit = () => {
     onSubmit(commentText);
@@ -46,7 +47,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
 
   return (
     <section
-      className={styles.addComment}
+      className={cn(styles.addComment, focusCommentId === id && styles.focus)}
       ref={(r) =>
         r &&
         typeof position === "number" &&
@@ -57,9 +58,10 @@ export const AddComment: React.FC<AddCommentProps> = ({
         })
       }
       style={{
-        top: offsetTop,
+        transform: `translateY(${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
       }}
+      onClick={() => setFocusCommentId(id)}
     >
       <form onSubmit={handleSubmit}>
         <textarea

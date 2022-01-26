@@ -14,11 +14,9 @@ import styles from "./CommentsPane.module.css";
 import type { SelectionRange } from "./types";
 
 export const CommentsPane: React.FC = () => {
-  const [inProgressSelections, setInProgressSelections] = React.useState<
-    SelectionRange[]
-  >([]);
   const { editorDivRef } = React.useContext(EditorContext);
-  const { setFocusCommentId } = React.useContext(CommentsContext);
+  const { inProgressSelections, setFocusCommentId, setInProgressSelections } =
+    React.useContext(CommentsContext);
   const comments = useCommentsSync();
   useCommentNamesSync();
   const createComment = useCreateComment();
@@ -78,7 +76,7 @@ export const CommentsPane: React.FC = () => {
   );
 };
 
-function getInProgressId(i: number) {
+export function getInProgressId(i: number) {
   return `add-comment-${i}`;
 }
 
@@ -202,7 +200,7 @@ const useCommentOffsets = (inProgressSelections: SelectionRange[]) => {
       }
     }
     setOffsets(newOffsets);
-  }, [comments, inProgressSelections]);
+  }, [focusCommentId, comments, inProgressSelections]);
   return { offsets, extraOffset };
 };
 

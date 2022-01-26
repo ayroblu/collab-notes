@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { CommentData } from "@/modules/documents/types";
-import { getHashColor, nonNullable } from "@/modules/utils";
+import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
@@ -23,7 +23,8 @@ export const Comment: React.FC<Props> = ({
   startLineNumber,
   text,
 }) => {
-  const { commentRefs } = React.useContext(CommentsContext);
+  const { commentRefs, focusCommentId, setFocusCommentId } =
+    React.useContext(CommentsContext);
   const selection = {
     startLineNumber,
     startColumn,
@@ -48,11 +49,12 @@ export const Comment: React.FC<Props> = ({
           height: r.getBoundingClientRect().height,
         })
       }
-      className={styles.comment}
+      className={cn(styles.comment, focusCommentId === id && styles.focus)}
       style={{
-        top: offsetTop,
+        transform: `translateY(${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
       }}
+      onClick={() => setFocusCommentId(id)}
     >
       <div className={styles.userHeading}>
         <FacePileFace color={getHashColor(byName)} name={byName} />
