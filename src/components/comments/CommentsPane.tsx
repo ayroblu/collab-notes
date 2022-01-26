@@ -2,7 +2,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { getComments } from "@/modules/documents";
+import { getComments, syncCommentNamesFn } from "@/modules/documents";
 import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
@@ -20,6 +20,7 @@ export const CommentsPane: React.FC = () => {
   const { editorDivRef } = React.useContext(EditorContext);
   const { setFocusCommentId } = React.useContext(CommentsContext);
   const comments = useCommentsSync();
+  useCommentNamesSync();
   const createComment = useCreateComment();
   const { extraOffset, offsets } = useCommentOffsets(inProgressSelections);
   const editorHeight = useEditorHeight();
@@ -104,6 +105,21 @@ const useCommentsSync = () => {
   }, [settings.activeRoomId]);
 
   return comments;
+};
+
+const useCommentNamesSync = () => {
+  const { settings } = React.useContext(SettingsContext);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  React.useEffect(() => {
+    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+    if (!room) return;
+    if (!fileName) return;
+    const yComments = getComments(room.id, room.password, fileName);
+    if (!yComments) return;
+
+    syncCommentNamesFn(room.id, room.password, fileName)(settings.id, settings.name);
+  }, [settings.activeRoomId, settings.name, fileName]);
 };
 
 const useCreateComment = () => {

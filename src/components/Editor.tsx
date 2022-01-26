@@ -11,7 +11,7 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 import { getYFileMetaData, getYFileText } from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
-import { cn, getRandomColor } from "../modules/utils";
+import { cn, getHashColor } from "../modules/utils";
 
 import type { Settings } from "./Contexts";
 import { CommentsContext } from "./Contexts";
@@ -288,8 +288,13 @@ function createMonacoEditor(
 }
 const builtInThemes = ["vs", "vs-dark", "hc-black"];
 
-const randomColour = getRandomColor();
-
+type LocalState = {
+  id: string,
+  name: string,
+  colour: string,
+  lineNumber: number | undefined,
+}
+type AwarenessStates = Map<number, {user: LocalState}>
 function setupYjsMonacoCursorData(
   editor: monaco.editor.IStandaloneCodeEditor,
   ydoc: Y.Doc,
@@ -298,9 +303,10 @@ function setupYjsMonacoCursorData(
   settings: Settings,
   getIsMounted: () => boolean
 ) {
-  const getLocalState = () => ({
+  const getLocalState = (): LocalState => ({
+    id: settings.id,
     name: settings.name,
-    colour: randomColour,
+    colour: getHashColor(settings.name),
     lineNumber: editor.getPosition()?.lineNumber,
   });
   provider.awareness.setLocalStateField("user", getLocalState());
@@ -315,9 +321,9 @@ function setupYjsMonacoCursorData(
     removed: string[];
   };
   provider.awareness.on("change", ({ updated }: AwarenessEvent) => {
-    const cursorData = Array.from(provider.awareness.getStates())
+    const cursorData = Array.from(provider.awareness.getStates() as AwarenessStates)
       .map(([clientId, { user }]) => ({ clientId, ...user }))
-      .filter(({ clientId }) => clientId !== ydoc.clientID);
+      .filter(({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id);
 
     const mainCursorStyles = cursorData.map(
       ({ clientId, colour, lineNumber, name }) => {
@@ -329,7 +335,7 @@ function setupYjsMonacoCursorData(
       }
     );
     const tempCursorStyles = cursorData
-      .filter(({ clientId }) => updated.includes(clientId))
+      .filter(({ clientId }) => updated.includes(clientId + ''))
       .map(
         ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
       );

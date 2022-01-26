@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { CommentData } from "@/modules/documents/types";
-import { getRandomColor, nonNullable } from "@/modules/utils";
+import { getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
@@ -55,7 +55,7 @@ export const Comment: React.FC<Props> = ({
       }}
     >
       <div className={styles.userHeading}>
-        <FacePileFace color={getRandomColor()} name={byName} />
+        <FacePileFace color={getHashColor(byName)} name={byName} />
         <h4 className={styles.userNameHeading}>{byName}</h4>
       </div>
       <p className={styles.text}>{text}</p>

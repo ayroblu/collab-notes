@@ -142,6 +142,32 @@ export function getComments(
   return getYFileComments(file);
 }
 
+export const syncCommentNamesFn = (
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+) => {
+  const {ydoc} = getRoom(roomId, roomPassword);
+  const comments = getComments(roomId, roomPassword, fileName);
+
+  return (id: string, name: string) => {
+    if (!comments) return;
+    const toChange: number[] = [];
+    comments.forEach(({ byId, byName }, i) => {
+      if (id === byId && byName !== name) {
+        toChange.push(i);
+      }
+    });
+    ydoc.transact(()=> {
+      toChange.forEach((i) => {
+        const comment = comments.get(i);
+        comments.delete(i);
+        comments.insert(i, [{...comment, byName: name}]);
+      });
+    });
+  };
+};
+
 export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   const seenMap: { [fileName: string]: { index: number; length: number }[] } =
     {};
