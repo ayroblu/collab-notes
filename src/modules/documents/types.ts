@@ -26,3 +26,10 @@ export type CommentData = {
   startColumn: number;
   endColumn: number;
 };
+export type LocalState = {
+  id: string;
+  name: string;
+  colour: string;
+  lineNumber: number | undefined;
+};
+export type AwarenessStates = Map<number, { user: LocalState }>;

@@ -8,7 +8,13 @@ import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 
-import { getYFileMetaData, getYFileText } from "../modules/documents";
+import type {
+  AwarenessStates,
+  LocalState} from "../modules/documents";
+import {
+  getYFileMetaData,
+  getYFileText
+} from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 import { cn, getHashColor } from "../modules/utils";
@@ -288,13 +294,6 @@ function createMonacoEditor(
 }
 const builtInThemes = ["vs", "vs-dark", "hc-black"];
 
-type LocalState = {
-  id: string,
-  name: string,
-  colour: string,
-  lineNumber: number | undefined,
-}
-type AwarenessStates = Map<number, {user: LocalState}>
 function setupYjsMonacoCursorData(
   editor: monaco.editor.IStandaloneCodeEditor,
   ydoc: Y.Doc,
@@ -321,9 +320,13 @@ function setupYjsMonacoCursorData(
     removed: string[];
   };
   provider.awareness.on("change", ({ updated }: AwarenessEvent) => {
-    const cursorData = Array.from(provider.awareness.getStates() as AwarenessStates)
+    const cursorData = Array.from(
+      provider.awareness.getStates() as AwarenessStates
+    )
       .map(([clientId, { user }]) => ({ clientId, ...user }))
-      .filter(({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id);
+      .filter(
+        ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
+      );
 
     const mainCursorStyles = cursorData.map(
       ({ clientId, colour, lineNumber, name }) => {
@@ -335,7 +338,7 @@ function setupYjsMonacoCursorData(
       }
     );
     const tempCursorStyles = cursorData
-      .filter(({ clientId }) => updated.includes(clientId + ''))
+      .filter(({ clientId }) => updated.includes(clientId + ""))
       .map(
         ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
       );

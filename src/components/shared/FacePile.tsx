@@ -1,6 +1,8 @@
 import React from "react";
 
+import type { AwarenessStates } from "@/modules/documents";
 import { getRoom } from "@/modules/documents";
+import { uniqBy } from "@/modules/utils";
 
 import { SettingsContext } from "../Contexts";
 
@@ -14,18 +16,22 @@ export const FacePile: React.FC = () => {
     if (!room) return;
     const { provider, ydoc } = getRoom(room.id, room.password);
     provider.awareness.on("change", () => {
-      const faces = Array.from(provider.awareness.getStates())
+      const faces = Array.from(
+        provider.awareness.getStates() as AwarenessStates
+      )
         .slice(1)
         .map(
           ([
             clientId,
             {
-              user: { colour, name },
+              user: { colour, id, name },
             },
-          ]) => ({ clientId, name, color: colour })
+          ]) => ({ clientId, name, color: colour, id })
         )
-        .filter(({ clientId }) => clientId !== ydoc.clientID);
-      setFaces(faces);
+        .filter(
+          ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
+        );
+      setFaces(uniqBy(faces, ({ id }) => id));
     });
   }, []);
   if (!room) return null;
