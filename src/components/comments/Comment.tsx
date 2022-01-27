@@ -1,9 +1,12 @@
 import React from "react";
+import { VscClose } from "react-icons/vsc";
+import { useSearchParams } from "react-router-dom";
 
+import { getComments } from "@/modules/documents";
 import type { CommentData } from "@/modules/documents/types";
 import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
-import { CommentsContext, EditorContext } from "../Contexts";
+import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
 
 import styles from "./Comment.module.css";
@@ -25,6 +28,9 @@ export const Comment: React.FC<Props> = ({
 }) => {
   const { commentRefs, focusCommentId, setFocusCommentId } =
     React.useContext(CommentsContext);
+  const { settings } = React.useContext(SettingsContext);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
   const selection = {
     startLineNumber,
     startColumn,
@@ -38,6 +44,22 @@ export const Comment: React.FC<Props> = ({
       : nonNullable(position)
       ? position
       : undefined;
+
+  const deleteComment = () => {
+    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+    if (!room) return;
+    if (!fileName) return;
+    const yComments = getComments(room.id, room.password, fileName);
+    if (!yComments) return;
+    const index = yComments.toArray().findIndex((comment) => comment.id === id);
+    if (index === -1) return;
+
+    yComments.delete(index);
+    if (focusCommentId === id) {
+      setFocusCommentId(null);
+    }
+    delete commentRefs.current[id];
+  };
   return (
     <section
       ref={(r) =>
@@ -61,6 +83,9 @@ export const Comment: React.FC<Props> = ({
         <h4 className={styles.userNameHeading}>{byName}</h4>
       </div>
       <p className={styles.text}>{text}</p>
+      <button className={styles.close} onClick={deleteComment}>
+        <VscClose />
+      </button>
     </section>
   );
 };

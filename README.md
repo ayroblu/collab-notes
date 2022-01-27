@@ -7,6 +7,8 @@ TODO
 ----
 ### MVP
 - comments
+  - bug with scroll position when creating
+  - Bug with changing to different file / room
   - Focus highlights + selection highlights
     - Focus on comment focuses selection too
 - Auto update settings without save button

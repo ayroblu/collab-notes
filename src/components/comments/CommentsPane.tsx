@@ -20,7 +20,7 @@ export const CommentsPane: React.FC = () => {
   const comments = useCommentsSync();
   useCommentNamesSync();
   const createComment = useCreateComment();
-  const { extraOffset, offsets } = useCommentOffsets(inProgressSelections);
+  const { extraOffset, offsets } = useCommentOffsets();
   const editorHeight = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
   useEditorScrollSync(commentsPaneRef, extraOffset);
@@ -150,8 +150,8 @@ const useCreateComment = () => {
 };
 
 const commentGap = 8;
-const useCommentOffsets = (inProgressSelections: SelectionRange[]) => {
-  const { commentRefs, comments, focusCommentId } =
+const useCommentOffsets = () => {
+  const { commentRefs, comments, focusCommentId, inProgressSelections } =
     React.useContext(CommentsContext);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
@@ -199,6 +199,7 @@ const useCommentOffsets = (inProgressSelections: SelectionRange[]) => {
         newOffsets[comment.id] = aboveCommentBottom - comment.top;
       }
     }
+    console.log(newOffsets);
     setOffsets(newOffsets);
   }, [focusCommentId, comments, inProgressSelections]);
   return { offsets, extraOffset };
