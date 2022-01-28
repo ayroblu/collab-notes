@@ -1,5 +1,6 @@
 import React from "react";
 import { VscComment } from "react-icons/vsc";
+import { v4 as uuidv4 } from "uuid";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 
@@ -64,6 +65,7 @@ const useShowCommentButton = () => {
         endLineNumber: sel.endLineNumber,
         startColumn: sel.startColumn,
         endColumn: sel.endColumn,
+        id: uuidv4(),
       };
       const top = editor.getTopForPosition(
         sel.startLineNumber,

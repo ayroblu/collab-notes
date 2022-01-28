@@ -1,6 +1,5 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 import { getComments, syncCommentNamesFn } from "@/modules/documents";
 import { nullable, sortBy } from "@/modules/utils";
@@ -31,17 +30,18 @@ export const CommentsPane: React.FC = () => {
 
   const addInProgressComment = (selection: SelectionRange) => {
     setInProgressSelections([...inProgressSelections, selection]);
-    setFocusCommentId(getInProgressId(inProgressSelections.length));
+    setFocusCommentId(selection.id);
   };
-  const createCommentFn =
-    (selection: SelectionRange, index: number) => (text: string) => {
-      setInProgressSelections(
-        inProgressSelections.filter((_, i) => i !== index)
-      );
-      text && createComment && createComment(text, selection);
-    };
-  const cancelCommentFn = (index: number) => () => {
-    setInProgressSelections(inProgressSelections.filter((_, i) => i !== index));
+  const createCommentFn = (selection: SelectionRange) => (text: string) => {
+    setInProgressSelections(
+      inProgressSelections.filter(({ id }) => selection.id !== id)
+    );
+    text && createComment && createComment(text, selection);
+  };
+  const cancelCommentFn = (selectionId: string) => () => {
+    setInProgressSelections(
+      inProgressSelections.filter(({ id }) => id !== selectionId)
+    );
     setFocusCommentId(null);
   };
   return (
@@ -59,14 +59,14 @@ export const CommentsPane: React.FC = () => {
             />
           </li>
         ))}
-        {inProgressSelections.map((sel, i) => (
+        {inProgressSelections.map((sel) => (
           <li key={JSON.stringify(sel)}>
             <AddComment
               selection={sel}
-              offset={(offsets[getInProgressId(i)] ?? 0) + extraOffset}
-              id={getInProgressId(i)}
-              onSubmit={createCommentFn(sel, i)}
-              onCancel={cancelCommentFn(i)}
+              offset={(offsets[sel.id] ?? 0) + extraOffset}
+              id={sel.id}
+              onSubmit={createCommentFn(sel)}
+              onCancel={cancelCommentFn(sel.id)}
             />
           </li>
         ))}
@@ -75,10 +75,6 @@ export const CommentsPane: React.FC = () => {
     </section>
   );
 };
-
-export function getInProgressId(i: number) {
-  return `add-comment-${i}`;
-}
 
 const useCommentsSync = () => {
   const { settings } = React.useContext(SettingsContext);
@@ -137,7 +133,6 @@ const useCreateComment = () => {
     const now = new Date().toISOString();
     yComments.push([
       {
-        id: uuidv4(),
         text,
         byId: settings.id,
         byName: settings.name,

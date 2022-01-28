@@ -1,6 +1,7 @@
 import React from "react";
 import { VscClose } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 import { getComments } from "@/modules/documents";
 import type { CommentData } from "@/modules/documents/types";
@@ -32,6 +33,7 @@ export const Comment: React.FC<Props> = ({
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const selection = {
+    id: uuidv4(),
     startLineNumber,
     startColumn,
     endLineNumber,

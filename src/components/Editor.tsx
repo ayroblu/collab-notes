@@ -22,7 +22,6 @@ import styles from "./Editor.module.css";
 import "./Editor.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
-import { getInProgressId } from "./comments/CommentsPane";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -137,7 +136,7 @@ const useCommentSelections = () => {
         })
       ),
       ...inProgressSelections.map(
-        ({ endColumn, endLineNumber, startColumn, startLineNumber }, i) => ({
+        ({ endColumn, endLineNumber, id, startColumn, startLineNumber }) => ({
           range: new monaco.Range(
             startLineNumber,
             startColumn,
@@ -145,7 +144,7 @@ const useCommentSelections = () => {
             endColumn
           ),
           options: {
-            className: cn(styles.selection, `comment-${getInProgressId(i)}`),
+            className: cn(styles.selection, `comment-${id}`),
           },
         })
       ),
