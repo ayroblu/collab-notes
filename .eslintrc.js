@@ -63,6 +63,9 @@ module.exports = {
     "css-modules/no-unused-class": "error",
     "arrow-body-style": ["error", "as-needed"],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      { additionalHooks: "useRecoilCallback" },
+    ],
   },
 };
