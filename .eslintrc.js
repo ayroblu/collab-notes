@@ -14,6 +14,7 @@ module.exports = {
     "sort-destructure-keys",
     "@typescript-eslint",
     "css-modules",
+    "react-hooks",
   ],
   // extends: ["react-app"],
   settings: {
@@ -61,5 +62,7 @@ module.exports = {
     "sort-destructure-keys/sort-destructure-keys": "error",
     "css-modules/no-unused-class": "error",
     "arrow-body-style": ["error", "as-needed"],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
   },
 };
