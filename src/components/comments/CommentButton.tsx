@@ -1,5 +1,6 @@
 import React from "react";
 import { VscComment } from "react-icons/vsc";
+import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
@@ -38,6 +39,8 @@ const useShowCommentButton = () => {
   const [position, setPosition] = React.useState<number | null>(null);
   const [selection, setSelection] = React.useState<SelectionRange | null>(null);
   const getIsMounted = useIsMounted();
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -79,6 +82,6 @@ const useShowCommentButton = () => {
       dispose();
       disposeBlur();
     };
-  }, []);
+  }, [fileName, editorRef, getIsMounted]);
   return { position, selection };
 };
