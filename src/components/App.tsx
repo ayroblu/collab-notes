@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+import { RecoilRoot } from "recoil";
 
 import { Contexts } from "./Contexts";
 import { EditorWithComments } from "./EditorWithComments";
@@ -8,9 +9,11 @@ import { Layout } from "./Layout";
 import { Settings } from "./Settings";
 
 export const App: React.FC = () => (
-  <Contexts>
-    <RouteGroup />
-  </Contexts>
+  <RecoilRoot>
+    <Contexts>
+      <RouteGroup />
+    </Contexts>
+  </RecoilRoot>
 );
 
 const RouteGroup: React.FC = () => (

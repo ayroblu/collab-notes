@@ -1,21 +1,25 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getComments, syncCommentNamesFn } from "@/modules/documents";
 import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
+import { inProgressSelectionsState } from "../data-model";
+import type { SelectionRange } from "../data-model/types";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
 import { CommentButton } from "./CommentButton";
 import styles from "./CommentsPane.module.css";
-import type { SelectionRange } from "./types";
 
 export const CommentsPane: React.FC = () => {
   const { editorDivRef } = React.useContext(EditorContext);
-  const { inProgressSelections, setFocusCommentId, setInProgressSelections } =
-    React.useContext(CommentsContext);
+  const { setFocusCommentId } = React.useContext(CommentsContext);
+  const [inProgressSelections, setInProgressSelections] = useRecoilState(
+    inProgressSelectionsState
+  );
   const comments = useCommentsSync();
   useCommentNamesSync();
   const createComment = useCreateComment();
@@ -146,8 +150,9 @@ const useCreateComment = () => {
 
 const commentGap = 8;
 const useCommentOffsets = () => {
-  const { commentRefs, comments, focusCommentId, inProgressSelections } =
+  const { commentRefs, comments, focusCommentId } =
     React.useContext(CommentsContext);
+  const inProgressSelections = useRecoilValue(inProgressSelectionsState);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   React.useEffect(() => {

@@ -8,10 +8,10 @@ import type { CommentData } from "@/modules/documents/types";
 import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
+import type { SelectionRange } from "../data-model/types";
 import { FacePileFace } from "../shared/FacePile";
 
 import styles from "./Comment.module.css";
-import type { SelectionRange } from "./types";
 
 type Props = CommentData & {
   offset: number | undefined;

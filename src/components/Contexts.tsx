@@ -13,7 +13,6 @@ import { generatePassword, getRandomName } from "@/modules/utils";
 import type { CommentData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
-import type { SelectionRange } from "./comments/types";
 import { Loading } from "./shared/Loading";
 
 const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
@@ -46,10 +45,6 @@ type CommentsContext = {
   commentRefs: React.MutableRefObject<{ [key: string]: CommentLayout }>;
   focusCommentId: string | null;
   setFocusCommentId: React.Dispatch<React.SetStateAction<string | null>>;
-  inProgressSelections: SelectionRange[];
-  setInProgressSelections: React.Dispatch<
-    React.SetStateAction<SelectionRange[]>
-  >;
 };
 type CommentLayout = {
   el: HTMLElement;
@@ -63,9 +58,6 @@ export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const editorDivRef = React.useRef<HTMLDivElement>(null);
-  const [inProgressSelections, setInProgressSelections] = React.useState<
-    SelectionRange[]
-  >([]);
   const [comments, setComments] = React.useState<CommentData[]>([]);
   const commentRefs = React.useRef<{ [key: string]: CommentLayout }>({});
   const [focusCommentId, setFocusCommentId] = React.useState<string | null>(
@@ -99,8 +91,6 @@ export const Contexts: React.FC = ({ children }) => {
               commentRefs,
               focusCommentId,
               setFocusCommentId,
-              inProgressSelections,
-              setInProgressSelections,
             }}
           >
             {children}

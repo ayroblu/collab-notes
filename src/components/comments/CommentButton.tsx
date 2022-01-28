@@ -6,9 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useIsMounted } from "@/hooks/useIsMounted";
 
 import { EditorContext } from "../Contexts";
+import type { SelectionRange } from "../data-model/types";
 
 import styles from "./CommentButton.module.css";
-import type { SelectionRange } from "./types";
 
 type CommentButtonProps = {
   onClick: (selection: SelectionRange) => void;

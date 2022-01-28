@@ -3,10 +3,10 @@ import React from "react";
 import { cn, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
+import type { SelectionRange } from "../data-model/types";
 import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./AddComment.module.css";
-import type { SelectionRange } from "./types";
 
 type AddCommentProps = {
   selection: SelectionRange;

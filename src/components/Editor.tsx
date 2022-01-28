@@ -2,6 +2,7 @@ import * as monaco from "monaco-editor";
 import { VimMode, initVimMode } from "monaco-vim";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
@@ -22,6 +23,7 @@ import styles from "./Editor.module.css";
 import "./Editor.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
+import { inProgressSelectionsState } from "./data-model";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -109,7 +111,8 @@ function useMonacoEditor(
 
 const useCommentSelections = () => {
   const { editorRef } = React.useContext(EditorContext);
-  const { comments, inProgressSelections } = React.useContext(CommentsContext);
+  const { comments } = React.useContext(CommentsContext);
+  const inProgressSelections = useRecoilValue(inProgressSelectionsState);
   const [decorations, setDecorations] = React.useState<string[]>([]);
   React.useEffect(() => {
     const newDecorations = [
