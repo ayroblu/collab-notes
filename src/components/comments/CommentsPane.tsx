@@ -194,7 +194,6 @@ const useCommentOffsets = () => {
         newOffsets[comment.id] = aboveCommentBottom - comment.top;
       }
     }
-    console.log(newOffsets);
     setOffsets(newOffsets);
   }, [focusCommentId, comments, inProgressSelections]);
   return { offsets, extraOffset };
