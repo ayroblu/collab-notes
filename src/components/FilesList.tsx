@@ -77,6 +77,7 @@ const useSyncFilesListState = () => {
     const filesMetaData = getAllFilesMetaData(room.id, room.password);
     setFilesData(filesMetaData);
     const changeListener = () => {
+      const filesMetaData = getAllFilesMetaData(room.id, room.password);
       deduplicateFiles(files);
       setFilesData(filesMetaData);
     };

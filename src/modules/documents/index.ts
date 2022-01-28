@@ -89,15 +89,8 @@ export function createNewFile(
   fileName: string
 ): Y.Map<any> {
   const { files } = getRoom(roomId, roomPassword);
-  const metadataMap = new Y.Map<FileMetaData>();
   const now = new Date().toISOString();
 
-  metadataMap.set("metadata", {
-    name: fileName,
-    tags: [],
-    lastUpdated: now,
-    dateCreated: now,
-  });
   const file = new Y.Map();
   file.set("metadata", {
     name: fileName,
