@@ -96,7 +96,7 @@ const useCommentsSync = () => {
     return () => {
       yComments.unobserve(changeListener);
     };
-  }, [settings.activeRoomId]);
+  }, [settings.activeRoomId, settings.rooms, fileName]);
 
   return comments;
 };

@@ -7,7 +7,6 @@ TODO
 ----
 ### MVP
 - comments
-  - Bug with changing to different file / room
   - Focus highlights + selection highlights
     - Focus on comment focuses selection too
   - selection when adjusting text
