@@ -3,12 +3,19 @@ import { atom, atomFamily } from "recoil";
 import type { CommentData, FileMetaData } from "@/modules/documents";
 import { generatePassword } from "@/modules/utils";
 
+import type { Room } from "./types";
+
 export * from "./selectors";
 export * from "./types";
 
 export const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
   default: generatePassword(),
+});
+
+export const roomsState = atom<Room[]>({
+  key: "roomsState",
+  default: [],
 });
 
 export const activeFileNameState = atomFamily<string, { roomId: string }>({

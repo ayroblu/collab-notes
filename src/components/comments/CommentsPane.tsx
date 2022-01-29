@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import type { CommentData, SelectionRange } from "@/modules/documents";
-import { getComments, syncCommentNamesFn } from "@/modules/documents";
+import { getComments } from "@/modules/documents";
 import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
@@ -27,7 +27,6 @@ export const CommentsPane: React.FC = () => {
     inProgressCommentsSelector
   );
   const comments = useComments();
-  useCommentNamesSync();
   const createComment = useCreateComment();
   const { extraOffset, offsets } = useCommentOffsets();
   const editorHeight = useEditorHeight();
@@ -93,24 +92,6 @@ export const CommentsPane: React.FC = () => {
       <CommentButton offset={extraOffset} onClick={addInProgressComment} />
     </section>
   );
-};
-
-const useCommentNamesSync = () => {
-  const { settings } = React.useContext(SettingsContext);
-  const room = useRoom();
-  const fileName = useFileName();
-
-  React.useEffect(() => {
-    if (!room) return;
-    const yComments = getComments(room.id, room.password, fileName);
-    if (!yComments) return;
-
-    syncCommentNamesFn(
-      room.id,
-      room.password,
-      fileName
-    )(settings.id, settings.name);
-  }, [settings.name, fileName, room, settings.id]);
 };
 
 const useCreateComment = () => {

@@ -1,13 +1,11 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
 
 import styles from "./NavBar.module.css";
 import { FacePile } from "./shared/FacePile";
+import { useFileName } from "./utils";
 
 export const NavBar: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  if (!fileName) return null;
+  const fileName = useFileName();
   return (
     <section className={styles.nav}>
       <h3 className={styles.pageTitle}>{fileName}</h3>

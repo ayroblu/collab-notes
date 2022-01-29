@@ -1,15 +1,17 @@
 import React from "react";
-import { useSetRecoilState } from "recoil";
+import { useSearchParams } from "react-router-dom";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 import {
   deduplicateFiles,
   getAllFilesMetaData,
   getComments,
   getRoom,
+  syncCommentNamesFn,
 } from "@/modules/documents";
 
 import { SettingsContext } from "./Contexts";
-import { filesDataState } from "./data-model";
+import { activeRoomIdState, filesDataState } from "./data-model";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 
 /**
@@ -19,6 +21,7 @@ export const Sync: React.FC = () => {
   useFilesListSync();
   useSettingsRoomNamesSync();
   useCommentsSync();
+  useCommentNamesSync();
 
   return null;
 };
@@ -105,3 +108,54 @@ const useCommentsSync = () => {
 
   return comments;
 };
+
+const useCommentNamesSync = () => {
+  const { settings } = React.useContext(SettingsContext);
+  const room = useRoom();
+  const fileName = useFileName();
+
+  React.useEffect(() => {
+    if (!room) return;
+    const yComments = getComments(room.id, room.password, fileName);
+    if (!yComments) return;
+
+    syncCommentNamesFn(
+      room.id,
+      room.password,
+      fileName
+    )(settings.id, settings.name);
+  }, [settings.name, fileName, room, settings.id]);
+};
+
+export const FileSearchParamsSync: React.FC = () => {
+  useSearchParamsSync();
+  return null;
+};
+const useSearchParamsSync = () => {
+  const room = useRoom();
+  const fileName = useFileName();
+  const [, setSearchParams] = useSearchParams();
+
+  React.useEffect(() => {
+    if (!room) return;
+    const password = room.id !== room.password ? room.password : undefined;
+    if (password) {
+      setSearchParams({ id: room.id, name: fileName, password });
+    } else {
+      setSearchParams({ id: room.id, name: fileName });
+    }
+  }, [room, fileName, setSearchParams]);
+};
+
+// export const useInitSync = () => {
+//   const [searchParams] = useSearchParams();
+//   const paramRoomId = searchParams.get("id");
+//   const paramRoomName = searchParams.get("groupName");
+//   const paramRoomPassword = searchParams.get("password");
+//   const paramFileName = searchParams.get("name");
+//   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
+
+//   React.useEffect(() => {
+//     // TODO
+//   }, []);
+// };

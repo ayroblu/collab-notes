@@ -77,11 +77,7 @@ export const Contexts: React.FC = ({ children }) => {
     >
       <SettingsContext.Provider value={{ settings, setSettings }}>
         <EditorContext.Provider value={{ editorRef, editorDivRef }}>
-          <CommentsContext.Provider
-            value={{
-              commentRefs,
-            }}
-          >
+          <CommentsContext.Provider value={{ commentRefs }}>
             {children}
           </CommentsContext.Provider>
         </EditorContext.Provider>
