@@ -8,10 +8,3 @@ export enum LeftNavEnum {
   files = "files",
   rooms = "rooms",
 }
-
-export type SelectionRange = {
-  startLineNumber: number;
-  endLineNumber: number;
-  startColumn: number;
-  endColumn: number;
-};

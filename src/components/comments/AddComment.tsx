@@ -2,17 +2,16 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 
+import type { SelectionRange } from "@/modules/documents";
 import { cn, getNonNullable, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { inProgressCommentSelector } from "../data-model";
-import type { SelectionRange } from "../data-model/types";
 import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./AddComment.module.css";
 
 type AddCommentProps = {
-  selection: SelectionRange;
   offset: number | undefined;
   onSubmit: () => void;
   onCancel: () => void;
@@ -23,7 +22,6 @@ export const AddComment: React.FC<AddCommentProps> = ({
   offset,
   onCancel,
   onSubmit,
-  selection,
 }) => {
   const { commentRefs, focusCommentId, setFocusCommentId } =
     React.useContext(CommentsContext);
@@ -38,7 +36,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
   const handleCancel = () => {
     onCancel();
   };
-  const position = usePosition(selection);
+  const position = usePosition(comment.selection);
   const offsetTop =
     nonNullable(position) && nonNullable(offset)
       ? position + offset

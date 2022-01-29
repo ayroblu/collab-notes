@@ -4,9 +4,9 @@ import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
+import type { SelectionRange } from "@/modules/documents";
 
 import { EditorContext } from "../Contexts";
-import type { SelectionRange } from "../data-model/types";
 
 import styles from "./CommentButton.module.css";
 

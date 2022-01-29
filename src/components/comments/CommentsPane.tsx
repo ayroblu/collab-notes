@@ -3,13 +3,12 @@ import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
-import type { CommentData } from "@/modules/documents";
+import type { CommentData, SelectionRange } from "@/modules/documents";
 import { getComments, syncCommentNamesFn } from "@/modules/documents";
 import { getNonNullable, nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 import { inProgressCommentsSelector } from "../data-model";
-import type { SelectionRange } from "../data-model/types";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
@@ -39,7 +38,7 @@ export const CommentsPane: React.FC = () => {
   const addInProgressComment = (selection: SelectionRange) => {
     const now = new Date().toISOString();
     const comment: CommentData = {
-      ...selection,
+      selection,
       id: uuidv4(),
       byId: "",
       byName: "",
@@ -80,7 +79,6 @@ export const CommentsPane: React.FC = () => {
         {inProgressComments.map((comment) => (
           <li key={comment.id}>
             <AddComment
-              selection={comment}
               offset={(offsets[comment.id] ?? 0) + extraOffset}
               id={comment.id}
               onSubmit={createCommentFn(comment)}

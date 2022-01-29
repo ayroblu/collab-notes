@@ -21,6 +21,9 @@ export type CommentData = {
   byName: string;
   dateCreated: string;
   dateUpdated: string;
+  selection: SelectionRange;
+};
+export type SelectionRange = {
   startLineNumber: number;
   endLineNumber: number;
   startColumn: number;

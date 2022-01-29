@@ -1,14 +1,12 @@
 import React from "react";
 import { VscClose } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 import { getComments } from "@/modules/documents";
-import type { CommentData } from "@/modules/documents/types";
+import type { CommentData, SelectionRange } from "@/modules/documents/types";
 import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
-import type { SelectionRange } from "../data-model/types";
 import { FacePileFace } from "../shared/FacePile";
 
 import styles from "./Comment.module.css";
@@ -19,12 +17,9 @@ type Props = CommentData & {
 
 export const Comment: React.FC<Props> = ({
   byName,
-  endColumn,
-  endLineNumber,
   id,
   offset,
-  startColumn,
-  startLineNumber,
+  selection,
   text,
 }) => {
   const { commentRefs, focusCommentId, setFocusCommentId } =
@@ -32,13 +27,6 @@ export const Comment: React.FC<Props> = ({
   const { settings } = React.useContext(SettingsContext);
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
-  const selection = {
-    id: uuidv4(),
-    startLineNumber,
-    startColumn,
-    endLineNumber,
-    endColumn,
-  };
   const position = usePosition(selection);
   const offsetTop =
     nonNullable(position) && nonNullable(offset)

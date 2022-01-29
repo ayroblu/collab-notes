@@ -122,11 +122,8 @@ const useCommentSelections = () => {
     const newDecorations = [
       ...comments.map(
         ({
-          endColumn,
-          endLineNumber,
           id,
-          startColumn,
-          startLineNumber,
+          selection: { endColumn, endLineNumber, startColumn, startLineNumber },
           text,
         }) => ({
           range: new monaco.Range(
@@ -143,7 +140,10 @@ const useCommentSelections = () => {
         })
       ),
       ...inProgressComments.map(
-        ({ endColumn, endLineNumber, id, startColumn, startLineNumber }) => ({
+        ({
+          id,
+          selection: { endColumn, endLineNumber, startColumn, startLineNumber },
+        }) => ({
           range: new monaco.Range(
             startLineNumber,
             startColumn,
