@@ -7,7 +7,7 @@ import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
-import { useFileName, useRoom } from "../utils";
+import { useFileName, useFocusCommentIdState, useRoom } from "../utils";
 
 import styles from "./Comment.module.css";
 
@@ -22,8 +22,8 @@ export const Comment: React.FC<Props> = ({
   selection,
   text,
 }) => {
-  const { commentRefs, focusCommentId, setFocusCommentId } =
-    React.useContext(CommentsContext);
+  const { commentRefs } = React.useContext(CommentsContext);
+  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
   const position = usePosition(selection);
   const room = useRoom();
   const fileName = useFileName();

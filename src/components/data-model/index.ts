@@ -1,14 +1,9 @@
-import {
-  atom,
-  atomFamily,
-  DefaultValue,
-  selector,
-  selectorFamily,
-} from "recoil";
+import { atom, atomFamily } from "recoil";
 
-import type { CommentData } from "@/modules/documents";
-import { generatePassword, getNonNullable } from "@/modules/utils";
+import type { CommentData, FileMetaData } from "@/modules/documents";
+import { generatePassword } from "@/modules/utils";
 
+export * from "./selectors";
 export * from "./types";
 
 export const activeRoomIdState = atom<string>({
@@ -19,6 +14,11 @@ export const activeRoomIdState = atom<string>({
 export const activeFileNameState = atomFamily<string, { roomId: string }>({
   key: "activeFileNameState",
   default: () => "",
+});
+
+export const filesDataState = atom<FileMetaData[]>({
+  key: "filesDataState",
+  default: [],
 });
 
 export const isNewUserState = atom<boolean>({
@@ -34,50 +34,18 @@ export const inProgressCommentsState = atomFamily<
   default: () => [] as CommentData[],
 });
 
-export const inProgressCommentsSelector = selector<CommentData[]>({
-  key: "InProgressCommentsSelector",
-  get: ({ get }) => {
-    const roomId = get(activeRoomIdState);
-    const fileName = get(activeFileNameState({ roomId }));
-    return get(inProgressCommentsState({ roomId, fileName }));
-  },
-  set: ({ get, set }, newValue) => {
-    const roomId = get(activeRoomIdState);
-    const fileName = get(activeFileNameState({ roomId }));
-    return set(inProgressCommentsState({ roomId, fileName }), newValue);
-  },
+export const commentsState = atomFamily<
+  CommentData[],
+  { fileName: string; roomId: string }
+>({
+  key: "commentsState",
+  default: () => [] as CommentData[],
 });
 
-export const inProgressCommentSelector = selectorFamily<
-  CommentData,
-  { fileName: string; commentId: string }
+export const focusCommentIdState = atomFamily<
+  string | null,
+  { fileName: string; roomId: string }
 >({
-  key: "inProgressCommentSelector",
-  get:
-    ({ commentId, fileName }) =>
-    ({ get }) => {
-      const activeRoomId = get(activeRoomIdState);
-      const comments = get(
-        inProgressCommentsState({ roomId: activeRoomId, fileName })
-      );
-      return getNonNullable(comments.find(({ id }) => id === commentId));
-    },
-  set:
-    ({ commentId, fileName }) =>
-    ({ get, set }, newValue) => {
-      const activeRoomId = get(activeRoomIdState);
-      const comments = get(
-        inProgressCommentsState({ roomId: activeRoomId, fileName })
-      );
-      const result =
-        newValue instanceof DefaultValue
-          ? newValue
-          : comments.map((comment) =>
-              comment.id === commentId ? newValue : comment
-            );
-      return set(
-        inProgressCommentsState({ roomId: activeRoomId, fileName }),
-        result
-      );
-    },
+  key: "focusCommentIdState",
+  default: () => null,
 });

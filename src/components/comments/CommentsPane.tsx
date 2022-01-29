@@ -8,7 +8,12 @@ import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 import { inProgressCommentsSelector } from "../data-model";
-import { useFileName, useRoom } from "../utils";
+import {
+  useComments,
+  useFileName,
+  useFocusCommentIdState,
+  useRoom,
+} from "../utils";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
@@ -17,11 +22,11 @@ import styles from "./CommentsPane.module.css";
 
 export const CommentsPane: React.FC = () => {
   const { editorDivRef } = React.useContext(EditorContext);
-  const { setFocusCommentId } = React.useContext(CommentsContext);
+  const [, setFocusCommentId] = useFocusCommentIdState();
   const [inProgressComments, setInProgressComments] = useRecoilState(
     inProgressCommentsSelector
   );
-  const comments = useCommentsSync();
+  const comments = useComments();
   useCommentNamesSync();
   const createComment = useCreateComment();
   const { extraOffset, offsets } = useCommentOffsets();
@@ -90,29 +95,6 @@ export const CommentsPane: React.FC = () => {
   );
 };
 
-const useCommentsSync = () => {
-  const { comments, setComments } = React.useContext(CommentsContext);
-  const fileName = useFileName();
-  const room = useRoom();
-  React.useEffect(() => {
-    if (!room) return;
-    if (!fileName) return;
-    const yComments = getComments(room.id, room.password, fileName);
-    if (!yComments) return;
-    setComments(yComments.toArray());
-
-    const changeListener = () => {
-      setComments(yComments.toArray());
-    };
-    yComments.observe(changeListener);
-    return () => {
-      yComments.unobserve(changeListener);
-    };
-  }, [fileName, room, setComments]);
-
-  return comments;
-};
-
 const useCommentNamesSync = () => {
   const { settings } = React.useContext(SettingsContext);
   const room = useRoom();
@@ -154,8 +136,9 @@ const useCreateComment = () => {
 
 const commentGap = 8;
 const useCommentOffsets = () => {
-  const { commentRefs, comments, focusCommentId } =
-    React.useContext(CommentsContext);
+  const { commentRefs } = React.useContext(CommentsContext);
+  const comments = useComments();
+  const [focusCommentId] = useFocusCommentIdState();
   const inProgressComments = useRecoilValue(inProgressCommentsSelector);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);

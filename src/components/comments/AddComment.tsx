@@ -1,13 +1,13 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 
 import type { SelectionRange } from "@/modules/documents";
-import { cn, getNonNullable, nonNullable } from "@/modules/utils";
+import { cn, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { inProgressCommentSelector } from "../data-model";
 import { Button, SubmitButton } from "../shared/Button";
+import { useFileName, useFocusCommentIdState } from "../utils";
 
 import styles from "./AddComment.module.css";
 
@@ -23,10 +23,9 @@ export const AddComment: React.FC<AddCommentProps> = ({
   onCancel,
   onSubmit,
 }) => {
-  const { commentRefs, focusCommentId, setFocusCommentId } =
-    React.useContext(CommentsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = getNonNullable(searchParams.get("name"));
+  const { commentRefs } = React.useContext(CommentsContext);
+  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+  const fileName = useFileName();
   const [comment, setComment] = useRecoilState(
     inProgressCommentSelector({ fileName, commentId: id })
   );

@@ -26,7 +26,7 @@ import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
 import { inProgressCommentsSelector, isNewUserState } from "./data-model";
 import type { Room } from "./data-model";
-import { useFileName, useRoom } from "./utils";
+import { useComments, useFileName, useRoom } from "./utils";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -121,7 +121,7 @@ function useMonacoEditor(
 
 const useCommentSelections = () => {
   const { editorRef } = React.useContext(EditorContext);
-  const { comments } = React.useContext(CommentsContext);
+  const comments = useComments();
   const inProgressComments = useRecoilValue(inProgressCommentsSelector);
   const [, setDecorations] = React.useState<string[]>([]);
   React.useEffect(() => {
@@ -171,7 +171,8 @@ const useCommentSelections = () => {
 };
 
 const useCommentHighlights = () => {
-  const { commentRefs, comments } = React.useContext(CommentsContext);
+  const { commentRefs } = React.useContext(CommentsContext);
+  const comments = useComments();
   React.useEffect(() => {
     let rafId = 0;
     const mouseMove = (e: MouseEvent) => {

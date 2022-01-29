@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { getRandomName } from "@/modules/utils";
 
-import type { CommentData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
 import { activeRoomIdState } from "./data-model";
@@ -42,11 +41,7 @@ type EditorContext = {
 };
 export const EditorContext = React.createContext<EditorContext>({} as any);
 type CommentsContext = {
-  comments: CommentData[];
-  setComments: React.Dispatch<React.SetStateAction<CommentData[]>>;
   commentRefs: React.MutableRefObject<{ [key: string]: CommentLayout }>;
-  focusCommentId: string | null;
-  setFocusCommentId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 type CommentLayout = {
   el: HTMLElement;
@@ -60,11 +55,7 @@ export const Contexts: React.FC = ({ children }) => {
   const [settings, setSettingsState] = React.useState(defaultSettings);
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const editorDivRef = React.useRef<HTMLDivElement>(null);
-  const [comments, setComments] = React.useState<CommentData[]>([]);
   const commentRefs = React.useRef<{ [key: string]: CommentLayout }>({});
-  const [focusCommentId, setFocusCommentId] = React.useState<string | null>(
-    null
-  );
 
   const setSettings = React.useCallback(async (settings: Settings) => {
     setSettingsState(settings);
@@ -88,11 +79,7 @@ export const Contexts: React.FC = ({ children }) => {
         <EditorContext.Provider value={{ editorRef, editorDivRef }}>
           <CommentsContext.Provider
             value={{
-              comments,
-              setComments,
               commentRefs,
-              focusCommentId,
-              setFocusCommentId,
             }}
           >
             {children}

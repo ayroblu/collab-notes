@@ -14,24 +14,20 @@ import {
 } from "react-icons/si";
 import { VscNewFile } from "react-icons/vsc";
 import { createSearchParams, Link } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
-import type { FileMetaData } from "../modules/documents";
-import {
-  createNewFile,
-  deduplicateFiles,
-  getAllFilesMetaData,
-  getRoom,
-} from "../modules/documents";
+import { createNewFile } from "../modules/documents";
 
 import styles from "./FilesList.module.css";
+import { filesDataState } from "./data-model";
 import { useFileName, useFileNameState, useRoom } from "./utils";
 
 export const FilesList = () => {
   const fileName = useFileName();
   const room = useRoom();
-  const filesData = useSyncFilesListState();
+  const filesData = useRecoilValue(filesDataState);
   if (!room) {
     return null;
   }
@@ -64,28 +60,6 @@ export const FilesList = () => {
       </li>
     </ul>
   );
-};
-const useSyncFilesListState = () => {
-  const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
-  const room = useRoom();
-  React.useLayoutEffect(() => {
-    if (!room) return;
-    const { files } = getRoom(room.id, room.password);
-    deduplicateFiles(files);
-
-    const filesMetaData = getAllFilesMetaData(room.id, room.password);
-    setFilesData(filesMetaData);
-    const changeListener = () => {
-      const filesMetaData = getAllFilesMetaData(room.id, room.password);
-      deduplicateFiles(files);
-      setFilesData(filesMetaData);
-    };
-    files.observe(changeListener);
-    return () => {
-      files.unobserve(changeListener);
-    };
-  }, [room]);
-  return filesData;
 };
 
 const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
