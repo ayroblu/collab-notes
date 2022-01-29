@@ -5,15 +5,30 @@ import { generatePassword, getNonNullable } from "@/modules/utils";
 
 import type { LeftNavEnum, Room } from "./types";
 
-export const roomsState = atom<Room[]>({
-  key: "roomsState",
+export const roomIdsState = atom<string[]>({
+  key: "roomIdsState",
   default: [],
 });
-export const roomState = (id: string) =>
-  atom<Room>({
-    key: `roomsState-${id}`,
-    default: { id, name: "", password: "" },
-  });
+export const roomsState = atomFamily<Room, string>({
+  key: "roomsState",
+  default: (id) => ({ id, name: "", password: "" }),
+  effects_UNSTABLE: (id) => [
+    ({ onSet }) => {
+      onSet((newId) => {
+        console.log(newId);
+      });
+    },
+  ],
+});
+export const roomsSelector = selectorFamily<Room[], string>({
+  key: "roomsSelector",
+  get:
+    (fileName) =>
+    ({ get }) => {
+      const roomIds = get(roomIdsState);
+      return roomIds.map((id) => get(roomsState(id)));
+    },
+});
 export const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
   default: generatePassword(),
@@ -34,7 +49,7 @@ export const inProgressCommentsState = atomFamily<
 
 export const inProgressCommentsSelector = selectorFamily<CommentData[], string>(
   {
-    key: "getInProgressCommentsSelector",
+    key: "InProgressCommentsSelector",
     get:
       (fileName) =>
       ({ get }) => {
@@ -57,7 +72,7 @@ export const inProgressCommentSelector = selectorFamily<
   CommentData,
   { fileName: string; commentId: string }
 >({
-  key: "getInProgressCommentSelector",
+  key: "inProgressCommentSelector",
   get:
     ({ commentId, fileName }) =>
     ({ get }) => {
