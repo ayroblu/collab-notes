@@ -6,8 +6,8 @@ import type { CommentData, SelectionRange } from "@/modules/documents";
 import { getComments } from "@/modules/documents";
 import { nullable, sortBy } from "@/modules/utils";
 
-import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
-import { inProgressCommentsSelector } from "../data-model";
+import { CommentsContext, EditorContext } from "../Contexts";
+import { inProgressCommentsSelector, settingsState } from "../data-model";
 import {
   useComments,
   useFileName,
@@ -95,7 +95,7 @@ export const CommentsPane: React.FC = () => {
 };
 
 const useCreateComment = () => {
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const room = useRoom();
   const fileName = useFileName();
   if (!room) return;

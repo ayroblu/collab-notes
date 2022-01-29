@@ -1,16 +1,17 @@
 import React from "react";
+import { useRecoilValue } from "recoil";
 
 import type { AwarenessStates } from "@/modules/documents";
 import { getRoom } from "@/modules/documents";
 import { uniqBy } from "@/modules/utils";
 
-import { SettingsContext } from "../Contexts";
+import { settingsState } from "../data-model";
 import { useRoom } from "../utils";
 
 import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const [faces, setFaces] = React.useState<Face[]>([]);
   const room = useRoom();
   React.useEffect(() => {

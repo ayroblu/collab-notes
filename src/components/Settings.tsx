@@ -1,12 +1,13 @@
 import isEqual from "lodash/isEqual";
 import themeList from "monaco-themes/themes/themelist.json";
 import React from "react";
+import { useRecoilState } from "recoil";
 import { useForm } from "use-form-ts";
 
 import { keys } from "../modules/utils";
 
-import { SettingsContext } from "./Contexts";
 import styles from "./Settings.module.css";
+import { settingsState } from "./data-model";
 import {
   FormLabel,
   FormLabelWrapper,
@@ -15,7 +16,7 @@ import {
 } from "./shared/InputField";
 
 export const Settings: React.FC = () => {
-  const { setSettings, settings } = React.useContext(SettingsContext);
+  const [settings, setSettings] = useRecoilState(settingsState);
   const { isVim, name, theme, vimrc, wordWrap } = settings;
   const adjustedSettings = {
     isVim,

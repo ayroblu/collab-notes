@@ -1,19 +1,18 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { createSearchParams, useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
 import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
 
-import { SettingsContext } from "./Contexts";
 import styles from "./RoomsList.module.css";
 import type { Room } from "./data-model";
+import { settingsState } from "./data-model";
 import { activeRoomIdState } from "./data-model";
 
 export const RoomsList = () => {
-  useSettingsRoomsSync();
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const [isEdit, setIsEdit] = React.useState(false);
 
   return (
@@ -41,7 +40,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   isEdit,
   room: { id, name, password },
 }) => {
-  const { setSettings, settings } = React.useContext(SettingsContext);
+  const [settings, setSettings] = useRecoilState(settingsState);
   const [isNameEdit, setIsNameEdit] = React.useState(false);
   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
   const navigate = useNavigate();
@@ -143,39 +142,3 @@ function getSubtitle(room: Room) {
   const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
   return `${formattedDateTime} - ${numFiles} files`;
 }
-
-const useSettingsRoomsSync = () => {
-  const { setSettings, settings } = React.useContext(SettingsContext);
-  React.useEffect(() => {
-    const roomNames = settings.rooms.map(
-      ({ id, password }) => getRoom(id, password).name
-    );
-
-    setSettings({
-      ...settings,
-      rooms: settings.rooms.map(({ id, password }, i) => ({
-        id,
-        name: roomNames[i]!.toString(),
-        password,
-      })),
-    });
-    const changeListener = () => {
-      setSettings({
-        ...settings,
-        rooms: settings.rooms.map(({ id, password }, i) => ({
-          id,
-          name: roomNames[i]!.toString(),
-          password,
-        })),
-      });
-    };
-    roomNames.forEach((t) => {
-      t.observe(changeListener);
-    });
-    return () => {
-      roomNames.forEach((t) => {
-        t.unobserve(changeListener);
-      });
-    };
-  }, [setSettings, settings, settings.rooms.length]);
-};

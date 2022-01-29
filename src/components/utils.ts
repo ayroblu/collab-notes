@@ -1,18 +1,17 @@
-import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getNonNullable } from "@/modules/utils";
 
-import { SettingsContext } from "./Contexts";
 import {
   activeFileNameState,
   activeRoomIdState,
   commentsState,
   focusCommentIdState,
+  settingsState,
 } from "./data-model";
 
 export const useRoom = () => {
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const activeRoomId = useRecoilValue(activeRoomIdState);
   return settings.rooms.find(({ id }) => id === activeRoomId);
 };

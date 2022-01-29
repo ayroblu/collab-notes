@@ -1,14 +1,15 @@
 import React from "react";
+import { useRecoilValue } from "recoil";
 
 import { unreachable } from "@/modules/utils";
 
-import { LeftNavEnum, SettingsContext } from "./Contexts";
 import { FilesListPane } from "./FilesListPane";
 import styles from "./LeftNavPane.module.css";
 import { RoomsList } from "./RoomsList";
+import { LeftNavEnum, settingsState } from "./data-model";
 
 export const LeftNavPane: React.FC = () => {
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const part = getLeftNavPanePart(settings.leftNav);
   return (
     <section className={styles.leftNavPane}>

@@ -5,16 +5,17 @@ import {
   VscRefresh,
   VscSettingsGear,
 } from "react-icons/vsc";
+import { useRecoilState } from "recoil";
 
 import { timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
-import { LeftNavEnum, SettingsContext } from "./Contexts";
 import styles from "./LeftNav.module.css";
 import { LeftNavButton, LeftNavButtonLink } from "./LeftNavButton";
+import { LeftNavEnum, settingsState } from "./data-model";
 
 export const LeftNav = () => {
-  const { setSettings, settings } = React.useContext(SettingsContext);
+  const [settings, setSettings] = useRecoilState(settingsState);
   const setSettingsLeftNav = (leftNav: LeftNavEnum) => () => {
     if (settings.leftNav === leftNav) {
       setSettings({ ...settings, leftNav: null });

@@ -1,6 +1,7 @@
+import isEqual from "lodash/isEqual";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import {
   deduplicateFiles,
@@ -10,8 +11,13 @@ import {
   syncCommentNamesFn,
 } from "@/modules/documents";
 
-import { SettingsContext } from "./Contexts";
-import { activeRoomIdState, filesDataState } from "./data-model";
+import type { Settings } from "./data-model";
+import {
+  activeRoomIdState,
+  filesDataState,
+  savedSettingsSelector,
+  settingsState,
+} from "./data-model";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 
 /**
@@ -50,7 +56,7 @@ const useFilesListSync = () => {
 };
 
 const useSettingsRoomNamesSync = () => {
-  const { setSettings, settings } = React.useContext(SettingsContext);
+  const [settings, setSettings] = useRecoilState(settingsState);
   React.useEffect(() => {
     const roomNames = settings.rooms.map(
       ({ id, password }) => getRoom(id, password).name
@@ -110,7 +116,7 @@ const useCommentsSync = () => {
 };
 
 const useCommentNamesSync = () => {
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const room = useRoom();
   const fileName = useFileName();
 
@@ -147,15 +153,123 @@ const useSearchParamsSync = () => {
   }, [room, fileName, setSearchParams]);
 };
 
-// export const useInitSync = () => {
+export const SetupSync: React.FC = () => {
+  useInitSync();
+  return null;
+};
+
+export const useInitSync = () => {
+  const [settings, setSettings] = useRecoilState(settingsState);
+  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
+
+  const savedSettings = useRecoilValue(savedSettingsSelector);
+  const setParamsSettings = useParamSettingsSync(savedSettings || settings);
+  useBroadcastSync(setSettingsLocal);
+  if (savedSettings && !isEqual(savedSettings, settings)) {
+    setSettings(savedSettings);
+  }
+
+  React.useEffect(() => {
+    setParamsSettings();
+  }, []);
+};
+
+const useParamSettingsSync = (settings: Settings) => {
+  const setSettings = useSetRecoilState(settingsState);
+  const [searchParams] = useSearchParams();
+  const paramRoomId = searchParams.get("id");
+  const paramRoomName = searchParams.get("groupName");
+  const paramRoomPassword = searchParams.get("password");
+  const paramFileName = searchParams.get("name");
+  const [, setActiveRoomId] = useRecoilState(activeRoomIdState);
+
+  if (!paramRoomId || !paramFileName) {
+    return null;
+  }
+  return () => {
+    const rooms = settings.rooms;
+    if (!rooms.find(({ id }) => id === paramRoomId)) {
+      setSettings({
+        ...settings,
+        rooms: [
+          ...rooms,
+          {
+            id: paramRoomId,
+            name: paramRoomName || "",
+            password: paramRoomPassword || paramRoomId,
+          },
+        ],
+      });
+      setActiveRoomId(paramRoomId);
+      return;
+    }
+  };
+  return;
+};
+// function useSetupFunc(
+//   settings: Settings,
+//   setSettings: (settings: Settings) => void
+// ) {
 //   const [searchParams] = useSearchParams();
 //   const paramRoomId = searchParams.get("id");
 //   const paramRoomName = searchParams.get("groupName");
 //   const paramRoomPassword = searchParams.get("password");
 //   const paramFileName = searchParams.get("name");
+//   const navigate = useNavigate();
 //   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
-
-//   React.useEffect(() => {
-//     // TODO
+//   const func = React.useCallback(async () => {
+//     // if route params -> add room to rooms list and switch
+//     // If new user -> create new room + readme.md
+//     const savedSettings: Settings | void = await idbGetWithMigrations();
+//     if (paramRoomId && paramFileName) {
+//       const rooms = savedSettings?.rooms || settings.rooms;
+//       if (!rooms.find(({ id }) => id === paramRoomId)) {
+//         setSettings({
+//           ...(savedSettings || settings),
+//           rooms: [
+//             ...rooms,
+//             {
+//               id: paramRoomId,
+//               name: paramRoomName || "",
+//               password: paramRoomPassword || paramRoomId,
+//             },
+//           ],
+//         });
+//         setActiveRoomId(paramRoomId);
+//         return;
+//       }
+//     }
+//     if (!savedSettings || !savedSettings.rooms.length) {
+//       const roomId = activeRoomId;
+//       const roomName = getRandomName();
+//       setSettings({
+//         ...settings,
+//         rooms: [
+//           ...settings.rooms,
+//           {
+//             id: roomId,
+//             name: getRandomName(),
+//             password: roomId,
+//           },
+//         ],
+//       });
+//       const { name } = getRoom(roomId, roomId);
+//       name.insert(0, roomName);
+//       navigate({
+//         pathname: "/files",
+//         search: `?${createSearchParams({
+//           name: "README.md",
+//           id: roomId,
+//           newUser: "1",
+//         })}`,
+//       });
+//       return;
+//     }
+//     setSettings(savedSettings);
+//     const room = savedSettings.rooms[0];
+//     if (!room) return;
+//     const { initialDbPromise } = getRoom(room.id, room.password);
+//     await initialDbPromise;
 //   }, []);
-// };
+//   return func;
+// }

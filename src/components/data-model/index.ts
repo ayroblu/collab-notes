@@ -1,12 +1,13 @@
 import { atom, atomFamily } from "recoil";
 
 import type { CommentData, FileMetaData } from "@/modules/documents";
-import { generatePassword } from "@/modules/utils";
+import { generatePassword, getRandomName, uuidv4 } from "@/modules/utils";
 
-import type { Room } from "./types";
+import type { Room, Settings } from "./types";
 
 export * from "./selectors";
 export * from "./types";
+export * from "./async-selectors";
 
 export const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
@@ -55,4 +56,26 @@ export const focusCommentIdState = atomFamily<
 >({
   key: "focusCommentIdState",
   default: () => null,
+});
+
+export const lastUpdatedState = atom<string>({
+  key: "lastUpdatedState",
+  default: new Date().toISOString(),
+});
+
+const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+const defaultSettings: Settings = {
+  isVim: false,
+  vimrc: "imap jk <Esc>\nimap jj <Esc>",
+  wordWrap: true,
+  name: getRandomName(),
+  theme: isDark ? "vs-dark" : "vs",
+  rooms: [],
+  leftNav: null,
+  id: uuidv4(),
+};
+
+export const settingsState = atom<Settings>({
+  key: "settingsState",
+  default: defaultSettings,
 });

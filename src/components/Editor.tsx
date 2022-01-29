@@ -18,14 +18,18 @@ import {
 } from "@/modules/documents";
 import { cn, getHashColor } from "@/modules/utils";
 
-import type { Settings } from "./Contexts";
-import { CommentsContext, EditorContext, SettingsContext } from "./Contexts";
+import { CommentsContext, EditorContext } from "./Contexts";
 import "./Editor.css";
 import styles from "./Editor.module.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
-import { inProgressCommentsSelector, isNewUserState } from "./data-model";
-import type { Room } from "./data-model";
+import {
+  inProgressCommentsSelector,
+  isNewUserState,
+  settingsState,
+} from "./data-model";
+import type { Room ,
+  Settings} from "./data-model";
 import { useComments, useFileName, useRoom } from "./utils";
 
 export const Editor: React.FC = () => {
@@ -50,7 +54,7 @@ function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const { editorDivRef } = React.useContext(EditorContext);
-  const { settings } = React.useContext(SettingsContext);
+  const settings = useRecoilValue(settingsState);
   const { editorRef } = React.useContext(EditorContext);
   const getIsMounted = useIsMounted();
   const room = useRoom();
