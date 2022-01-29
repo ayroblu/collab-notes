@@ -1,42 +1,29 @@
-import { atom, atomFamily, DefaultValue, selectorFamily } from "recoil";
+import {
+  atom,
+  atomFamily,
+  DefaultValue,
+  selector,
+  selectorFamily,
+} from "recoil";
 
 import type { CommentData } from "@/modules/documents";
 import { generatePassword, getNonNullable } from "@/modules/utils";
 
-import type { LeftNavEnum, Room } from "./types";
+export * from "./types";
 
-export const roomIdsState = atom<string[]>({
-  key: "roomIdsState",
-  default: [],
-});
-export const roomsState = atomFamily<Room, string>({
-  key: "roomsState",
-  default: (id) => ({ id, name: "", password: "" }),
-  effects_UNSTABLE: (id) => [
-    ({ onSet }) => {
-      onSet((newId) => {
-        console.log(newId);
-      });
-    },
-  ],
-});
-export const roomsSelector = selectorFamily<Room[], string>({
-  key: "roomsSelector",
-  get:
-    (fileName) =>
-    ({ get }) => {
-      const roomIds = get(roomIdsState);
-      return roomIds.map((id) => get(roomsState(id)));
-    },
-});
 export const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
   default: generatePassword(),
 });
 
-export const leftNavState = atom<LeftNavEnum | null>({
-  key: "leftNavState",
-  default: null,
+export const activeFileNameState = atomFamily<string, { roomId: string }>({
+  key: "activeFileNameState",
+  default: () => "",
+});
+
+export const isNewUserState = atom<boolean>({
+  key: "isNewUserState",
+  default: false,
 });
 
 export const inProgressCommentsState = atomFamily<
@@ -47,26 +34,19 @@ export const inProgressCommentsState = atomFamily<
   default: () => [] as CommentData[],
 });
 
-export const inProgressCommentsSelector = selectorFamily<CommentData[], string>(
-  {
-    key: "InProgressCommentsSelector",
-    get:
-      (fileName) =>
-      ({ get }) => {
-        const activeRoomId = get(activeRoomIdState);
-        return get(inProgressCommentsState({ roomId: activeRoomId, fileName }));
-      },
-    set:
-      (fileName) =>
-      ({ get, set }, newValue) => {
-        const activeRoomId = get(activeRoomIdState);
-        return set(
-          inProgressCommentsState({ roomId: activeRoomId, fileName }),
-          newValue
-        );
-      },
-  }
-);
+export const inProgressCommentsSelector = selector<CommentData[]>({
+  key: "InProgressCommentsSelector",
+  get: ({ get }) => {
+    const roomId = get(activeRoomIdState);
+    const fileName = get(activeFileNameState({ roomId }));
+    return get(inProgressCommentsState({ roomId, fileName }));
+  },
+  set: ({ get, set }, newValue) => {
+    const roomId = get(activeRoomIdState);
+    const fileName = get(activeFileNameState({ roomId }));
+    return set(inProgressCommentsState({ roomId, fileName }), newValue);
+  },
+});
 
 export const inProgressCommentSelector = selectorFamily<
   CommentData,

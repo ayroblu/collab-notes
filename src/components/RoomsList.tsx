@@ -1,13 +1,15 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
 import { createSearchParams, useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
-import { cn, dateTimeFormatter } from "@/modules/utils";
+import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
 
-import type { Room } from "./Contexts";
 import { SettingsContext } from "./Contexts";
 import styles from "./RoomsList.module.css";
+import type { Room } from "./data-model";
+import { activeRoomIdState } from "./data-model";
 
 export const RoomsList = () => {
   useSettingsRoomsSync();
@@ -41,16 +43,17 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
 }) => {
   const { setSettings, settings } = React.useContext(SettingsContext);
   const [isNameEdit, setIsNameEdit] = React.useState(false);
+  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isNameEdit && !isEdit) {
       setIsNameEdit(false);
     }
-  });
+  }, [isNameEdit, isEdit]);
 
   const makeRoomActiveHandler = (id: string, password: string) => () => {
-    setSettings({ ...settings, activeRoomId: id });
+    setActiveRoomId(id);
     const { files } = getRoom(id, password);
     const file = files.slice(0, 1)[0];
     const metadata = file && getYFileMetaData(file);
@@ -80,29 +83,26 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
       const index = settings.rooms.findIndex((room) => room.id === id);
       const newRooms = settings.rooms.filter((room) => room.name !== name);
       const newActiveRoomId =
-        id === settings.activeRoomId
+        id === activeRoomId
           ? newRooms[index]
             ? newRooms[index]!.id
             : newRooms.length
             ? newRooms[newRooms.length - 1]!.id
-            : null
-          : settings.activeRoomId;
+            : generatePassword()
+          : activeRoomId;
 
       setSettings({
         ...settings,
         rooms: newRooms,
-        activeRoomId: newActiveRoomId,
       });
+      setActiveRoomId(newActiveRoomId);
     }
   };
 
   return (
     <div className={styles.roomButtonWrapper}>
       <button
-        className={cn(
-          styles.roomButton,
-          settings.activeRoomId === id && styles.active
-        )}
+        className={cn(styles.roomButton, activeRoomId === id && styles.active)}
         onClick={
           isEdit
             ? () => setIsNameEdit(true)
@@ -177,5 +177,5 @@ const useSettingsRoomsSync = () => {
         t.unobserve(changeListener);
       });
     };
-  }, [settings.rooms.length]);
+  }, [setSettings, settings, settings.rooms.length]);
 };

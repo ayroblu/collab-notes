@@ -6,13 +6,16 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
-import { generatePassword, getRandomName } from "@/modules/utils";
+import { getRandomName } from "@/modules/utils";
 
 import type { CommentData } from "../modules/documents";
 import { getRoom } from "../modules/documents";
 
+import { activeRoomIdState } from "./data-model";
+import type { Room } from "./data-model/types";
 import { Loading } from "./shared/Loading";
 
 const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
@@ -23,7 +26,6 @@ const defaultSettings: Settings = {
   name: getRandomName(),
   theme: isDark ? "vs-dark" : "vs",
   rooms: [],
-  activeRoomId: null,
   leftNav: null,
   id: uuidv4(),
 };
@@ -124,6 +126,7 @@ function useSetupFunc(
   const paramRoomPassword = searchParams.get("password");
   const paramFileName = searchParams.get("name");
   const navigate = useNavigate();
+  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
   const func = React.useCallback(async () => {
     // if route params -> add room to rooms list and switch
     // If new user -> create new room + readme.md
@@ -141,13 +144,13 @@ function useSetupFunc(
               password: paramRoomPassword || paramRoomId,
             },
           ],
-          activeRoomId: paramRoomId,
         });
+        setActiveRoomId(paramRoomId);
         return;
       }
     }
     if (!savedSettings || !savedSettings.rooms.length) {
-      const roomId = generatePassword();
+      const roomId = activeRoomId;
       const roomName = getRandomName();
       setSettings({
         ...settings,
@@ -159,7 +162,6 @@ function useSetupFunc(
             password: roomId,
           },
         ],
-        activeRoomId: roomId,
       });
       const { name } = getRoom(roomId, roomId);
       name.insert(0, roomName);
@@ -174,9 +176,7 @@ function useSetupFunc(
       return;
     }
     setSettings(savedSettings);
-    const room = savedSettings.rooms.find(
-      ({ id }) => id === savedSettings.activeRoomId
-    );
+    const room = savedSettings.rooms[0];
     if (!room) return;
     const { initialDbPromise } = getRoom(room.id, room.password);
     await initialDbPromise;
@@ -195,18 +195,12 @@ async function idbGetWithMigrations(): Promise<Settings | void> {
   return settings;
 }
 
-export type Room = {
-  id: string;
-  name: string;
-  password: string;
-};
 export type Settings = {
   isVim: boolean;
   vimrc: string;
   wordWrap: boolean;
   name: string;
   theme: string;
-  activeRoomId: string | null;
   rooms: Room[];
   leftNav: LeftNavEnum | null;
   id: string;

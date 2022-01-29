@@ -13,24 +13,24 @@ import {
   SiTypescript,
 } from "react-icons/si";
 import { VscNewFile } from "react-icons/vsc";
-import { createSearchParams, Link, useSearchParams } from "react-router-dom";
+import { createSearchParams, Link } from "react-router-dom";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
 
 import type { FileMetaData } from "../modules/documents";
-import { deduplicateFiles } from "../modules/documents";
-import { getAllFilesMetaData } from "../modules/documents";
-import { createNewFile } from "../modules/documents";
-import { getRoom } from "../modules/documents";
+import {
+  createNewFile,
+  deduplicateFiles,
+  getAllFilesMetaData,
+  getRoom,
+} from "../modules/documents";
 
-import { SettingsContext } from "./Contexts";
 import styles from "./FilesList.module.css";
+import { useFileName, useFileNameState, useRoom } from "./utils";
 
 export const FilesList = () => {
-  const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  const fileName = useFileName();
+  const room = useRoom();
   const filesData = useSyncFilesListState();
   if (!room) {
     return null;
@@ -66,10 +66,9 @@ export const FilesList = () => {
   );
 };
 const useSyncFilesListState = () => {
-  const { settings } = React.useContext(SettingsContext);
   const [filesData, setFilesData] = React.useState<FileMetaData[]>([]);
+  const room = useRoom();
   React.useLayoutEffect(() => {
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     const { files } = getRoom(room.id, room.password);
     deduplicateFiles(files);
@@ -85,7 +84,7 @@ const useSyncFilesListState = () => {
     return () => {
       files.unobserve(changeListener);
     };
-  }, []);
+  }, [room]);
   return filesData;
 };
 
@@ -124,9 +123,8 @@ const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
 
 const NewFile: React.FC = () => {
   const [isNewFileInput, setIsNewFileInput] = React.useState(false);
-  const [, setSearchParams] = useSearchParams();
-  const { settings } = React.useContext(SettingsContext);
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
+  const room = useRoom();
+  const [, setFileName] = useFileNameState();
   if (!room) return null;
   const handleNewFileFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     handleNewFile(e.currentTarget.value.trim());
@@ -135,7 +133,7 @@ const NewFile: React.FC = () => {
     setIsNewFileInput(false);
     if (name) {
       createNewFile(room.id, room.password, name);
-      setSearchParams({ name });
+      setFileName(name);
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

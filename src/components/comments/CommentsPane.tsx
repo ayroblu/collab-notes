@@ -1,14 +1,14 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import type { CommentData, SelectionRange } from "@/modules/documents";
 import { getComments, syncCommentNamesFn } from "@/modules/documents";
-import { getNonNullable, nullable, sortBy } from "@/modules/utils";
+import { nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
 import { inProgressCommentsSelector } from "../data-model";
+import { useFileName, useRoom } from "../utils";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
@@ -18,10 +18,8 @@ import styles from "./CommentsPane.module.css";
 export const CommentsPane: React.FC = () => {
   const { editorDivRef } = React.useContext(EditorContext);
   const { setFocusCommentId } = React.useContext(CommentsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
   const [inProgressComments, setInProgressComments] = useRecoilState(
-    inProgressCommentsSelector(getNonNullable(fileName))
+    inProgressCommentsSelector
   );
   const comments = useCommentsSync();
   useCommentNamesSync();
@@ -93,12 +91,10 @@ export const CommentsPane: React.FC = () => {
 };
 
 const useCommentsSync = () => {
-  const { settings } = React.useContext(SettingsContext);
   const { comments, setComments } = React.useContext(CommentsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
+  const fileName = useFileName();
+  const room = useRoom();
   React.useEffect(() => {
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     if (!fileName) return;
     const yComments = getComments(room.id, room.password, fileName);
@@ -112,19 +108,18 @@ const useCommentsSync = () => {
     return () => {
       yComments.unobserve(changeListener);
     };
-  }, [settings.activeRoomId, settings.rooms, fileName]);
+  }, [fileName, room, setComments]);
 
   return comments;
 };
 
 const useCommentNamesSync = () => {
   const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
+  const room = useRoom();
+  const fileName = useFileName();
+
   React.useEffect(() => {
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
-    if (!fileName) return;
     const yComments = getComments(room.id, room.password, fileName);
     if (!yComments) return;
 
@@ -133,16 +128,14 @@ const useCommentNamesSync = () => {
       room.password,
       fileName
     )(settings.id, settings.name);
-  }, [settings.activeRoomId, settings.name, fileName]);
+  }, [settings.name, fileName, room, settings.id]);
 };
 
 const useCreateComment = () => {
   const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  const room = useRoom();
+  const fileName = useFileName();
   if (!room) return;
-  if (!fileName) return;
   const yComments = getComments(room.id, room.password, fileName);
   if (!yComments) return;
   return (comment: CommentData) => {
@@ -163,11 +156,7 @@ const commentGap = 8;
 const useCommentOffsets = () => {
   const { commentRefs, comments, focusCommentId } =
     React.useContext(CommentsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const inProgressComments = useRecoilValue(
-    inProgressCommentsSelector(getNonNullable(fileName))
-  );
+  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   React.useEffect(() => {
@@ -215,7 +204,7 @@ const useCommentOffsets = () => {
       }
     }
     setOffsets(newOffsets);
-  }, [focusCommentId, comments, inProgressComments]);
+  }, [focusCommentId, comments, inProgressComments, commentRefs]);
   return { offsets, extraOffset };
 };
 
@@ -252,7 +241,7 @@ const useEditorScrollSync = (
     return () => {
       dispose();
     };
-  }, [extraOffset]);
+  }, [commentsPaneRef, editorRef, extraOffset]);
 
   React.useEffect(() => {
     // For when commentspane scrolls, reflect in editor
@@ -278,7 +267,7 @@ const useEditorScrollSync = (
     return () => {
       dispose();
     };
-  }, [extraOffset]);
+  }, [commentsPaneRef, editorRef, extraOffset]);
 
   // For when focus comment changes usually
   React.useEffect(() => {
@@ -287,7 +276,7 @@ const useEditorScrollSync = (
     if (!editor) return;
     if (!commentsPane) return;
     commentsPane.scrollTop = editor.getScrollTop() + extraOffset;
-  }, [extraOffset]);
+  }, [commentsPaneRef, editorRef, extraOffset]);
 };
 
 function getIsRecent(date: string | null, diff: number): boolean {

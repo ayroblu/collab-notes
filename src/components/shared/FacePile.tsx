@@ -5,13 +5,14 @@ import { getRoom } from "@/modules/documents";
 import { uniqBy } from "@/modules/utils";
 
 import { SettingsContext } from "../Contexts";
+import { useRoom } from "../utils";
 
 import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {
   const { settings } = React.useContext(SettingsContext);
   const [faces, setFaces] = React.useState<Face[]>([]);
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  const room = useRoom();
   React.useEffect(() => {
     if (!room) return;
     const { provider, ydoc } = getRoom(room.id, room.password);

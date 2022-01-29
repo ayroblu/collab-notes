@@ -1,13 +1,13 @@
 import React from "react";
 import { VscClose } from "react-icons/vsc";
-import { useSearchParams } from "react-router-dom";
 
 import { getComments } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
 import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
-import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
+import { CommentsContext, EditorContext } from "../Contexts";
 import { FacePileFace } from "../shared/FacePile";
+import { useFileName, useRoom } from "../utils";
 
 import styles from "./Comment.module.css";
 
@@ -24,10 +24,9 @@ export const Comment: React.FC<Props> = ({
 }) => {
   const { commentRefs, focusCommentId, setFocusCommentId } =
     React.useContext(CommentsContext);
-  const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
   const position = usePosition(selection);
+  const room = useRoom();
+  const fileName = useFileName();
   const offsetTop =
     nonNullable(position) && nonNullable(offset)
       ? position + offset
@@ -36,7 +35,6 @@ export const Comment: React.FC<Props> = ({
       : undefined;
 
   const deleteComment = () => {
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
     if (!room) return;
     if (!fileName) return;
     const yComments = getComments(room.id, room.password, fileName);

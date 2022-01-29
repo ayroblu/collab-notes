@@ -1,42 +1,41 @@
 import * as monaco from "monaco-editor";
-import { VimMode, initVimMode } from "monaco-vim";
+import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
-import { useSearchParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
-
-import type { AwarenessStates, LocalState } from "../modules/documents";
-import { getYFileMetaData, getYFileText } from "../modules/documents";
-import { createNewFile, getFileFromFileName } from "../modules/documents";
-import { getRoom } from "../modules/documents";
-import { cn, getHashColor, getNonNullable } from "../modules/utils";
+import type { AwarenessStates, LocalState } from "@/modules/documents";
+import {
+  createNewFile,
+  getDocument,
+  getFileFromFileName,
+  getRoom,
+  getYFileMetaData,
+  getYFileText,
+} from "@/modules/documents";
+import { cn, getHashColor } from "@/modules/utils";
 
 import type { Settings } from "./Contexts";
-import { CommentsContext } from "./Contexts";
-import { EditorContext } from "./Contexts";
-import { SettingsContext } from "./Contexts";
-import styles from "./Editor.module.css";
+import { CommentsContext, EditorContext, SettingsContext } from "./Contexts";
 import "./Editor.css";
+import styles from "./Editor.module.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
-import { inProgressCommentsSelector } from "./data-model";
+import { inProgressCommentsSelector, isNewUserState } from "./data-model";
+import type { Room } from "./data-model";
+import { useFileName, useRoom } from "./utils";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { editorDivRef } = React.useContext(EditorContext);
-  const { settings } = React.useContext(SettingsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const hasRoom =
-    fileName && settings.rooms.find(({ id }) => id === settings.activeRoomId);
+  const room = useRoom();
 
   useMonacoEditor(setCursorStyles);
 
-  if (!hasRoom) {
+  if (!room) {
     return <NoMatchFile />;
   }
   return (
@@ -53,33 +52,25 @@ function useMonacoEditor(
   const { editorDivRef } = React.useContext(EditorContext);
   const { settings } = React.useContext(SettingsContext);
   const { editorRef } = React.useContext(EditorContext);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const isNewUser = searchParams.get("newUser");
   const getIsMounted = useIsMounted();
+  const room = useRoom();
+  const fileName = useFileName();
+  const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
 
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
       return;
     }
+    if (!room) return;
     const { editor, model, text } = createMonacoEditor(
       editorDivRef.current,
       setCursorStyles,
       settings,
-      fileName!,
+      room,
+      fileName,
       getIsMounted
     );
     editorRef.current = editor;
-    if (isNewUser) {
-      if (!text.length) {
-        text.insert(0, initialText);
-      }
-      setSearchParams(
-        Object.fromEntries([...searchParams].filter(([k]) => k !== "newUser"))
-      );
-    }
-    const room = settings.rooms.find(({ id }) => id === settings.activeRoomId);
-    if (!room) return;
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
       if (!file) return;
@@ -97,7 +88,26 @@ function useMonacoEditor(
       model.dispose();
       text.unobserve(changeListener);
     };
-  }, [fileName, settings.activeRoomId]);
+  }, [
+    editorDivRef,
+    editorRef,
+    fileName,
+    getIsMounted,
+    room,
+    setCursorStyles,
+    settings,
+  ]);
+  React.useEffect(() => {
+    if (!room) return;
+    const text = getDocument(room.id, room.password, fileName);
+    if (!text) return;
+    if (isNewUser) {
+      if (!text.length) {
+        text.insert(0, initialText);
+      }
+      setIsNewUser(false);
+    }
+  }, [fileName, isNewUser, room, setIsNewUser]);
   useCommentSelections();
   useCommentHighlights();
 
@@ -106,18 +116,14 @@ function useMonacoEditor(
     if (!editor) return;
     editor.layout({ width: 300, height: 300 });
     editor.layout();
-  }, [settings]);
+  }, [editorRef]);
 }
 
 const useCommentSelections = () => {
   const { editorRef } = React.useContext(EditorContext);
   const { comments } = React.useContext(CommentsContext);
-  const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
-  const inProgressComments = useRecoilValue(
-    inProgressCommentsSelector(getNonNullable(fileName))
-  );
-  const [decorations, setDecorations] = React.useState<string[]>([]);
+  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
+  const [, setDecorations] = React.useState<string[]>([]);
   React.useEffect(() => {
     const newDecorations = [
       ...comments.map(
@@ -158,8 +164,10 @@ const useCommentSelections = () => {
     ];
     const editor = editorRef.current;
     if (!editor) return;
-    setDecorations(editor.deltaDecorations(decorations, newDecorations));
-  }, [inProgressComments, comments]);
+    setDecorations((decorations) =>
+      editor.deltaDecorations(decorations, newDecorations)
+    );
+  }, [inProgressComments, comments, editorRef]);
 };
 
 const useCommentHighlights = () => {
@@ -195,7 +203,7 @@ const useCommentHighlights = () => {
     return () => {
       document.body.removeEventListener("mousemove", mouseMove);
     };
-  }, [comments]);
+  }, [commentRefs, comments]);
 };
 function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
   const isIn =
@@ -254,10 +262,10 @@ function createMonacoEditor(
   divEl: HTMLDivElement,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings,
+  room: Room,
   fileName: string,
   getIsMounted: () => boolean
 ) {
-  const room = settings.rooms.find(({ id }) => id === settings.activeRoomId)!;
   const { provider, ydoc } = getRoom(room.id, room.password);
   let file = getFileFromFileName(room.id, room.password, fileName);
   if (!file) {
