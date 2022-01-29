@@ -1,12 +1,14 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { v4 as uuidv4 } from "uuid";
 
+import type { CommentData } from "@/modules/documents";
 import { getComments, syncCommentNamesFn } from "@/modules/documents";
-import { nullable, sortBy } from "@/modules/utils";
+import { getNonNullable, nullable, sortBy } from "@/modules/utils";
 
 import { CommentsContext, EditorContext, SettingsContext } from "../Contexts";
-import { inProgressSelectionsState } from "../data-model";
+import { inProgressCommentsSelector } from "../data-model";
 import type { SelectionRange } from "../data-model/types";
 
 import { AddComment } from "./AddComment";
@@ -17,8 +19,10 @@ import styles from "./CommentsPane.module.css";
 export const CommentsPane: React.FC = () => {
   const { editorDivRef } = React.useContext(EditorContext);
   const { setFocusCommentId } = React.useContext(CommentsContext);
-  const [inProgressSelections, setInProgressSelections] = useRecoilState(
-    inProgressSelectionsState
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const [inProgressComments, setInProgressComments] = useRecoilState(
+    inProgressCommentsSelector(getNonNullable(fileName))
   );
   const comments = useCommentsSync();
   useCommentNamesSync();
@@ -33,18 +37,28 @@ export const CommentsPane: React.FC = () => {
     : window.innerHeight;
 
   const addInProgressComment = (selection: SelectionRange) => {
-    setInProgressSelections([...inProgressSelections, selection]);
-    setFocusCommentId(selection.id);
+    const now = new Date().toISOString();
+    const comment: CommentData = {
+      ...selection,
+      id: uuidv4(),
+      byId: "",
+      byName: "",
+      dateCreated: now,
+      dateUpdated: now,
+      text: "",
+    };
+    setInProgressComments([...inProgressComments, comment]);
+    setFocusCommentId(comment.id);
   };
-  const createCommentFn = (selection: SelectionRange) => (text: string) => {
-    setInProgressSelections(
-      inProgressSelections.filter(({ id }) => selection.id !== id)
+  const createCommentFn = (comment: CommentData) => () => {
+    setInProgressComments(
+      inProgressComments.filter(({ id }) => comment.id !== id)
     );
-    text && createComment && createComment(text, selection);
+    createComment && createComment(comment);
   };
   const cancelCommentFn = (selectionId: string) => () => {
-    setInProgressSelections(
-      inProgressSelections.filter(({ id }) => id !== selectionId)
+    setInProgressComments(
+      inProgressComments.filter(({ id }) => id !== selectionId)
     );
     setFocusCommentId(null);
   };
@@ -63,14 +77,14 @@ export const CommentsPane: React.FC = () => {
             />
           </li>
         ))}
-        {inProgressSelections.map((sel) => (
-          <li key={JSON.stringify(sel)}>
+        {inProgressComments.map((comment) => (
+          <li key={comment.id}>
             <AddComment
-              selection={sel}
-              offset={(offsets[sel.id] ?? 0) + extraOffset}
-              id={sel.id}
-              onSubmit={createCommentFn(sel)}
-              onCancel={cancelCommentFn(sel.id)}
+              selection={comment}
+              offset={(offsets[comment.id] ?? 0) + extraOffset}
+              id={comment.id}
+              onSubmit={createCommentFn(comment)}
+              onCancel={cancelCommentFn(comment.id)}
             />
           </li>
         ))}
@@ -133,16 +147,15 @@ const useCreateComment = () => {
   if (!fileName) return;
   const yComments = getComments(room.id, room.password, fileName);
   if (!yComments) return;
-  return (text: string, selection: SelectionRange) => {
+  return (comment: CommentData) => {
     const now = new Date().toISOString();
     yComments.push([
       {
-        text,
+        ...comment,
         byId: settings.id,
         byName: settings.name,
         dateCreated: now,
         dateUpdated: now,
-        ...selection,
       },
     ]);
   };
@@ -152,7 +165,11 @@ const commentGap = 8;
 const useCommentOffsets = () => {
   const { commentRefs, comments, focusCommentId } =
     React.useContext(CommentsContext);
-  const inProgressSelections = useRecoilValue(inProgressSelectionsState);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const inProgressComments = useRecoilValue(
+    inProgressCommentsSelector(getNonNullable(fileName))
+  );
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   React.useEffect(() => {
@@ -200,7 +217,7 @@ const useCommentOffsets = () => {
       }
     }
     setOffsets(newOffsets);
-  }, [focusCommentId, comments, inProgressSelections]);
+  }, [focusCommentId, comments, inProgressComments]);
   return { offsets, extraOffset };
 };
 

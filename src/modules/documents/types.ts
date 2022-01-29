@@ -18,7 +18,7 @@ export type CommentData = {
   id: string; // uuid
   text: string;
   byId: string;
-  byName: string; // May be outdated, could be theoretically reconciled IF connected via awareness
+  byName: string;
   dateCreated: string;
   dateUpdated: string;
   startLineNumber: number;

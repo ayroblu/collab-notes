@@ -1,8 +1,11 @@
 import React from "react";
+import { useSearchParams } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
-import { cn, nonNullable } from "@/modules/utils";
+import { cn, getNonNullable, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
+import { inProgressCommentSelector } from "../data-model";
 import type { SelectionRange } from "../data-model/types";
 import { Button, SubmitButton } from "../shared/Button";
 
@@ -11,7 +14,7 @@ import styles from "./AddComment.module.css";
 type AddCommentProps = {
   selection: SelectionRange;
   offset: number | undefined;
-  onSubmit: (text: string) => void;
+  onSubmit: () => void;
   onCancel: () => void;
   id: string;
 };
@@ -24,9 +27,13 @@ export const AddComment: React.FC<AddCommentProps> = ({
 }) => {
   const { commentRefs, focusCommentId, setFocusCommentId } =
     React.useContext(CommentsContext);
-  const [commentText, setCommentText] = React.useState("");
+  const [searchParams] = useSearchParams();
+  const fileName = getNonNullable(searchParams.get("name"));
+  const [comment, setComment] = useRecoilState(
+    inProgressCommentSelector({ fileName, commentId: id })
+  );
   const handleSubmit = () => {
-    onSubmit(commentText);
+    onSubmit();
   };
   const handleCancel = () => {
     onCancel();
@@ -40,7 +47,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
       : undefined;
 
   const onBlur = () => {
-    if (!commentText) {
+    if (!comment.text) {
       handleCancel();
     }
   };
@@ -66,13 +73,15 @@ export const AddComment: React.FC<AddCommentProps> = ({
       <form onSubmit={handleSubmit}>
         <textarea
           className={styles.textarea}
-          value={commentText}
-          onChange={(e) => setCommentText(e.currentTarget.value)}
+          value={comment.text}
+          onChange={(e) =>
+            setComment({ ...comment, text: e.currentTarget.value })
+          }
           onBlur={onBlur}
           autoFocus
         />
         <div className={styles.flexEnd}>
-          <SubmitButton value="Save" disabled={!commentText} />
+          <SubmitButton value="Save" disabled={!comment.text} />
           <Button buttonType="form" onClick={handleCancel}>
             Cancel
           </Button>

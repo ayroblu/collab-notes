@@ -13,7 +13,7 @@ import type { AwarenessStates, LocalState } from "../modules/documents";
 import { getYFileMetaData, getYFileText } from "../modules/documents";
 import { createNewFile, getFileFromFileName } from "../modules/documents";
 import { getRoom } from "../modules/documents";
-import { cn, getHashColor } from "../modules/utils";
+import { cn, getHashColor, getNonNullable } from "../modules/utils";
 
 import type { Settings } from "./Contexts";
 import { CommentsContext } from "./Contexts";
@@ -23,7 +23,7 @@ import styles from "./Editor.module.css";
 import "./Editor.css";
 import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
-import { inProgressSelectionsState } from "./data-model";
+import { inProgressCommentsSelector } from "./data-model";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -112,7 +112,11 @@ function useMonacoEditor(
 const useCommentSelections = () => {
   const { editorRef } = React.useContext(EditorContext);
   const { comments } = React.useContext(CommentsContext);
-  const inProgressSelections = useRecoilValue(inProgressSelectionsState);
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const inProgressComments = useRecoilValue(
+    inProgressCommentsSelector(getNonNullable(fileName))
+  );
   const [decorations, setDecorations] = React.useState<string[]>([]);
   React.useEffect(() => {
     const newDecorations = [
@@ -138,7 +142,7 @@ const useCommentSelections = () => {
           },
         })
       ),
-      ...inProgressSelections.map(
+      ...inProgressComments.map(
         ({ endColumn, endLineNumber, id, startColumn, startLineNumber }) => ({
           range: new monaco.Range(
             startLineNumber,
@@ -155,7 +159,7 @@ const useCommentSelections = () => {
     const editor = editorRef.current;
     if (!editor) return;
     setDecorations(editor.deltaDecorations(decorations, newDecorations));
-  }, [inProgressSelections, comments]);
+  }, [inProgressComments, comments]);
 };
 
 const useCommentHighlights = () => {

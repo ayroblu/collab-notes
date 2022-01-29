@@ -1,9 +1,4 @@
-import {
-  adjectives,
-  animals,
-  colors,
-  uniqueNamesGenerator,
-} from "unique-names-generator";
+export * from "./lib-helpers";
 
 export function getRandomColor() {
   // return "#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0");
@@ -12,7 +7,12 @@ export function getRandomColor() {
 export function getHashColor(text: string) {
   return generateHslaColor(getBoundedHashNumber(text));
 }
-function generateHslaColor(randomNumber = Math.random(), saturation = 100, lightness = 40, alpha = 1) {
+function generateHslaColor(
+  randomNumber = Math.random(),
+  saturation = 100,
+  lightness = 40,
+  alpha = 1
+) {
   const hue = (randomNumber * 360).toFixed();
 
   return `hsla(${hue},${saturation}%,${lightness}%,${alpha})`;
@@ -20,19 +20,24 @@ function generateHslaColor(randomNumber = Math.random(), saturation = 100, light
 
 /** https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript */
 export function getHashNumber(str: string, seed = 0): number {
-    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for (let i = 0, ch; i < str.length; i++) {
-        ch = str.charCodeAt(i);
-        h1 = Math.imul(h1 ^ ch, 2654435761);
-        h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
-    return 4294967296 * (2097151 & h2) + (h1>>>0);
-};
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
 export function getBoundedHashNumber(str: string, seed = 0): number {
   const num = getHashNumber(str, seed);
-  return num % 2e14 / 2e14
+  return (num % 2e14) / 2e14;
 }
 
 export function slugify(str: string) {
@@ -126,13 +131,6 @@ export function cn(
   return args.filter((a) => a).join(" ");
 }
 
-export function getRandomName() {
-  return uniqueNamesGenerator({
-    dictionaries: [adjectives, colors, animals],
-    separator: " ",
-  });
-}
-
 export function unreachable(_: never) {}
 
 export function timeoutPromiseSuccess<T>(promise: Promise<T>, timeout = 1000) {
@@ -172,3 +170,9 @@ export const sortBy =
     }
     return 0;
   };
+export const getNonNullable = <T>(item: T | null | undefined): T => {
+  if (nullable(item)) {
+    throw new Error("expected non nullable item");
+  }
+  return item;
+};
