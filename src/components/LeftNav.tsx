@@ -12,10 +12,10 @@ import { unregister } from "@/serviceWorkerRegistration";
 
 import styles from "./LeftNav.module.css";
 import { LeftNavButton, LeftNavButtonLink } from "./LeftNavButton";
-import { LeftNavEnum, settingsState } from "./data-model";
+import { LeftNavEnum, settingsSelector } from "./data-model";
 
 export const LeftNav = () => {
-  const [settings, setSettings] = useRecoilState(settingsState);
+  const [settings, setSettings] = useRecoilState(settingsSelector);
   const setSettingsLeftNav = (leftNav: LeftNavEnum) => () => {
     if (settings.leftNav === leftNav) {
       setSettings({ ...settings, leftNav: null });

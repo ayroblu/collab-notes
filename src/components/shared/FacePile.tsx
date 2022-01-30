@@ -5,13 +5,13 @@ import type { AwarenessStates } from "@/modules/documents";
 import { getRoom } from "@/modules/documents";
 import { uniqBy } from "@/modules/utils";
 
-import { settingsState } from "../data-model";
+import { settingsSelector } from "../data-model";
 import { useRoom } from "../utils";
 
 import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const [faces, setFaces] = React.useState<Face[]>([]);
   const room = useRoom();
   React.useEffect(() => {

@@ -23,6 +23,9 @@ module.exports = {
     },
   },
   rules: {
+    "arrow-body-style": ["error", "as-needed"],
+
+    // Plugin rules follow:
     "import/order": [
       "error",
       {
@@ -48,20 +51,25 @@ module.exports = {
         ],
       },
     ],
+    "import/no-duplicates": "error",
+
     "react/jsx-key": [
       "error",
       {
         checkFragmentShorthand: true,
       },
     ],
+
     "@typescript-eslint/consistent-type-imports": [
       "error",
       { prefer: "type-imports" },
     ],
     "@typescript-eslint/sort-type-union-intersection-members": "error",
+
     "sort-destructure-keys/sort-destructure-keys": "error",
+
     "css-modules/no-unused-class": "error",
-    "arrow-body-style": ["error", "as-needed"],
+
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": [
       "warn",

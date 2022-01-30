@@ -7,11 +7,15 @@ import { EditorWithComments } from "./EditorWithComments";
 import { Home } from "./Home";
 import { Layout } from "./Layout";
 import { Settings } from "./Settings";
+import { SetupSync, Sync } from "./Sync";
 
 export const App: React.FC = () => (
   <RecoilRoot>
     <Contexts>
-      <RouteGroup />
+      <SetupSync>
+        <Sync />
+        <RouteGroup />
+      </SetupSync>
     </Contexts>
   </RecoilRoot>
 );

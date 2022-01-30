@@ -1,17 +1,16 @@
 import { atom, atomFamily } from "recoil";
 
 import type { CommentData, FileMetaData } from "@/modules/documents";
-import { generatePassword, getRandomName, uuidv4 } from "@/modules/utils";
 
-import type { Room, Settings } from "./types";
+import type { Room } from "./types";
 
 export * from "./selectors";
+export * from "./settings";
 export * from "./types";
-export * from "./async-selectors";
 
 export const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
-  default: generatePassword(),
+  default: "",
 });
 
 export const roomsState = atom<Room[]>({
@@ -19,7 +18,8 @@ export const roomsState = atom<Room[]>({
   default: [],
 });
 
-export const activeFileNameState = atomFamily<string, { roomId: string }>({
+type RoomId = string;
+export const activeFileNameState = atomFamily<string, RoomId>({
   key: "activeFileNameState",
   default: () => "",
 });
@@ -56,26 +56,4 @@ export const focusCommentIdState = atomFamily<
 >({
   key: "focusCommentIdState",
   default: () => null,
-});
-
-export const lastUpdatedState = atom<string>({
-  key: "lastUpdatedState",
-  default: new Date().toISOString(),
-});
-
-const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-const defaultSettings: Settings = {
-  isVim: false,
-  vimrc: "imap jk <Esc>\nimap jj <Esc>",
-  wordWrap: true,
-  name: getRandomName(),
-  theme: isDark ? "vs-dark" : "vs",
-  rooms: [],
-  leftNav: null,
-  id: uuidv4(),
-};
-
-export const settingsState = atom<Settings>({
-  key: "settingsState",
-  default: defaultSettings,
 });

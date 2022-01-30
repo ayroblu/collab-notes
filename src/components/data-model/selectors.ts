@@ -13,12 +13,12 @@ export const inProgressCommentsSelector = selector<CommentData[]>({
   key: "InProgressCommentsSelector",
   get: ({ get }) => {
     const roomId = get(activeRoomIdState);
-    const fileName = get(activeFileNameState({ roomId }));
+    const fileName = get(activeFileNameState(roomId));
     return get(inProgressCommentsState({ roomId, fileName }));
   },
   set: ({ get, set }, newValue) => {
     const roomId = get(activeRoomIdState);
-    const fileName = get(activeFileNameState({ roomId }));
+    const fileName = get(activeFileNameState(roomId));
     return set(inProgressCommentsState({ roomId, fileName }), newValue);
   },
 });

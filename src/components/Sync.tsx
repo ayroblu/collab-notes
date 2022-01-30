@@ -1,4 +1,3 @@
-import isEqual from "lodash/isEqual";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -11,12 +10,11 @@ import {
   syncCommentNamesFn,
 } from "@/modules/documents";
 
-import type { Settings } from "./data-model";
 import {
   activeRoomIdState,
   filesDataState,
-  savedSettingsSelector,
-  settingsState,
+  settingsSelector,
+  yRoomSelector,
 } from "./data-model";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 
@@ -56,7 +54,7 @@ const useFilesListSync = () => {
 };
 
 const useSettingsRoomNamesSync = () => {
-  const [settings, setSettings] = useRecoilState(settingsState);
+  const [settings, setSettings] = useRecoilState(settingsSelector);
   React.useEffect(() => {
     const roomNames = settings.rooms.map(
       ({ id, password }) => getRoom(id, password).name
@@ -116,7 +114,7 @@ const useCommentsSync = () => {
 };
 
 const useCommentNamesSync = () => {
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const room = useRoom();
   const fileName = useFileName();
 
@@ -153,40 +151,30 @@ const useSearchParamsSync = () => {
   }, [room, fileName, setSearchParams]);
 };
 
-export const SetupSync: React.FC = () => {
+export const SetupSync: React.FC = ({ children }) => {
   useInitSync();
-  return null;
+  return <>{children}</>;
 };
 
-export const useInitSync = () => {
-  const [settings, setSettings] = useRecoilState(settingsState);
-  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
-
-  const savedSettings = useRecoilValue(savedSettingsSelector);
-  const setParamsSettings = useParamSettingsSync(savedSettings || settings);
-  useBroadcastSync(setSettingsLocal);
-  if (savedSettings && !isEqual(savedSettings, settings)) {
-    setSettings(savedSettings);
-  }
-
-  React.useEffect(() => {
-    setParamsSettings();
-  }, []);
+const useInitSync = () => {
+  useParamSettingsSync();
+  useRecoilValue(yRoomSelector);
 };
 
-const useParamSettingsSync = (settings: Settings) => {
-  const setSettings = useSetRecoilState(settingsState);
+const useParamSettingsSync = () => {
+  const [settings, setSettings] = useRecoilState(settingsSelector);
   const [searchParams] = useSearchParams();
-  const paramRoomId = searchParams.get("id");
-  const paramRoomName = searchParams.get("groupName");
-  const paramRoomPassword = searchParams.get("password");
-  const paramFileName = searchParams.get("name");
   const [, setActiveRoomId] = useRecoilState(activeRoomIdState);
 
-  if (!paramRoomId || !paramFileName) {
-    return null;
-  }
-  return () => {
+  React.useLayoutEffect(() => {
+    const paramRoomId = searchParams.get("id");
+    const paramRoomName = searchParams.get("groupName");
+    const paramRoomPassword = searchParams.get("password");
+    const paramFileName = searchParams.get("name");
+
+    if (!paramRoomId || !paramFileName) {
+      return;
+    }
     const rooms = settings.rooms;
     if (!rooms.find(({ id }) => id === paramRoomId)) {
       setSettings({
@@ -203,7 +191,7 @@ const useParamSettingsSync = (settings: Settings) => {
       setActiveRoomId(paramRoomId);
       return;
     }
-  };
+  }, []);
   return;
 };
 // function useSetupFunc(

@@ -7,7 +7,7 @@ import { useForm } from "use-form-ts";
 import { keys } from "../modules/utils";
 
 import styles from "./Settings.module.css";
-import { settingsState } from "./data-model";
+import { settingsSelector } from "./data-model";
 import {
   FormLabel,
   FormLabelWrapper,
@@ -16,7 +16,7 @@ import {
 } from "./shared/InputField";
 
 export const Settings: React.FC = () => {
-  const [settings, setSettings] = useRecoilState(settingsState);
+  const [settings, setSettings] = useRecoilState(settingsSelector);
   const { isVim, name, theme, vimrc, wordWrap } = settings;
   const adjustedSettings = {
     isVim,

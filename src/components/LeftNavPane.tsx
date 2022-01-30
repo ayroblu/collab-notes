@@ -6,10 +6,10 @@ import { unreachable } from "@/modules/utils";
 import { FilesListPane } from "./FilesListPane";
 import styles from "./LeftNavPane.module.css";
 import { RoomsList } from "./RoomsList";
-import { LeftNavEnum, settingsState } from "./data-model";
+import { LeftNavEnum, settingsSelector } from "./data-model";
 
 export const LeftNavPane: React.FC = () => {
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const part = getLeftNavPanePart(settings.leftNav);
   return (
     <section className={styles.leftNavPane}>

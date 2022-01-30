@@ -8,11 +8,10 @@ import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
 
 import styles from "./RoomsList.module.css";
 import type { Room } from "./data-model";
-import { settingsState } from "./data-model";
-import { activeRoomIdState } from "./data-model";
+import { settingsSelector , activeRoomIdState } from "./data-model";
 
 export const RoomsList = () => {
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const [isEdit, setIsEdit] = React.useState(false);
 
   return (
@@ -40,7 +39,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   isEdit,
   room: { id, name, password },
 }) => {
-  const [settings, setSettings] = useRecoilState(settingsState);
+  const [settings, setSettings] = useRecoilState(settingsSelector);
   const [isNameEdit, setIsNameEdit] = React.useState(false);
   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
   const navigate = useNavigate();

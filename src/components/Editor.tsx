@@ -26,10 +26,9 @@ import { parseVimrc } from "./Settings";
 import {
   inProgressCommentsSelector,
   isNewUserState,
-  settingsState,
+  settingsSelector,
 } from "./data-model";
-import type { Room ,
-  Settings} from "./data-model";
+import type { Room, Settings } from "./data-model";
 import { useComments, useFileName, useRoom } from "./utils";
 
 export const Editor: React.FC = () => {
@@ -54,7 +53,7 @@ function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const { editorDivRef } = React.useContext(EditorContext);
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const { editorRef } = React.useContext(EditorContext);
   const getIsMounted = useIsMounted();
   const room = useRoom();

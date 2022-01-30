@@ -7,27 +7,23 @@ import {
   activeRoomIdState,
   commentsState,
   focusCommentIdState,
-  settingsState,
+  settingsSelector,
 } from "./data-model";
 
 export const useRoom = () => {
-  const settings = useRecoilValue(settingsState);
+  const settings = useRecoilValue(settingsSelector);
   const activeRoomId = useRecoilValue(activeRoomIdState);
   return settings.rooms.find(({ id }) => id === activeRoomId);
 };
 
 export const useFileName = () => {
   const room = useRoom();
-  return useRecoilValue(
-    activeFileNameState({ roomId: getNonNullable(room).id })
-  );
+  return useRecoilValue(activeFileNameState(getNonNullable(room).id));
 };
 
 export const useFileNameState = () => {
   const room = useRoom();
-  return useRecoilState(
-    activeFileNameState({ roomId: getNonNullable(room).id })
-  );
+  return useRecoilState(activeFileNameState(getNonNullable(room).id));
 };
 
 export const useComments = () => {
