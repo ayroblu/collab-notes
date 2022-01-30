@@ -41,7 +41,7 @@ export const FilesList = () => {
               styles.filesListItem,
               fileName === name && styles.highlight
             )}
-            to={`files?${createSearchParams({ name, id: room.id })}`}
+            to={`files?${createSearchParams({ name })}`}
           >
             <div className={styles.file}>
               <FileTypeIcon name={name} />

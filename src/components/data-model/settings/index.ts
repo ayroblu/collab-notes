@@ -38,7 +38,6 @@ export const settingsSelector = selector<Settings>({
         ...newSettings.rooms,
         {
           id: roomId,
-          name: getRandomName(),
           password: roomId,
         },
       ],

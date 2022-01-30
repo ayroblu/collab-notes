@@ -74,7 +74,7 @@ const validCharsOptions = {
 };
 export function generatePassword({
   length = 16,
-  validCharsType = "lettersNumbersSymbols",
+  validCharsType = "lowerLettersNumbers",
 }: {
   validCharsType?: keyof typeof validCharsOptions;
   length?: number;

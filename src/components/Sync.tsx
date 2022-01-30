@@ -1,8 +1,13 @@
 import React from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { useLayoutEffectOnce } from "@/hooks/useLayoutEffectOnce";
+import { useStable } from "@/hooks/useStable";
 import {
   deduplicateFiles,
   getAllFilesMetaData,
@@ -118,106 +123,64 @@ const useParamsSync = () => {
 };
 
 export const SetupSync: React.FC = ({ children }) => {
-  useParamSettingsSync();
+  const settings = useRecoilValue(settingsSelector);
   useRecoilValue(yRoomSelector);
+  useSetupParamsSync();
 
+  if (!settings.rooms.length) {
+    return null;
+  }
   return <>{children}</>;
 };
 
-const useParamSettingsSync = () => {
+const useSetupParamsSync = () => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
-  const [searchParams] = useSearchParams();
+  const activeRoomId = useRecoilValue(activeRoomIdSelector);
+  const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const navigateStable = useStable(navigate, [roomId]);
+  const activeFileName = useRecoilValue(activeFileNameState(roomId));
 
-  // We could make this be the always just create a room if specified
-  useLayoutEffectOnce(() => {
-    const paramRoomId = searchParams.get("id");
+  React.useEffect(() => {
+    if (!roomId && settings.rooms.length) {
+      navigateStable(
+        `${activeRoomId}/files?${createSearchParams({ name: activeFileName })}`
+      );
+      return;
+    } else if (roomId && !searchParams.get("name")) {
+      setSearchParams({ name: activeFileName });
+    }
+  }, [
+    roomId,
+    navigateStable,
+    settings.rooms.length,
+    activeRoomId,
+    searchParams,
+    activeFileName,
+    setSearchParams,
+  ]);
+
+  React.useEffect(() => {
     const paramRoomPassword = searchParams.get("password");
-    const paramFileName = searchParams.get("name");
 
-    if (!paramRoomId || !paramFileName) {
+    if (!roomId) {
       return;
     }
     const rooms = settings.rooms;
-    if (!rooms.find(({ id }) => id === paramRoomId)) {
-      setSettings({
+    if (!rooms.find(({ id }) => id === roomId)) {
+      setSettings((settings) => ({
         ...settings,
         rooms: [
           ...rooms,
           {
-            id: paramRoomId,
-            password: paramRoomPassword || paramRoomId,
+            id: roomId,
+            password: paramRoomPassword || roomId,
           },
         ],
-      });
+      }));
       return;
     }
-  });
+  }, [roomId, searchParams, setSettings, settings.rooms]);
   return;
 };
-// function useSetupFunc(
-//   settings: Settings,
-//   setSettings: (settings: Settings) => void
-// ) {
-//   const [searchParams] = useSearchParams();
-//   const paramRoomId = searchParams.get("id");
-//   const paramRoomName = searchParams.get("groupName");
-//   const paramRoomPassword = searchParams.get("password");
-//   const paramFileName = searchParams.get("name");
-//   const navigate = useNavigate();
-//   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
-//   const func = React.useCallback(async () => {
-//     // if route params -> add room to rooms list and switch
-//     // If new user -> create new room + readme.md
-//     const savedSettings: Settings | void = await idbGetWithMigrations();
-//     if (paramRoomId && paramFileName) {
-//       const rooms = savedSettings?.rooms || settings.rooms;
-//       if (!rooms.find(({ id }) => id === paramRoomId)) {
-//         setSettings({
-//           ...(savedSettings || settings),
-//           rooms: [
-//             ...rooms,
-//             {
-//               id: paramRoomId,
-//               name: paramRoomName || "",
-//               password: paramRoomPassword || paramRoomId,
-//             },
-//           ],
-//         });
-//         setActiveRoomId(paramRoomId);
-//         return;
-//       }
-//     }
-//     if (!savedSettings || !savedSettings.rooms.length) {
-//       const roomId = activeRoomId;
-//       const roomName = getRandomName();
-//       setSettings({
-//         ...settings,
-//         rooms: [
-//           ...settings.rooms,
-//           {
-//             id: roomId,
-//             name: getRandomName(),
-//             password: roomId,
-//           },
-//         ],
-//       });
-//       const { name } = getRoom(roomId, roomId);
-//       name.insert(0, roomName);
-//       navigate({
-//         pathname: "/files",
-//         search: `?${createSearchParams({
-//           name: "README.md",
-//           id: roomId,
-//           newUser: "1",
-//         })}`,
-//       });
-//       return;
-//     }
-//     setSettings(savedSettings);
-//     const room = savedSettings.rooms[0];
-//     if (!room) return;
-//     const { initialDbPromise } = getRoom(room.id, room.password);
-//     await initialDbPromise;
-//   }, []);
-//   return func;
-// }

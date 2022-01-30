@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 
@@ -7,16 +7,18 @@ import { EditorWithComments } from "./EditorWithComments";
 import { Home } from "./Home";
 import { Layout } from "./Layout";
 import { Settings } from "./Settings";
-import { SetupSync, Sync } from "./Sync";
+import { ErrorBoundary } from "./shared/ErrorBoundary";
+import { Spinner } from "./shared/Spinner";
 
 export const App: React.FC = () => (
   <RecoilRoot>
-    <Contexts>
-      <SetupSync>
-        <Sync />
-        <RouteGroup />
-      </SetupSync>
-    </Contexts>
+    <ErrorBoundary>
+      <Suspense fallback={<Spinner />}>
+        <Contexts>
+          <RouteGroup />
+        </Contexts>
+      </Suspense>
+    </ErrorBoundary>
   </RecoilRoot>
 );
 
