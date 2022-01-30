@@ -1,5 +1,6 @@
 import React from "react";
 import { useRecoilValue } from "recoil";
+import * as awarenessProtocol from "y-protocols/awareness.js";
 
 import type { AwarenessStates } from "@/modules/documents";
 import { getRoom } from "@/modules/documents";
@@ -17,7 +18,7 @@ export const FacePile: React.FC = () => {
   React.useEffect(() => {
     if (!room) return;
     const { provider, ydoc } = getRoom(room.id, room.password);
-    provider.awareness.on("change", () => {
+    const changeFunc = () => {
       const faces = Array.from(
         provider.awareness.getStates() as AwarenessStates
       )
@@ -35,8 +36,16 @@ export const FacePile: React.FC = () => {
           ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
         );
       setFaces(uniqBy(faces, ({ id }) => id));
-    });
-  }, []);
+    };
+    provider.awareness.on("change", changeFunc);
+    return () => {
+      awarenessProtocol.removeAwarenessStates(
+        provider.awareness,
+        [ydoc.clientID],
+        "left room"
+      );
+    };
+  }, [room, settings.id]);
   if (!room) return null;
   if (faces.length < 6) {
     return (

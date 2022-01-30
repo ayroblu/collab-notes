@@ -2,6 +2,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
+import { useLayoutEffectOnce } from "@/hooks/useLayoutEffectOnce";
 import {
   deduplicateFiles,
   getAllFilesMetaData,
@@ -166,7 +167,7 @@ const useParamSettingsSync = () => {
   const [searchParams] = useSearchParams();
   const [, setActiveRoomId] = useRecoilState(activeRoomIdState);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffectOnce(() => {
     const paramRoomId = searchParams.get("id");
     const paramRoomName = searchParams.get("groupName");
     const paramRoomPassword = searchParams.get("password");
@@ -191,7 +192,7 @@ const useParamSettingsSync = () => {
       setActiveRoomId(paramRoomId);
       return;
     }
-  }, []);
+  });
   return;
 };
 // function useSetupFunc(
