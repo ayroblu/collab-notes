@@ -9,7 +9,6 @@ import {
   getRoom,
   syncCommentNamesFn,
 } from "@/modules/documents";
-import { getRandomName } from "@/modules/utils";
 
 import {
   activeFileNameState,
@@ -18,7 +17,6 @@ import {
   settingsSelector,
   yRoomSelector,
 } from "./data-model";
-import { routesHelper, useStableNavigate } from "./navigation-utils";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 
 /**
@@ -40,19 +38,16 @@ const useFilesListSync = () => {
   React.useEffect(() => {
     if (!room) return;
     const { files } = getRoom(room.id, room.password);
-    const didDedup = deduplicateFiles(files);
-    console.log("init diddedup", didDedup);
+    deduplicateFiles(files);
 
     const filesMetaData = getAllFilesMetaData(room.id, room.password);
     setFilesData(filesMetaData);
     const changeListener = () => {
-      const didDedup = deduplicateFiles(files);
+      deduplicateFiles(files);
       const filesMetaData = getAllFilesMetaData(room.id, room.password);
       setFilesData(filesMetaData);
-      console.log("diddedup", didDedup);
-      if (didDedup) {
-        setSettings({ ...settings });
-      }
+      // TODO: An ugly hack for first time joiners, to fix
+      setSettings({ ...settings });
     };
     files.observe(changeListener);
     return () => {
