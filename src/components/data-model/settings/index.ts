@@ -4,7 +4,7 @@ import { getRoom } from "@/modules/documents";
 import { generatePassword, getRandomName } from "@/modules/utils";
 
 import type { Settings } from "..";
-import { activeFileNameState, activeRoomIdState, isNewUserState } from "..";
+import { activeFileNameState, activeRoomIdSelector, isNewUserState } from "..";
 
 import { defaultSettings, syncStorageEffect } from "./utils";
 
@@ -18,14 +18,15 @@ export const settingsSelector = selector<Settings>({
   key: "settingsSelector",
   get: ({ get }) => get(settingsState),
   set: ({ get, set }, newSettings) => {
+    // NOT CORRECT!!!
     if (newSettings instanceof DefaultValue) {
       return set(settingsState, newSettings);
     }
     if (newSettings.rooms.length) {
-      const activeRoomId = get(activeRoomIdState);
+      const activeRoomId = get(activeRoomIdSelector);
       const room = newSettings.rooms.find(({ id }) => id === activeRoomId);
       if (!room) {
-        set(activeRoomIdState, newSettings.rooms[0]!.id);
+        set(activeRoomIdSelector, newSettings.rooms[0]!.id);
       }
       return set(settingsState, newSettings);
     }
@@ -44,7 +45,7 @@ export const settingsSelector = selector<Settings>({
     });
     const { name } = getRoom(roomId, roomId);
     name.insert(0, roomName);
-    set(activeRoomIdState, roomId);
+    set(activeRoomIdSelector, roomId);
     set(activeFileNameState(roomId), "README.md");
     set(isNewUserState, true);
     return;
@@ -54,7 +55,7 @@ export const yRoomSelector = selector<void>({
   key: "yRoomSelector",
   get: async ({ get }) => {
     const settings = get(settingsSelector);
-    const activeRoomId = get(activeRoomIdState);
+    const activeRoomId = get(activeRoomIdSelector);
     const room = settings.rooms.find(({ id }) => activeRoomId === id);
     if (!room) return;
     const { initialDbPromise } = getRoom(room.id, room.password);

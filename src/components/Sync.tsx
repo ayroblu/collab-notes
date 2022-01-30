@@ -1,3 +1,4 @@
+import isEqual from "lodash/isEqual";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -12,7 +13,7 @@ import {
 } from "@/modules/documents";
 
 import {
-  activeRoomIdState,
+  activeRoomIdSelector,
   filesDataState,
   settingsSelector,
   yRoomSelector,
@@ -61,23 +62,26 @@ const useSettingsRoomNamesSync = () => {
       ({ id, password }) => getRoom(id, password).name
     );
 
-    setSettings({
-      ...settings,
-      rooms: settings.rooms.map(({ id, password }, i) => ({
-        id,
-        name: roomNames[i]!.toString(),
-        password,
-      })),
-    });
+    const newRooms = settings.rooms.map(({ id, password }, i) => ({
+      id,
+      name: roomNames[i]!.toString(),
+      password,
+    }));
+    if (!isEqual(newRooms, settings.rooms)) {
+      setSettings((settings) => ({
+        ...settings,
+        rooms: newRooms,
+      }));
+    }
     const changeListener = () => {
-      setSettings({
+      setSettings((settings) => ({
         ...settings,
         rooms: settings.rooms.map(({ id, password }, i) => ({
           id,
           name: roomNames[i]!.toString(),
           password,
         })),
-      });
+      }));
     };
     roomNames.forEach((t) => {
       t.observe(changeListener);
@@ -87,7 +91,7 @@ const useSettingsRoomNamesSync = () => {
         t.unobserve(changeListener);
       });
     };
-  }, [setSettings, settings, settings.rooms.length]);
+  }, [setSettings, settings.rooms]);
 };
 
 const useCommentsSync = () => {
@@ -153,19 +157,17 @@ const useSearchParamsSync = () => {
 };
 
 export const SetupSync: React.FC = ({ children }) => {
-  useInitSync();
-  return <>{children}</>;
-};
-
-const useInitSync = () => {
   useParamSettingsSync();
+  useAlwaysActiveRoomSync();
   useRecoilValue(yRoomSelector);
+
+  return <>{children}</>;
 };
 
 const useParamSettingsSync = () => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
   const [searchParams] = useSearchParams();
-  const [, setActiveRoomId] = useRecoilState(activeRoomIdState);
+  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
 
   useLayoutEffectOnce(() => {
     const paramRoomId = searchParams.get("id");
@@ -195,6 +197,14 @@ const useParamSettingsSync = () => {
   });
   return;
 };
+const useAlwaysActiveRoomSync = () => {
+  const settings = useRecoilValue(settingsSelector);
+  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
+  const room = settings.rooms.find(({ id }) => id === activeRoomId);
+  if (!room) {
+    setActiveRoomId(settings.rooms[0]!.id);
+  }
+};
 // function useSetupFunc(
 //   settings: Settings,
 //   setSettings: (settings: Settings) => void
@@ -205,7 +215,7 @@ const useParamSettingsSync = () => {
 //   const paramRoomPassword = searchParams.get("password");
 //   const paramFileName = searchParams.get("name");
 //   const navigate = useNavigate();
-//   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdState);
+//   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
 //   const func = React.useCallback(async () => {
 //     // if route params -> add room to rooms list and switch
 //     // If new user -> create new room + readme.md

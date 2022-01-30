@@ -26,6 +26,7 @@ export const syncStorageEffect: AtomEffect<Settings> = ({ onSet, setSelf }) => {
   // 2. effect -> no rooms -> new room
   // 3. onSet -> broadcast new room -> then do nothing
   setSelf(
+    // TODO: ALSO VERY WRONG, not DefaultValue
     idbGetWithMigrations().then((savedSettings) =>
       savedSettings ? savedSettings : new DefaultValue()
     )

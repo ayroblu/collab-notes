@@ -4,7 +4,7 @@ import { getNonNullable } from "@/modules/utils";
 
 import {
   activeFileNameState,
-  activeRoomIdState,
+  activeRoomIdSelector,
   commentsState,
   focusCommentIdState,
   settingsSelector,
@@ -12,7 +12,7 @@ import {
 
 export const useRoom = () => {
   const settings = useRecoilValue(settingsSelector);
-  const activeRoomId = useRecoilValue(activeRoomIdState);
+  const activeRoomId = useRecoilValue(activeRoomIdSelector);
   return settings.rooms.find(({ id }) => id === activeRoomId);
 };
 

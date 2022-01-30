@@ -1,16 +1,40 @@
-import { atom, atomFamily } from "recoil";
+import { atom, atomFamily, selector } from "recoil";
 
 import type { CommentData, FileMetaData } from "@/modules/documents";
 
+import { settingsSelector } from "./settings";
 import type { Room } from "./types";
 
 export * from "./selectors";
 export * from "./settings";
 export * from "./types";
 
-export const activeRoomIdState = atom<string>({
+const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
-  default: "",
+  default: selector<string>({
+    key: "defaultActiveRoomIdSelector",
+    get: ({ get }) => {
+      const settings = get(settingsSelector);
+      if (!settings.rooms.length) return "";
+      return settings.rooms[0]!.id;
+    },
+  }),
+});
+export const activeRoomIdSelector = selector<string>({
+  key: "activeRoomIdSelector",
+  get: ({ get }) => {
+    const activeRoomId = get(activeRoomIdState);
+    const settings = get(settingsSelector);
+    if (!settings.rooms.length) return activeRoomId;
+    const room = settings.rooms.find(({ id }) => id === activeRoomId);
+    if (!room) {
+      return settings.rooms[0]!.id;
+    }
+    return activeRoomId;
+  },
+  set: ({ set }, newValue) => {
+    set(activeRoomIdState, newValue);
+  },
 });
 
 export const roomsState = atom<Room[]>({

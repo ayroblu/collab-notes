@@ -5,19 +5,19 @@ import { getNonNullable } from "@/modules/utils";
 
 import {
   activeFileNameState,
-  activeRoomIdState,
+  activeRoomIdSelector,
   inProgressCommentsState,
 } from ".";
 
 export const inProgressCommentsSelector = selector<CommentData[]>({
   key: "InProgressCommentsSelector",
   get: ({ get }) => {
-    const roomId = get(activeRoomIdState);
+    const roomId = get(activeRoomIdSelector);
     const fileName = get(activeFileNameState(roomId));
     return get(inProgressCommentsState({ roomId, fileName }));
   },
   set: ({ get, set }, newValue) => {
-    const roomId = get(activeRoomIdState);
+    const roomId = get(activeRoomIdSelector);
     const fileName = get(activeFileNameState(roomId));
     return set(inProgressCommentsState({ roomId, fileName }), newValue);
   },
@@ -31,7 +31,7 @@ export const inProgressCommentSelector = selectorFamily<
   get:
     ({ commentId, fileName }) =>
     ({ get }) => {
-      const activeRoomId = get(activeRoomIdState);
+      const activeRoomId = get(activeRoomIdSelector);
       const comments = get(
         inProgressCommentsState({ roomId: activeRoomId, fileName })
       );
@@ -40,7 +40,7 @@ export const inProgressCommentSelector = selectorFamily<
   set:
     ({ commentId, fileName }) =>
     ({ get, set }, newValue) => {
-      const activeRoomId = get(activeRoomIdState);
+      const activeRoomId = get(activeRoomIdSelector);
       const comments = get(
         inProgressCommentsState({ roomId: activeRoomId, fileName })
       );
