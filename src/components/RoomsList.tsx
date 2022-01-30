@@ -1,6 +1,5 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
-import { createSearchParams, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
@@ -8,7 +7,11 @@ import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
 
 import styles from "./RoomsList.module.css";
 import type { Room } from "./data-model";
-import { settingsSelector, activeRoomIdSelector } from "./data-model";
+import {
+  activeRoomIdSelector,
+  roomNamesState,
+  settingsSelector,
+} from "./data-model";
 
 export const RoomsList = () => {
   const settings = useRecoilValue(settingsSelector);
@@ -37,12 +40,12 @@ export const RoomsList = () => {
 
 const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   isEdit,
-  room: { id, name, password },
+  room: { id, password },
 }) => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
   const [isNameEdit, setIsNameEdit] = React.useState(false);
   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
-  const navigate = useNavigate();
+  const name = useRecoilValue(roomNamesState({ id, password }));
 
   React.useEffect(() => {
     if (isNameEdit && !isEdit) {
@@ -50,18 +53,8 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
     }
   }, [isNameEdit, isEdit]);
 
-  const makeRoomActiveHandler = (id: string, password: string) => () => {
+  const makeRoomActiveHandler = (id: string) => () => {
     setActiveRoomId(id);
-    const { files } = getRoom(id, password);
-    const file = files.slice(0, 1)[0];
-    const metadata = file && getYFileMetaData(file);
-    navigate({
-      pathname: "files",
-      search: `?${createSearchParams({
-        name: metadata?.name || "README.md",
-        id,
-      })}`,
-    });
   };
   const { name: yname } = getRoom(id, password);
   const setRoomName = (text: string) => {
@@ -79,7 +72,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
     const confirmation = confirm(`Are you sure you want to delete ${name}?`);
     if (confirmation) {
       const index = settings.rooms.findIndex((room) => room.id === id);
-      const newRooms = settings.rooms.filter((room) => room.name !== name);
+      const newRooms = settings.rooms.filter((room) => room.id !== id);
       const newActiveRoomId =
         id === activeRoomId
           ? newRooms[index]
@@ -101,11 +94,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
     <div className={styles.roomButtonWrapper}>
       <button
         className={cn(styles.roomButton, activeRoomId === id && styles.active)}
-        onClick={
-          isEdit
-            ? () => setIsNameEdit(true)
-            : makeRoomActiveHandler(id, password)
-        }
+        onClick={isEdit ? () => setIsNameEdit(true) : makeRoomActiveHandler(id)}
       >
         {isEdit && isNameEdit ? (
           <input
@@ -119,7 +108,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
         ) : (
           name
         )}
-        <p className={styles.subtitle}>{getSubtitle({ id, name, password })}</p>
+        <p className={styles.subtitle}>{getSubtitle({ id, password })}</p>
       </button>
       {isEdit && !isNameEdit && (
         <button className={styles.hoverDelete} onClick={handleDelete}>

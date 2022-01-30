@@ -1,4 +1,3 @@
-import isEqual from "lodash/isEqual";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -25,7 +24,6 @@ import { useCommentsState, useFileName, useRoom } from "./utils";
  */
 export const Sync: React.FC = () => {
   useFilesListSync();
-  useSettingsRoomNamesSync();
   useCommentsSync();
   useCommentNamesSync();
 
@@ -53,45 +51,6 @@ const useFilesListSync = () => {
       files.unobserve(changeListener);
     };
   }, [room, setFilesData]);
-};
-
-const useSettingsRoomNamesSync = () => {
-  const [settings, setSettings] = useRecoilState(settingsSelector);
-  React.useEffect(() => {
-    const roomNames = settings.rooms.map(
-      ({ id, password }) => getRoom(id, password).name
-    );
-
-    const newRooms = settings.rooms.map(({ id, password }, i) => ({
-      id,
-      name: roomNames[i]!.toString(),
-      password,
-    }));
-    if (!isEqual(newRooms, settings.rooms)) {
-      setSettings((settings) => ({
-        ...settings,
-        rooms: newRooms,
-      }));
-    }
-    const changeListener = () => {
-      setSettings((settings) => ({
-        ...settings,
-        rooms: settings.rooms.map(({ id, password }, i) => ({
-          id,
-          name: roomNames[i]!.toString(),
-          password,
-        })),
-      }));
-    };
-    roomNames.forEach((t) => {
-      t.observe(changeListener);
-    });
-    return () => {
-      roomNames.forEach((t) => {
-        t.unobserve(changeListener);
-      });
-    };
-  }, [setSettings, settings.rooms]);
 };
 
 const useCommentsSync = () => {
@@ -171,7 +130,6 @@ const useParamSettingsSync = () => {
 
   useLayoutEffectOnce(() => {
     const paramRoomId = searchParams.get("id");
-    const paramRoomName = searchParams.get("groupName");
     const paramRoomPassword = searchParams.get("password");
     const paramFileName = searchParams.get("name");
 
@@ -186,7 +144,6 @@ const useParamSettingsSync = () => {
           ...rooms,
           {
             id: paramRoomId,
-            name: paramRoomName || "",
             password: paramRoomPassword || paramRoomId,
           },
         ],
