@@ -22,7 +22,7 @@ export const App: React.FC = () => (
 
 const RouteGroup: React.FC = () => (
   <Routes>
-    <Route path="/" element={<Layout />}>
+    <Route path="/:roomId" element={<Layout />}>
       <Route index element={<Home />} />
       <Route path="files">
         <Route index element={<EditorWithComments />} />
@@ -30,6 +30,7 @@ const RouteGroup: React.FC = () => (
       <Route path="settings" element={<Settings />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
+    <Route path="*" element={<NoMatch />} />
   </Routes>
 );
 

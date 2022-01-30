@@ -1,5 +1,5 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { useLayoutEffectOnce } from "@/hooks/useLayoutEffectOnce";
@@ -12,6 +12,7 @@ import {
 } from "@/modules/documents";
 
 import {
+  activeFileNameState,
   activeRoomIdSelector,
   filesDataState,
   settingsSelector,
@@ -95,29 +96,29 @@ const useCommentNamesSync = () => {
   }, [settings.name, fileName, room, settings.id]);
 };
 
-export const FileSearchParamsSync: React.FC = () => {
-  useSearchParamsSync();
+export const ParamsSync: React.FC = () => {
+  useParamsSync();
   return null;
 };
-const useSearchParamsSync = () => {
-  const room = useRoom();
-  const fileName = useFileName();
-  const [, setSearchParams] = useSearchParams();
+const useParamsSync = () => {
+  const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
+  const setActiveFileName = useSetRecoilState(activeFileNameState(roomId));
 
-  React.useEffect(() => {
-    if (!room) return;
-    const password = room.id !== room.password ? room.password : undefined;
-    if (password) {
-      setSearchParams({ id: room.id, name: fileName, password });
-    } else {
-      setSearchParams({ id: room.id, name: fileName });
+  React.useLayoutEffect(() => {
+    if (roomId) {
+      setActiveRoomId(roomId);
+      if (fileName) {
+        setActiveFileName(fileName);
+      }
     }
-  }, [room, fileName, setSearchParams]);
+  }, [fileName, roomId, setActiveRoomId, setActiveFileName]);
 };
 
 export const SetupSync: React.FC = ({ children }) => {
   useParamSettingsSync();
-  useAlwaysActiveRoomSync();
   useRecoilValue(yRoomSelector);
 
   return <>{children}</>;
@@ -126,8 +127,8 @@ export const SetupSync: React.FC = ({ children }) => {
 const useParamSettingsSync = () => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
   const [searchParams] = useSearchParams();
-  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
 
+  // We could make this be the always just create a room if specified
   useLayoutEffectOnce(() => {
     const paramRoomId = searchParams.get("id");
     const paramRoomPassword = searchParams.get("password");
@@ -148,19 +149,10 @@ const useParamSettingsSync = () => {
           },
         ],
       });
-      setActiveRoomId(paramRoomId);
       return;
     }
   });
   return;
-};
-const useAlwaysActiveRoomSync = () => {
-  const settings = useRecoilValue(settingsSelector);
-  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
-  const room = settings.rooms.find(({ id }) => id === activeRoomId);
-  if (!room) {
-    setActiveRoomId(settings.rooms[0]!.id);
-  }
 };
 // function useSetupFunc(
 //   settings: Settings,

@@ -63,9 +63,12 @@ export const roomNamesState = atomFamily<string, Room>({
 });
 
 type RoomId = string;
-export const activeFileNameState = atomFamily<string, RoomId>({
+export const activeFileNameState = atomFamily<
+  string,
+  RoomId | null | undefined
+>({
   key: "activeFileNameState",
-  default: () => "",
+  default: () => "Untitled",
 });
 
 export const filesDataState = atom<FileMetaData[]>({
