@@ -6,7 +6,8 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- use recoiljs to make states that key off room + fileName esp inProgressSelections
+- Bug with new joining user - no text?
+- fix DefaultValue usage in recoil for settings
 - comments
   - Focus highlights + selection highlights
     - Focus on comment focuses selection too

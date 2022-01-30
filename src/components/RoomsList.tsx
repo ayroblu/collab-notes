@@ -109,7 +109,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
             autoFocus
           />
         ) : (
-          name
+          name || id
         )}
         <p className={styles.subtitle}>{getSubtitle({ id, password })}</p>
       </button>

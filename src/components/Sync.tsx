@@ -35,24 +35,30 @@ export const Sync: React.FC = () => {
 const useFilesListSync = () => {
   const setFilesData = useSetRecoilState(filesDataState);
   const room = useRoom();
+  const [settings, setSettings] = useRecoilState(settingsSelector);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (!room) return;
     const { files } = getRoom(room.id, room.password);
-    deduplicateFiles(files);
+    const didDedup = deduplicateFiles(files);
+    console.log("init diddedup", didDedup);
 
     const filesMetaData = getAllFilesMetaData(room.id, room.password);
     setFilesData(filesMetaData);
     const changeListener = () => {
+      const didDedup = deduplicateFiles(files);
       const filesMetaData = getAllFilesMetaData(room.id, room.password);
-      deduplicateFiles(files);
       setFilesData(filesMetaData);
+      console.log("diddedup", didDedup);
+      if (didDedup) {
+        setSettings({ ...settings });
+      }
     };
     files.observe(changeListener);
     return () => {
       files.unobserve(changeListener);
     };
-  }, [room, setFilesData]);
+  }, [room, setFilesData, setSettings, settings]);
 };
 
 const useCommentsSync = () => {
@@ -104,15 +110,12 @@ export const ParamsSync: React.FC = () => {
 const useParamsSync = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
-  const navigate = useStableNavigate();
 
   React.useEffect(() => {
     if (roomId && roomId !== activeRoomId) {
       setActiveRoomId(roomId);
-    } else if (!roomId) {
-      navigate(routesHelper.room(activeRoomId).index);
     }
-  }, [activeRoomId, navigate, roomId, setActiveRoomId]);
+  }, [activeRoomId, roomId, setActiveRoomId]);
 };
 export const FilesParamsSync: React.FC = ({ children }) => {
   useFileNameInitSync();
@@ -146,27 +149,12 @@ const useFileNameInitSync = () => {
 export const SetupSync: React.FC = ({ children }) => {
   const settings = useRecoilValue(settingsSelector);
   useRecoilValue(yRoomSelector);
-  useSetupParamsSync();
   useSetupNewRoomSync();
 
   if (!settings.rooms.length) {
     return null;
   }
   return <>{children}</>;
-};
-
-const useSetupParamsSync = () => {
-  const [settings] = useRecoilState(settingsSelector);
-  const activeRoomId = useRecoilValue(activeRoomIdSelector);
-  const { roomId } = useParams<{ roomId: string }>();
-  const navigate = useStableNavigate();
-
-  React.useEffect(() => {
-    if (!roomId && settings.rooms.length) {
-      navigate(routesHelper.room(activeRoomId).index);
-      return;
-    }
-  }, [activeRoomId, navigate, roomId, settings.rooms.length]);
 };
 
 const useSetupNewRoomSync = () => {
@@ -195,9 +183,6 @@ const useSetupNewRoomSync = () => {
         },
       ],
     }));
-    const { name } = getRoom(roomId, roomId);
-    const roomName = getRandomName();
-    name.insert(0, roomName);
     setActiveRoomId(roomId);
     setActiveFileName("README.md");
     return;

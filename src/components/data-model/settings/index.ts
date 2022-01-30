@@ -42,9 +42,6 @@ export const settingsSelector = selector<Settings>({
         },
       ],
     });
-    const { name } = getRoom(roomId, roomId);
-    const roomName = getRandomName();
-    name.insert(0, roomName);
     set(activeRoomIdSelector, roomId);
     set(activeFileNameState(roomId), "README.md");
     set(isNewUserState, true);

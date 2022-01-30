@@ -5,6 +5,7 @@ import { RecoilRoot } from "recoil";
 import { Contexts } from "./Contexts";
 import { EditorWithComments } from "./EditorWithComments";
 import { Layout } from "./Layout";
+import { RoomRedirect } from "./RoomRedirect";
 import { Settings } from "./Settings";
 import { ErrorBoundary } from "./shared/ErrorBoundary";
 import { Spinner } from "./shared/Spinner";
@@ -24,6 +25,7 @@ export const App: React.FC = () => (
 const RouteGroup: React.FC = () => (
   <Routes>
     <Route path="/" element={<Layout />}>
+      <Route index element={<RoomRedirect />} />
       <Route path="/:roomId">
         <Route index element={<Navigate to="files" replace />} />
         <Route path="files">

@@ -7,7 +7,6 @@ import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
-import type { AwarenessStates, LocalState } from "@/modules/documents";
 import {
   createNewFile,
   getDocument,
@@ -16,31 +15,27 @@ import {
   getYFileMetaData,
   getYFileText,
 } from "@/modules/documents";
+import type { AwarenessStates, LocalState } from "@/modules/documents";
 import { cn, getHashColor } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "./Contexts";
 import "./Editor.css";
 import styles from "./Editor.module.css";
-import { NoMatchFile } from "./NoMatchFile";
 import { parseVimrc } from "./Settings";
+import type { Room, Settings } from "./data-model";
 import {
   inProgressCommentsSelector,
   isNewUserState,
   settingsSelector,
 } from "./data-model";
-import type { Room, Settings } from "./data-model";
 import { useComments, useFileName, useRoom } from "./utils";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { editorDivRef } = React.useContext(EditorContext);
-  const room = useRoom();
 
   useMonacoEditor(setCursorStyles);
 
-  if (!room) {
-    return <NoMatchFile />;
-  }
   return (
     <>
       <style>{cursorStyles.join("")}</style>

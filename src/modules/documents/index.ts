@@ -101,7 +101,7 @@ export function createNewFile(
   file.set("comments", new Y.Array<CommentData>());
   file.set("text", new Y.Text());
   files.push([file]);
-  return file;
+  return getFileFromFileName(roomId, roomPassword, fileName)!;
 }
 export function deleteFile(
   roomId: string,
