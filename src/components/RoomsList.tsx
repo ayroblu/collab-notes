@@ -1,5 +1,6 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
@@ -46,6 +47,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   const [isNameEdit, setIsNameEdit] = React.useState(false);
   const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
   const name = useRecoilValue(roomNamesState({ id, password }));
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isNameEdit && !isEdit) {
@@ -55,6 +57,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
 
   const makeRoomActiveHandler = (id: string) => () => {
     setActiveRoomId(id);
+    navigate(`/${id}`);
   };
   const { name: yname } = getRoom(id, password);
   const setRoomName = (text: string) => {
@@ -87,6 +90,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
         rooms: newRooms,
       });
       setActiveRoomId(newActiveRoomId);
+      navigate(newActiveRoomId);
     }
   };
 

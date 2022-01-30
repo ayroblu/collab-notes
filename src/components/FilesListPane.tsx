@@ -1,5 +1,6 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
+import { useSearchParams } from "react-router-dom";
 
 import {
   deleteFile,
@@ -35,6 +36,7 @@ export const FilesListPane = () => {
 const useDeleteFile = () => {
   const room = useRoom();
   const [fileName, setFileName] = useFileNameState();
+  const [, setSearchParams] = useSearchParams();
   return () => {
     if (!fileName) return;
     const confirmation = confirm(
@@ -47,7 +49,9 @@ const useDeleteFile = () => {
 
       const { files } = getRoom(room.id, room.password);
       const newIndex = index >= files.length ? files.length - 1 : index;
-      setFileName(getYFileMetaData(files.get(newIndex)).name);
+      const name = getYFileMetaData(files.get(newIndex)).name;
+      setFileName(name);
+      setSearchParams({ name });
     }
   };
 };

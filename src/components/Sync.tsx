@@ -108,18 +108,42 @@ export const ParamsSync: React.FC = () => {
 const useParamsSync = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [searchParams] = useSearchParams();
-  const fileName = searchParams.get("name");
   const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
   const setActiveFileName = useSetRecoilState(activeFileNameState(roomId));
 
   React.useLayoutEffect(() => {
     if (roomId) {
       setActiveRoomId(roomId);
-      if (fileName) {
-        setActiveFileName(fileName);
-      }
     }
-  }, [fileName, roomId, setActiveRoomId, setActiveFileName]);
+  }, [roomId, setActiveRoomId, setActiveFileName]);
+};
+export const FilesParamsSync: React.FC = ({ children }) => {
+  const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams] = useSearchParams();
+  const fileName = searchParams.get("name");
+  const activeFileName = useRecoilValue(activeFileNameState(roomId));
+  useFileNameInitSync();
+
+  if (!fileName || fileName !== activeFileName) return null;
+  return <>{children}</>;
+};
+const useFileNameInitSync = () => {
+  const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filesData = useRecoilValue(filesDataState);
+  const [activeFileName, setActiveFileName] = useRecoilState(
+    activeFileNameState(roomId)
+  );
+  const fileName = searchParams.get("name");
+
+  React.useEffect(() => {
+    if (!fileName) {
+      const name = filesData[0]?.name ?? "README.md";
+      setSearchParams({ name });
+    } else if (activeFileName !== fileName) {
+      setActiveFileName(fileName);
+    }
+  }, [activeFileName, fileName, filesData, setActiveFileName, setSearchParams]);
 };
 
 export const SetupSync: React.FC = ({ children }) => {
@@ -148,8 +172,6 @@ const useSetupParamsSync = () => {
         `${activeRoomId}/files?${createSearchParams({ name: activeFileName })}`
       );
       return;
-    } else if (roomId && !searchParams.get("name")) {
-      setSearchParams({ name: activeFileName });
     }
   }, [
     roomId,
