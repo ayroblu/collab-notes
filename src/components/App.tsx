@@ -1,10 +1,9 @@
 import React, { Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 
 import { Contexts } from "./Contexts";
 import { EditorWithComments } from "./EditorWithComments";
-import { Home } from "./Home";
 import { Layout } from "./Layout";
 import { Settings } from "./Settings";
 import { ErrorBoundary } from "./shared/ErrorBoundary";
@@ -24,15 +23,17 @@ export const App: React.FC = () => (
 
 const RouteGroup: React.FC = () => (
   <Routes>
-    <Route path="/:roomId" element={<Layout />}>
-      <Route index element={<Home />} />
-      <Route path="files">
-        <Route index element={<EditorWithComments />} />
+    <Route path="/" element={<Layout />}>
+      <Route path="/:roomId">
+        <Route index element={<Navigate to="files" replace />} />
+        <Route path="files">
+          <Route index element={<EditorWithComments />} />
+        </Route>
+        <Route path="*" element={<Navigate to="files" replace />} />
       </Route>
       <Route path="settings" element={<Settings />} />
       <Route path="*" element={<NoMatch />} />
     </Route>
-    <Route path="*" element={<NoMatch />} />
   </Routes>
 );
 

@@ -16,6 +16,7 @@ const settingsState = atom<Settings>({
 });
 export const settingsSelector = selector<Settings>({
   key: "settingsSelector",
+  // NOT CORRECT!!!
   get: ({ get }) => get(settingsState),
   set: ({ get, set }, newSettings) => {
     // NOT CORRECT!!!
@@ -31,7 +32,6 @@ export const settingsSelector = selector<Settings>({
       return set(settingsState, newSettings);
     }
     const roomId = generatePassword();
-    const roomName = getRandomName();
     set(settingsState, {
       ...newSettings,
       rooms: [
@@ -43,6 +43,7 @@ export const settingsSelector = selector<Settings>({
       ],
     });
     const { name } = getRoom(roomId, roomId);
+    const roomName = getRandomName();
     name.insert(0, roomName);
     set(activeRoomIdSelector, roomId);
     set(activeFileNameState(roomId), "README.md");

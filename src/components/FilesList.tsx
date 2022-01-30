@@ -13,7 +13,7 @@ import {
   SiTypescript,
 } from "react-icons/si";
 import { VscNewFile } from "react-icons/vsc";
-import { createSearchParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
@@ -22,6 +22,7 @@ import { createNewFile } from "../modules/documents";
 
 import styles from "./FilesList.module.css";
 import { filesDataState } from "./data-model";
+import { routesHelper } from "./navigation-utils";
 import { useFileName, useFileNameState, useRoom } from "./utils";
 
 export const FilesList = () => {
@@ -41,7 +42,7 @@ export const FilesList = () => {
               styles.filesListItem,
               fileName === name && styles.highlight
             )}
-            to={`files?${createSearchParams({ name })}`}
+            to={routesHelper.room(room.id).files(name)}
           >
             <div className={styles.file}>
               <FileTypeIcon name={name} />

@@ -21,6 +21,9 @@ const activeRoomIdState = atom<string>({
     },
   }),
 });
+/**
+ * This is reflected in the url, make sure to set the route at the same time
+ */
 export const activeRoomIdSelector = selector<string>({
   key: "activeRoomIdSelector",
   get: ({ get }) => {
@@ -63,6 +66,9 @@ export const roomNamesState = atomFamily<string, Room>({
 });
 
 type RoomId = string;
+/**
+ * This is reflected in the url, make sure to set the route at the same time
+ */
 export const activeFileNameState = atomFamily<
   string,
   RoomId | null | undefined

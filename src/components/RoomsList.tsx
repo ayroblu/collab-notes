@@ -13,6 +13,7 @@ import {
   roomNamesState,
   settingsSelector,
 } from "./data-model";
+import { useSetActiveRoomId } from "./navigation-utils";
 
 export const RoomsList = () => {
   const settings = useRecoilValue(settingsSelector);
@@ -45,9 +46,9 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
 }) => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
   const [isNameEdit, setIsNameEdit] = React.useState(false);
-  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
+  const [activeRoomId] = useRecoilState(activeRoomIdSelector);
+  const setActiveRoomId = useSetActiveRoomId();
   const name = useRecoilValue(roomNamesState({ id, password }));
-  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isNameEdit && !isEdit) {
@@ -57,7 +58,6 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
 
   const makeRoomActiveHandler = (id: string) => () => {
     setActiveRoomId(id);
-    navigate(`/${id}`);
   };
   const { name: yname } = getRoom(id, password);
   const setRoomName = (text: string) => {
@@ -90,7 +90,6 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
         rooms: newRooms,
       });
       setActiveRoomId(newActiveRoomId);
-      navigate(newActiveRoomId);
     }
   };
 

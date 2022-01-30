@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  createSearchParams,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { useStable } from "@/hooks/useStable";
 import {
   deduplicateFiles,
   getAllFilesMetaData,
@@ -15,6 +9,7 @@ import {
   getRoom,
   syncCommentNamesFn,
 } from "@/modules/documents";
+import { getRandomName } from "@/modules/utils";
 
 import {
   activeFileNameState,
@@ -23,10 +18,11 @@ import {
   settingsSelector,
   yRoomSelector,
 } from "./data-model";
+import { routesHelper, useStableNavigate } from "./navigation-utils";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 
 /**
- * This component exists to sync state from yjs, url data with internal state
+ * This component exists to sync state from yjs
  */
 export const Sync: React.FC = () => {
   useFilesListSync();
@@ -107,22 +103,23 @@ export const ParamsSync: React.FC = () => {
 };
 const useParamsSync = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const [searchParams] = useSearchParams();
-  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
-  const setActiveFileName = useSetRecoilState(activeFileNameState(roomId));
+  const [activeRoomId, setActiveRoomId] = useRecoilState(activeRoomIdSelector);
+  const navigate = useStableNavigate();
 
-  React.useLayoutEffect(() => {
-    if (roomId) {
+  React.useEffect(() => {
+    if (roomId && roomId !== activeRoomId) {
       setActiveRoomId(roomId);
+    } else if (!roomId) {
+      navigate(routesHelper.room(activeRoomId).index);
     }
-  }, [roomId, setActiveRoomId, setActiveFileName]);
+  }, [activeRoomId, navigate, roomId, setActiveRoomId]);
 };
 export const FilesParamsSync: React.FC = ({ children }) => {
+  useFileNameInitSync();
   const { roomId } = useParams<{ roomId: string }>();
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const activeFileName = useRecoilValue(activeFileNameState(roomId));
-  useFileNameInitSync();
 
   if (!fileName || fileName !== activeFileName) return null;
   return <>{children}</>;
@@ -150,6 +147,7 @@ export const SetupSync: React.FC = ({ children }) => {
   const settings = useRecoilValue(settingsSelector);
   useRecoilValue(yRoomSelector);
   useSetupParamsSync();
+  useSetupNewRoomSync();
 
   if (!settings.rooms.length) {
     return null;
@@ -158,30 +156,25 @@ export const SetupSync: React.FC = ({ children }) => {
 };
 
 const useSetupParamsSync = () => {
-  const [settings, setSettings] = useRecoilState(settingsSelector);
+  const [settings] = useRecoilState(settingsSelector);
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
   const { roomId } = useParams<{ roomId: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const navigateStable = useStable(navigate, [roomId]);
-  const activeFileName = useRecoilValue(activeFileNameState(roomId));
+  const navigate = useStableNavigate();
 
   React.useEffect(() => {
     if (!roomId && settings.rooms.length) {
-      navigateStable(
-        `${activeRoomId}/files?${createSearchParams({ name: activeFileName })}`
-      );
+      navigate(routesHelper.room(activeRoomId).index);
       return;
     }
-  }, [
-    roomId,
-    navigateStable,
-    settings.rooms.length,
-    activeRoomId,
-    searchParams,
-    activeFileName,
-    setSearchParams,
-  ]);
+  }, [activeRoomId, navigate, roomId, settings.rooms.length]);
+};
+
+const useSetupNewRoomSync = () => {
+  const [settings, setSettings] = useRecoilState(settingsSelector);
+  const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams] = useSearchParams();
+  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
+  const setActiveFileName = useSetRecoilState(activeFileNameState(roomId));
 
   React.useEffect(() => {
     const paramRoomPassword = searchParams.get("password");
@@ -189,20 +182,32 @@ const useSetupParamsSync = () => {
     if (!roomId) {
       return;
     }
-    const rooms = settings.rooms;
-    if (!rooms.find(({ id }) => id === roomId)) {
-      setSettings((settings) => ({
-        ...settings,
-        rooms: [
-          ...rooms,
-          {
-            id: roomId,
-            password: paramRoomPassword || roomId,
-          },
-        ],
-      }));
-      return;
-    }
-  }, [roomId, searchParams, setSettings, settings.rooms]);
+    const room = settings.rooms.find(({ id }) => id === roomId);
+    if (room) return;
+
+    setSettings((settings) => ({
+      ...settings,
+      rooms: [
+        ...settings.rooms,
+        {
+          id: roomId,
+          password: paramRoomPassword || roomId,
+        },
+      ],
+    }));
+    const { name } = getRoom(roomId, roomId);
+    const roomName = getRandomName();
+    name.insert(0, roomName);
+    setActiveRoomId(roomId);
+    setActiveFileName("README.md");
+    return;
+  }, [
+    roomId,
+    searchParams,
+    setActiveFileName,
+    setActiveRoomId,
+    setSettings,
+    settings.rooms,
+  ]);
   return;
 };
