@@ -48,8 +48,11 @@
   border: 1px solid var(--darker-color);
 }
 .thread {
+  border-block-start: 1px solid var(--fade-color);
+  padding-block-start: var(--spacing-8);
 }
 .addThread {
+  margin-block-start: var(--spacing-8);
 }
 .textarea {
   width: 100%;
@@ -60,4 +63,7 @@
 }
 .flexEnd > *:not(:first-child) {
   margin-inline-start: var(--spacing-8);
+}
+.ruledLine {
+  border-block-end: 1px solid var(--fade-color);
 }

@@ -17,6 +17,8 @@
   --main-background-color: var(--dark-main-background-color);
   --text-color: var(--dark-text-color);
   --subtle-text-color: var(--dark-subtle-text-color);
+  --deep-color: var(--darker-color);
+  --fade-color: var(--lighter-color);
   --standard-font-size: 20px;
 
   --spacing-1: 1px;

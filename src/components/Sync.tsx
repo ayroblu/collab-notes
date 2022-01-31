@@ -20,11 +20,7 @@ import {
   filesDataState,
   settingsSelector,
 } from "./data-model";
-import {
-  useFileName,
-  useRoom,
-  useSetComments,
-} from "./utils";
+import { useFileName, useRoom, useSetComments } from "./utils";
 
 /**
  * This component exists to sync state from yjs
@@ -118,9 +114,9 @@ const useThreadsSync = () => {
     const changeListener = () => {
       setThreads(yThread.toJSON());
     };
-    yThread.observe(changeListener);
+    yThread.observeDeep(changeListener);
     return () => {
-      yThread.unobserve(changeListener);
+      yThread.unobserveDeep(changeListener);
     };
   }, [fileName, room, setThreads]);
 };
@@ -209,7 +205,6 @@ const useSetupNewRoomSync = () => {
     }));
     setActiveRoomId(roomId);
     setActiveFileName(paramFileName || "README.md");
-    
   }, [
     roomId,
     searchParams,
@@ -218,7 +213,6 @@ const useSetupNewRoomSync = () => {
     setSettings,
     settings.rooms,
   ]);
-  
 };
 
 const useYRoomLoad = () => {

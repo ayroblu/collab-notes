@@ -80,6 +80,7 @@ export const Comment: React.FC<Props> = ({
         <VscClose />
       </button>
       <CommentThread commentId={id} />
+      {isFocusComment && <div className={styles.ruledLine} />}
       {isFocusComment && <CommentAddThread commentId={id} />}
     </section>
   );
@@ -87,6 +88,7 @@ export const Comment: React.FC<Props> = ({
 
 const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
   const [text, setText] = React.useState("");
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const room = useRoom();
   const fileName = useFileName();
   const settings = useRecoilValue(settingsSelector);
@@ -97,11 +99,11 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
     switch (e.key) {
       case "Enter":
         if (isCmd || isCtrl) {
-          return onSubmit();
+          return addThread();
         }
     }
   };
-  const onSubmit = () => {
+  const addThread = () => {
     if (!room) return;
     const thread = getThread(room.id, room.password, fileName, commentId);
     if (text && thread) {
@@ -117,21 +119,30 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
           dateUpdated: now,
         },
       ]);
+      setText("");
+      textareaRef.current?.blur();
     }
   };
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    addThread();
+  };
   return (
-    <section className={styles.addThread}>
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.currentTarget.value)}
-        placeholder="Reply to comment"
-        className={styles.textarea}
-        onKeyDown={handleKeyDown}
-      />
-      <div className={styles.flexEnd}>
-        <SubmitButton value="Save" disabled={!text} />
-      </div>
-    </section>
+    <form onSubmit={onSubmit}>
+      <section className={styles.addThread}>
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.currentTarget.value)}
+          placeholder="Reply to comment"
+          className={styles.textarea}
+          onKeyDown={handleKeyDown}
+        />
+        <div className={styles.flexEnd}>
+          <SubmitButton value="Save" disabled={!text} />
+        </div>
+      </section>
+    </form>
   );
 };
 
