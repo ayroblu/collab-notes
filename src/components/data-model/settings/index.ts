@@ -1,7 +1,7 @@
 import { atom, DefaultValue, selector } from "recoil";
 
 import { getRoom } from "@/modules/documents";
-import { generatePassword } from "@/modules/utils";
+import { generatePassword, timeoutPromiseSuccess } from "@/modules/utils";
 
 import type { Settings } from "..";
 import { activeFileNameState, activeRoomIdSelector, isNewUserState } from "..";
@@ -55,7 +55,11 @@ export const yRoomSelector = selector<void>({
     const activeRoomId = get(activeRoomIdSelector);
     const room = settings.rooms.find(({ id }) => activeRoomId === id);
     if (!room) return;
-    const { initialDbPromise } = getRoom(room.id, room.password);
+    const { initialConnectionPromise, initialDbPromise } = getRoom(
+      room.id,
+      room.password
+    );
     await initialDbPromise;
+    await timeoutPromiseSuccess(initialConnectionPromise, 3000);
   },
 });

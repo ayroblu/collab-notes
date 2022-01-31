@@ -25,8 +25,18 @@ export function getRoom(roomId: string, password: string): YRoom {
   const initialDbPromise = new Promise<void>((resolve) =>
     persistence.once("synced", () => resolve())
   );
+  const initialConnectionPromise = new Promise<void>((resolve) =>
+    provider.awareness.once("synced", () => resolve())
+  );
 
-  rooms[roomId] = { provider, ydoc, files, name, initialDbPromise };
+  rooms[roomId] = {
+    provider,
+    ydoc,
+    files,
+    name,
+    initialDbPromise,
+    initialConnectionPromise,
+  };
   return rooms[roomId]!;
 }
 

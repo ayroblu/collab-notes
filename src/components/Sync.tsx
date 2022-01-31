@@ -46,8 +46,6 @@ const useFilesListSync = () => {
       deduplicateFiles(files);
       const filesMetaData = getAllFilesMetaData(room.id, room.password);
       setFilesData(filesMetaData);
-      // TODO: An ugly hack for first time joiners, to fix
-      setSettings({ ...settings });
     };
     files.observe(changeListener);
     return () => {
@@ -143,8 +141,8 @@ const useFileNameInitSync = () => {
 
 export const SetupSync: React.FC = ({ children }) => {
   const settings = useRecoilValue(settingsSelector);
-  useRecoilValue(yRoomSelector);
   useSetupNewRoomSync();
+  useRecoilValue(yRoomSelector);
 
   if (!settings.rooms.length) {
     return null;
@@ -161,6 +159,7 @@ const useSetupNewRoomSync = () => {
 
   React.useEffect(() => {
     const paramRoomPassword = searchParams.get("password");
+    const paramFileName = searchParams.get("name");
 
     if (!roomId) {
       return;
@@ -179,7 +178,7 @@ const useSetupNewRoomSync = () => {
       ],
     }));
     setActiveRoomId(roomId);
-    setActiveFileName("README.md");
+    setActiveFileName(paramFileName || "README.md");
     return;
   }, [
     roomId,

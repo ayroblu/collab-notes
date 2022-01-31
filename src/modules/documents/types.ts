@@ -7,6 +7,7 @@ export type YRoom = {
   files: Y.Array<Y.Map<any>>;
   name: Y.Text;
   initialDbPromise: Promise<void>;
+  initialConnectionPromise: Promise<void>;
 };
 export type FileMetaData = {
   name: string;
