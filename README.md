@@ -7,8 +7,10 @@ TODO
 ----
 ### MVP
 - comments
-  - Add threads to comments
   - Focus highlights + selection highlights - make prettier?
+- delete threads
+- edit comments
+- "resolve" comments
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!
