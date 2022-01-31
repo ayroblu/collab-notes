@@ -1,7 +1,10 @@
+import isEqual from "lodash/isEqual";
 import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
+import { getComments, getRoom } from "@/modules/documents";
+import type { CommentData } from "@/modules/documents";
 import { cn } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
@@ -11,7 +14,7 @@ import {
   focusCommentIdState,
   inProgressCommentsSelector,
 } from "../data-model";
-import { useComments } from "../utils";
+import { useComments, useRoom } from "../utils";
 
 import styles from "./useCommentHighlights.module.css";
 
@@ -184,9 +187,57 @@ export const useCommentDecorations = () => {
       );
     }, 100);
   }, [inProgressComments, comments, editorRef, focusCommentId]);
+
+  const editor = editorRef.current;
+  const room = useRoom();
   React.useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-  });
+    // Adjust decorations based on typing that happens
+    if (!editor || !room) return;
+    const comments = getComments(room.id, room.password, fileName);
+    const { ydoc } = getRoom(room.id, room.password);
+    if (!comments) return;
+    const { dispose } = editor.onDidChangeModelDecorations(() => {
+      clearTimeout(commentsThrottleTimeoutId);
+      commentsThrottleTimeoutId = window.setTimeout(() => {
+        const decorations = editor.getModel()!.getAllDecorations();
+        decorations
+          .map(({ options, range }) => ({
+            commentId: options.className
+              ?.split(" ")
+              .filter((c) => c.startsWith("comment-"))
+              .map((c) => c.replace("comment-", ""))[0],
+            range: {
+              startLineNumber: range.startLineNumber,
+              startColumn: range.startColumn,
+              endLineNumber: range.endLineNumber,
+              endColumn: range.endColumn,
+            },
+          }))
+          .filter(({ commentId }) => commentId)
+          .forEach(({ commentId, range }) => {
+            let commentNum: { comment: CommentData; index: number } | null =
+              null;
+            for (let i = 0; i < comments.length; ++i) {
+              const c = comments.get(i)!;
+              if (c.id === commentId) {
+                commentNum = { comment: c, index: i };
+              }
+            }
+            if (!commentNum) return;
+            const { comment, index } = commentNum;
+            if (!isEqual(range, comment.selection)) {
+              ydoc.transact(() => {
+                comments.delete(index);
+                comments.insert(index, [{ ...comment, selection: range }]);
+              });
+            }
+          });
+      }, 1000);
+    });
+    return () => {
+      dispose();
+    };
+  }, [editor, fileName, room]);
 };
 let timeoutId = 0;
+let commentsThrottleTimeoutId = 0;

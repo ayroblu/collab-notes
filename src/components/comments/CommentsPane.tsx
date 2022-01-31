@@ -89,7 +89,10 @@ export const CommentsPane: React.FC = () => {
           </li>
         ))}
       </ul>
-      <CommentButton offset={extraOffset} onClick={addInProgressComment} />
+      <CommentButton
+        offset={extraOffset + scrollOffset}
+        onClick={addInProgressComment}
+      />
     </section>
   );
 };

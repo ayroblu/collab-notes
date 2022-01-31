@@ -72,7 +72,7 @@ const useShowCommentButton = () => {
         sel.startColumn
       );
       const lineHeight = editor.getRawOptions().lineHeight || 24;
-      setPosition(top - lineHeight / 2);
+      setPosition(top + lineHeight / 2);
       setSelection(selection);
     });
     return () => {

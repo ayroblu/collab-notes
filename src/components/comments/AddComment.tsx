@@ -48,6 +48,16 @@ export const AddComment: React.FC<AddCommentProps> = ({
       handleCancel();
     }
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCmd = e.getModifierState("Meta");
+    const isCtrl = e.getModifierState("Ctrl");
+    switch (e.key) {
+      case "Enter":
+        if (isCmd || isCtrl) {
+          return handleSubmit();
+        }
+    }
+  };
 
   return (
     <section
@@ -74,6 +84,7 @@ export const AddComment: React.FC<AddCommentProps> = ({
           onChange={(e) =>
             setComment({ ...comment, text: e.currentTarget.value })
           }
+          onKeyDown={handleKeyDown}
           onBlur={onBlur}
           autoFocus
         />
