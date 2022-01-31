@@ -9,7 +9,6 @@ TODO
 - comments
   - Add threads to comments
   - Focus highlights + selection highlights - make prettier?
-  - selection when adjusting text - decoration size changes
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!

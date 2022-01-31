@@ -24,6 +24,7 @@ module.exports = {
   },
   rules: {
     "arrow-body-style": ["error", "as-needed"],
+    "no-useless-rename": "error",
 
     // Plugin rules follow:
     "import/order": [

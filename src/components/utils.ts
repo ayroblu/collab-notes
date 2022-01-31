@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { getNonNullable } from "@/modules/utils";
 
@@ -34,10 +34,10 @@ export const useComments = () => {
   );
 };
 
-export const useCommentsState = () => {
+export const useSetComments = () => {
   const fileName = useFileName();
   const room = useRoom();
-  return useRecoilState(
+  return useSetRecoilState(
     commentsState({ fileName, roomId: getNonNullable(room).id })
   );
 };

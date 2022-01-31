@@ -1,6 +1,16 @@
-import { atom, atomFamily, selector } from "recoil";
+import {
+  atom,
+  atomFamily,
+  DefaultValue,
+  selector,
+  selectorFamily,
+} from "recoil";
 
-import type { CommentData, FileMetaData } from "@/modules/documents";
+import type {
+  CommentData,
+  FileMetaData,
+  ThreadData,
+} from "@/modules/documents";
 import { getRoom } from "@/modules/documents";
 
 import { settingsSelector } from "./settings";
@@ -109,4 +119,39 @@ export const focusCommentIdState = atomFamily<
 >({
   key: "focusCommentIdState",
   default: () => null,
+});
+
+export const threadState = atomFamily<
+  ThreadData[],
+  { fileName: string; roomId: string; commentId: string }
+>({
+  key: "threadState",
+  default: () => [],
+});
+export const threadsSelector = selectorFamily<
+  { [commentId: string]: ThreadData[] },
+  { fileName: string; roomId: string }
+>({
+  key: "threadsSelector",
+  get:
+    ({ fileName, roomId }) =>
+    ({ get }) => {
+      const comments = get(commentsState({ fileName, roomId }));
+      return comments.reduce((result, comment) => {
+        result[comment.id] = get(
+          threadState({ roomId, fileName, commentId: comment.id })
+        );
+        return result;
+      }, {} as { [commentId: string]: ThreadData[] });
+    },
+  set:
+    ({ fileName, roomId }) =>
+    ({ set }, newValue) => {
+      if (newValue instanceof DefaultValue) {
+        return;
+      }
+      Object.entries(newValue).forEach(([commentId, threadData]) => {
+        set(threadState({ fileName, roomId, commentId }), threadData);
+      });
+    },
 });

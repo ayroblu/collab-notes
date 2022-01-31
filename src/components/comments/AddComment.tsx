@@ -29,7 +29,8 @@ export const AddComment: React.FC<AddCommentProps> = ({
   const [comment, setComment] = useRecoilState(
     inProgressCommentSelector({ fileName, commentId: id })
   );
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     onSubmit();
   };
   const handleCancel = () => {
@@ -48,13 +49,13 @@ export const AddComment: React.FC<AddCommentProps> = ({
       handleCancel();
     }
   };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     const isCmd = e.getModifierState("Meta");
     const isCtrl = e.getModifierState("Ctrl");
     switch (e.key) {
       case "Enter":
         if (isCmd || isCtrl) {
-          return handleSubmit();
+          return onSubmit();
         }
     }
   };

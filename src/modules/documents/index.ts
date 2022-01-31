@@ -4,7 +4,7 @@ import * as Y from "yjs";
 
 import { nonNullable, sortBy } from "../utils";
 
-import type { CommentData, FileMetaData, YRoom } from "./types";
+import type { CommentData, FileMetaData, ThreadData, YRoom } from "./types";
 
 export * from "./types";
 
@@ -92,6 +92,13 @@ export function getYFileComments(file: Y.Map<any>): Y.Array<CommentData> {
 export function getYFileText(file: Y.Map<any>): Y.Text {
   return file.get("text");
 }
+export function getYFileThreads(file: Y.Map<any>): Y.Map<Y.Array<ThreadData>> {
+  const threads = file.get("threads");
+  if (!threads) {
+    file.set("threads", new Y.Map<Y.Array<ThreadData>>());
+  }
+  return file.get("threads");
+}
 
 export function createNewFile(
   roomId: string,
@@ -110,6 +117,7 @@ export function createNewFile(
   });
   file.set("comments", new Y.Array<CommentData>());
   file.set("text", new Y.Text());
+  file.set("threads", new Y.Map<Y.Array<ThreadData>>());
   files.push([file]);
   return getFileFromFileName(roomId, roomPassword, fileName)!;
 }
@@ -143,6 +151,30 @@ export function getComments(
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
   return getYFileComments(file);
+}
+
+export function getThreads(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): Y.Map<Y.Array<ThreadData>> | void {
+  const file = getFileFromFileName(roomId, roomPassword, fileName);
+  if (!file) return;
+  return getYFileThreads(file);
+}
+
+export function getThread(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  commentId: string
+): Y.Array<ThreadData> | void {
+  const threads = getThreads(roomId, roomPassword, fileName);
+  if (!threads) return;
+  if (!threads.has(commentId)) {
+    threads.set(commentId, new Y.Array<ThreadData>());
+  }
+  return threads.get(commentId)!;
 }
 
 export const syncCommentNamesFn = (

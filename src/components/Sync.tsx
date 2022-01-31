@@ -8,17 +8,23 @@ import {
   getAllFilesMetaData,
   getComments,
   getRoom,
+  getThreads,
   syncCommentNamesFn,
 } from "@/modules/documents";
 import { timeoutPromiseSuccess } from "@/modules/utils";
 
+import { useSetThreads } from "./comments/useThread";
 import {
   activeFileNameState,
   activeRoomIdSelector,
   filesDataState,
   settingsSelector,
 } from "./data-model";
-import { useCommentsState, useFileName, useRoom } from "./utils";
+import {
+  useFileName,
+  useRoom,
+  useSetComments,
+} from "./utils";
 
 /**
  * This component exists to sync state from yjs
@@ -27,6 +33,7 @@ export const Sync: React.FC = () => {
   useFilesListSync();
   useCommentsSync();
   useCommentNamesSync();
+  useThreadsSync();
 
   return null;
 };
@@ -58,7 +65,7 @@ const useFilesListSync = () => {
 const useCommentsSync = () => {
   const fileName = useFileName();
   const room = useRoom();
-  const [comments, setComments] = useCommentsState();
+  const setComments = useSetComments();
 
   React.useEffect(() => {
     if (!room) return;
@@ -75,8 +82,6 @@ const useCommentsSync = () => {
       yComments.unobserve(changeListener);
     };
   }, [fileName, room, setComments]);
-
-  return comments;
 };
 
 const useCommentNamesSync = () => {
@@ -95,6 +100,29 @@ const useCommentNamesSync = () => {
       fileName
     )(settings.id, settings.name);
   }, [settings.name, fileName, room, settings.id]);
+};
+
+const useThreadsSync = () => {
+  const fileName = useFileName();
+  const room = useRoom();
+  const setThreads = useSetThreads();
+
+  React.useEffect(() => {
+    if (!room) return;
+    const yThread = getThreads(room.id, room.password, fileName);
+    if (!yThread) return;
+    const threads = yThread.toJSON();
+
+    setThreads(threads);
+
+    const changeListener = () => {
+      setThreads(yThread.toJSON());
+    };
+    yThread.observe(changeListener);
+    return () => {
+      yThread.unobserve(changeListener);
+    };
+  }, [fileName, room, setThreads]);
 };
 
 export const ParamsSync: React.FC = () => {

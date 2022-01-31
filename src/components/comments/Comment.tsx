@@ -1,15 +1,19 @@
 import React from "react";
 import { VscClose } from "react-icons/vsc";
+import { useRecoilValue } from "recoil";
 
-import { getComments } from "@/modules/documents";
+import { getComments, getThread } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
-import { cn, getHashColor, nonNullable } from "@/modules/utils";
+import { cn, getHashColor, nonNullable, uuidv4 } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
+import { settingsSelector } from "../data-model";
+import { SubmitButton } from "../shared/Button";
 import { FacePileFace } from "../shared/FacePile";
 import { useFileName, useFocusCommentIdState, useRoom } from "../utils";
 
 import styles from "./Comment.module.css";
+import { useThreadValue } from "./useThread";
 
 type Props = CommentData & {
   offset: number | undefined;
@@ -48,6 +52,7 @@ export const Comment: React.FC<Props> = ({
     }
     delete commentRefs.current[id];
   };
+  const isFocusComment = focusCommentId === id;
   return (
     <section
       ref={(r) =>
@@ -74,7 +79,76 @@ export const Comment: React.FC<Props> = ({
       <button className={styles.close} onClick={deleteComment}>
         <VscClose />
       </button>
+      <CommentThread commentId={id} />
+      {isFocusComment && <CommentAddThread commentId={id} />}
     </section>
+  );
+};
+
+const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
+  const [text, setText] = React.useState("");
+  const room = useRoom();
+  const fileName = useFileName();
+  const settings = useRecoilValue(settingsSelector);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    const isCmd = e.getModifierState("Meta");
+    const isCtrl = e.getModifierState("Ctrl");
+    switch (e.key) {
+      case "Enter":
+        if (isCmd || isCtrl) {
+          return onSubmit();
+        }
+    }
+  };
+  const onSubmit = () => {
+    if (!room) return;
+    const thread = getThread(room.id, room.password, fileName, commentId);
+    if (text && thread) {
+      const now = new Date().toISOString();
+      thread.push([
+        {
+          id: uuidv4(),
+          commentId,
+          text,
+          byId: settings.id,
+          byName: settings.name,
+          dateCreated: now,
+          dateUpdated: now,
+        },
+      ]);
+    }
+  };
+  return (
+    <section className={styles.addThread}>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.currentTarget.value)}
+        placeholder="Reply to comment"
+        className={styles.textarea}
+        onKeyDown={handleKeyDown}
+      />
+      <div className={styles.flexEnd}>
+        <SubmitButton value="Save" disabled={!text} />
+      </div>
+    </section>
+  );
+};
+
+const CommentThread: React.FC<{ commentId: string }> = ({ commentId }) => {
+  const thread = useThreadValue(commentId);
+  return (
+    <>
+      {thread.map(({ byName, id, text }) => (
+        <section className={styles.thread} key={id}>
+          <div className={styles.userHeading}>
+            <FacePileFace color={getHashColor(byName)} name={byName} />
+            <h4 className={styles.userNameHeading}>{byName}</h4>
+          </div>
+          <p className={styles.text}>{text}</p>
+        </section>
+      ))}
+    </>
   );
 };
 

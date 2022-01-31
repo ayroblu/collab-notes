@@ -26,6 +26,7 @@
 }
 .text {
   margin-block-start: var(--spacing-8);
+  margin-block-end: var(--spacing-8);
 }
 .focus {
   border: 1px solid var(--text-color);
@@ -45,4 +46,18 @@
 .close:hover {
   background: var(--background-color);
   border: 1px solid var(--darker-color);
+}
+.thread {
+}
+.addThread {
+}
+.textarea {
+  width: 100%;
+}
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+.flexEnd > *:not(:first-child) {
+  margin-inline-start: var(--spacing-8);
 }

@@ -30,6 +30,15 @@ export type SelectionRange = {
   startColumn: number;
   endColumn: number;
 };
+export type ThreadData = {
+  id: string; // uuid
+  commentId: string;
+  text: string;
+  byId: string;
+  byName: string;
+  dateCreated: string;
+  dateUpdated: string;
+};
 export type LocalState = {
   id: string;
   name: string;
