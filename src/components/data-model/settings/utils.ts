@@ -3,31 +3,16 @@ import isEqual from "lodash/isEqual";
 import type { AtomEffect } from "recoil";
 import { DefaultValue } from "recoil";
 
-import { getRandomName, uuidv4 } from "@/modules/utils";
+import { uuidv4 } from "@/modules/utils";
 
 import type { Settings } from "..";
 
 const dbKey = "settings";
 
-const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-export const defaultSettings: Settings = {
-  isVim: false,
-  vimrc: "imap jk <Esc>\nimap jj <Esc>",
-  wordWrap: true,
-  name: getRandomName(),
-  theme: isDark ? "vs-dark" : "vs",
-  rooms: [],
-  leftNav: null,
-  id: uuidv4(),
-};
-
 export const syncStorageEffect: AtomEffect<Settings> = ({ onSet, setSelf }) => {
-  // 1. indexeddb
-  // 2. effect -> no rooms -> new room
-  // 3. onSet -> broadcast new room -> then do nothing
   setSelf(
-    // TODO: ALSO VERY WRONG, not DefaultValue
     idbGetWithMigrations().then((savedSettings) =>
+      // Active room id should be set by the app elsewhere, so this should be okay
       savedSettings ? savedSettings : new DefaultValue()
     )
   );

@@ -1,27 +1,30 @@
 import { atom, DefaultValue, selector } from "recoil";
 
-import { getRoom } from "@/modules/documents";
-import { generatePassword, timeoutPromiseSuccess } from "@/modules/utils";
+import { generatePassword, getRandomName, uuidv4 } from "@/modules/utils";
 
 import type { Settings } from "..";
 import { activeFileNameState, activeRoomIdSelector, isNewUserState } from "..";
 
-import { defaultSettings, syncStorageEffect } from "./utils";
+import { syncStorageEffect } from "./utils";
 
 // Don't use / export settingsState directly, always go through the selector
 const settingsState = atom<Settings>({
   key: "settingsState",
-  default: defaultSettings,
+  default: selector<Settings>({
+    key: "defaultSettingsSelector",
+    get: () => getDefaultSettings(),
+  }),
   effects: [syncStorageEffect],
 });
 export const settingsSelector = selector<Settings>({
   key: "settingsSelector",
-  // NOT CORRECT!!!
   get: ({ get }) => get(settingsState),
   set: ({ get, set }, newSettings) => {
-    // NOT CORRECT!!!
     if (newSettings instanceof DefaultValue) {
-      return set(settingsState, newSettings);
+      set(settingsState, newSettings);
+      const settings = get(settingsState);
+      set(activeRoomIdSelector, settings.rooms[0]!.id);
+      return;
     }
     if (newSettings.rooms.length) {
       const activeRoomId = get(activeRoomIdSelector);
@@ -48,3 +51,23 @@ export const settingsSelector = selector<Settings>({
     return;
   },
 });
+
+function getDefaultSettings() {
+  const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  const roomId = generatePassword();
+  return {
+    isVim: false,
+    vimrc: "imap jk <Esc>\nimap jj <Esc>",
+    wordWrap: true,
+    name: getRandomName(),
+    theme: isDark ? "vs-dark" : "vs",
+    rooms: [
+      {
+        id: roomId,
+        password: roomId,
+      },
+    ],
+    leftNav: null,
+    id: uuidv4(),
+  };
+}

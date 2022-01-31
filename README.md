@@ -6,7 +6,6 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- fix DefaultValue usage in recoil for settings
 - Add threads to comments
 - comments
   - Focus highlights + selection highlights
@@ -14,7 +13,6 @@ TODO
   - selection when adjusting text
 - Auto update settings without save button
 - decoration size changes
-- settings save triggers loading screen, due to connections requirement
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!
