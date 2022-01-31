@@ -17,7 +17,6 @@ import {
   activeRoomIdSelector,
   filesDataState,
   settingsSelector,
-  yRoomSelector,
 } from "./data-model";
 import { useCommentsState, useFileName, useRoom } from "./utils";
 

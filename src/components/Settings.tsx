@@ -1,8 +1,9 @@
-import isEqual from "lodash/isEqual";
 import themeList from "monaco-themes/themes/themelist.json";
 import React from "react";
 import { useRecoilState } from "recoil";
 import { useForm } from "use-form-ts";
+
+import { useStable } from "@/hooks/useStable";
 
 import { keys } from "../modules/utils";
 
@@ -32,15 +33,19 @@ export const Settings: React.FC = () => {
   });
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    persist();
+  };
+  const persist = () => {
     if (form.validate()) {
       setSettings({ ...settings, ...tempSettings });
-      // todo
     }
   };
-  const cancelHandler = () => {
-    setTempSettings(adjustedSettings);
-  };
-  const isNoChanges = isEqual({ isVim, vimrc, name, theme }, tempSettings);
+  // This is just magic, try deleting your name, you should get invalid state
+  const persistStable = useStable(persist, [tempSettings]);
+  React.useEffect(() => {
+    persist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persistStable]);
 
   return (
     <section className={styles.settings}>
@@ -127,23 +132,6 @@ export const Settings: React.FC = () => {
             </select>
           </FormLabelWrapper>
         ))}
-        <div className={styles.buttonRow}>
-          <FormLabel />
-          <input
-            type="submit"
-            value="Save"
-            className={styles.submit}
-            disabled={isNoChanges}
-          />
-          <button
-            type="button"
-            onClick={cancelHandler}
-            className={styles.cancel}
-            disabled={isNoChanges}
-          >
-            Cancel
-          </button>
-        </div>
       </form>
     </section>
   );

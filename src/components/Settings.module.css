@@ -10,25 +10,3 @@
 .settings form {
   flex: 1 1 auto;
 }
-.buttonRow {
-  display: flex;
-  margin-inline-start: var(--spacing-4);
-  margin-block-start: var(--spacing-16);
-}
-.submit {
-  padding: var(--spacing-4) var(--spacing-8);
-  margin-inline-end: var(--spacing-8);
-  cursor: pointer;
-}
-.cancel {
-  padding: var(--spacing-4) var(--spacing-8);
-  border-radius: var(--button-border-radius);
-}
-.submit:hover,
-.cancel:hover {
-  background-color: var(--lighter-color);
-}
-.submit:disabled,
-.cancel:disabled {
-  opacity: 0.4;
-}

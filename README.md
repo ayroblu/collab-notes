@@ -6,12 +6,12 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Add threads to comments
 - comments
+  - switch to settings + switch back, comments are overlaid
+  - Add threads to comments
   - Focus highlights + selection highlights
     - Focus on comment focuses selection too
   - selection when adjusting text
-- Auto update settings without save button
 - decoration size changes
 
 ### Longer term

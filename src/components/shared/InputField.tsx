@@ -6,6 +6,7 @@ type InputFieldProps = {
   label: string;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
   errorText: string;
 };
 export const InputField: React.FC<InputFieldProps> = ({

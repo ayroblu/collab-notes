@@ -1,7 +1,4 @@
 import isEqual from "lodash/isEqual";
-import React from "react";
-
-import { useIsMounted } from "./useIsMounted";
 
 enum FetchStatusEnum {
   none = "none",
