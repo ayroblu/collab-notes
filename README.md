@@ -7,12 +7,9 @@ TODO
 ----
 ### MVP
 - comments
-  - switch to settings + switch back, comments are overlaid
   - Add threads to comments
-  - Focus highlights + selection highlights
-    - Focus on comment focuses selection too
-  - selection when adjusting text
-- decoration size changes
+  - Focus highlights + selection highlights - make prettier?
+  - selection when adjusting text - decoration size changes
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!

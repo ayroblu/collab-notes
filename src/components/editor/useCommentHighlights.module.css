@@ -1,11 +1,12 @@
 .selection {
   background: rgba(213, 169, 45, 0.3);
 }
-.selectionHover {
-  background: rgba(213, 169, 45, 0.6);
-}
+.selectionHover,
 .selection:hover {
   background: rgba(213, 169, 45, 0.6);
+}
+.selectionFocus {
+  background: rgba(213, 169, 45, 0.7);
 }
 .commentHover {
   border: 1px solid var(--text-color) !important;

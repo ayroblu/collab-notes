@@ -27,10 +27,10 @@ import { useFileName, useRoom } from "../utils";
 import "./Editor.css";
 import styles from "./Editor.module.css";
 import {
-  useCommentHighlights,
-  useHighlightClick,
+  useCommentDecorations,
+  useCommentDecorationsClick,
+  useCommentDecorationsHover,
 } from "./useCommentHighlights";
-import { useCommentSelections } from "./useCommentSelections";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -109,9 +109,9 @@ function useMonacoEditor(
       setIsNewUser(false);
     }
   }, [fileName, isNewUser, room, setIsNewUser]);
-  useCommentSelections();
-  useCommentHighlights();
-  useHighlightClick();
+  useCommentDecorations();
+  useCommentDecorationsHover();
+  useCommentDecorationsClick();
 
   React.useEffect(() => {
     const editor = editorRef.current;

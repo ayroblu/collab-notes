@@ -1,17 +1,21 @@
+import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import { CommentsContext } from "../Contexts";
+import { cn } from "@/modules/utils";
+
+import { CommentsContext, EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
   focusCommentIdState,
+  inProgressCommentsSelector,
 } from "../data-model";
 import { useComments } from "../utils";
 
 import styles from "./useCommentHighlights.module.css";
 
-export const useCommentHighlights = () => {
+export const useCommentDecorationsHover = () => {
   const { commentRefs } = React.useContext(CommentsContext);
   const comments = useComments();
   React.useEffect(() => {
@@ -55,7 +59,7 @@ function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
     e.clientY < r.bottom;
   return isIn;
 }
-export const useHighlightClick = () => {
+export const useCommentDecorationsClick = () => {
   const { commentRefs } = React.useContext(CommentsContext);
   const comments = useComments();
   const roomId = useRecoilValue(activeRoomIdSelector);
@@ -133,3 +137,56 @@ export const useHighlightClick = () => {
 //     };
 //   }, [comments]);
 // };
+
+export const useCommentDecorations = () => {
+  const { editorRef } = React.useContext(EditorContext);
+  const comments = useComments();
+  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
+  const [, setDecorations] = React.useState<string[]>([]);
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const focusCommentId = useRecoilValue(
+    focusCommentIdState({ fileName, roomId })
+  );
+  React.useEffect(() => {
+    const newDecorations = [
+      ...[...comments, ...inProgressComments].map(
+        ({
+          id,
+          selection: { endColumn, endLineNumber, startColumn, startLineNumber },
+          text,
+        }) => ({
+          range: new monaco.Range(
+            startLineNumber,
+            startColumn,
+            endLineNumber,
+            endColumn
+          ),
+          options: {
+            // inlineClassName: cn(styles.selection, `comment-${id}`),
+            className: cn(
+              styles.selection,
+              id === focusCommentId && styles.selectionFocus,
+              `comment-${id}`
+            ),
+            hoverMessage: { value: text },
+          },
+        })
+      ),
+    ];
+    const editor = editorRef.current;
+    if (!editor) return;
+    // TODO: Why set timeout is necessary here? Decorations show double hover without it
+    clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      setDecorations((decorations) =>
+        editor.deltaDecorations(decorations, newDecorations)
+      );
+    }, 100);
+  }, [inProgressComments, comments, editorRef, focusCommentId]);
+  React.useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+  });
+};
+let timeoutId = 0;
