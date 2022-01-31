@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor";
 import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
@@ -24,6 +24,9 @@ import styles from "./Editor.module.css";
 import { parseVimrc } from "./Settings";
 import type { Room, Settings } from "./data-model";
 import {
+  activeFileNameState,
+  activeRoomIdSelector,
+  focusCommentIdState,
   inProgressCommentsSelector,
   isNewUserState,
   settingsSelector,
@@ -108,6 +111,7 @@ function useMonacoEditor(
   }, [fileName, isNewUser, room, setIsNewUser]);
   useCommentSelections();
   useCommentHighlights();
+  useHighlightClick();
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -212,6 +216,40 @@ function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
     e.clientY < r.bottom;
   return isIn;
 }
+const useHighlightClick = () => {
+  const { commentRefs } = React.useContext(CommentsContext);
+  const comments = useComments();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const setFocusCommentId = useSetRecoilState(
+    focusCommentIdState({ fileName, roomId })
+  );
+  React.useEffect(() => {
+    let rafId = 0;
+    const click = (e: MouseEvent) => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
+          const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
+
+          const classes = [...v.classList];
+          const commentClass = classes.find((c) => c.startsWith("comment-"));
+          if (!commentClass) return;
+          const commentId = commentClass.replace("comment-", "");
+          const el = commentRefs.current[commentId]?.el;
+          if (!el) return;
+          if (isIn) {
+            setFocusCommentId(commentId);
+          }
+        });
+      });
+    };
+    document.body.addEventListener("click", click);
+    return () => {
+      document.body.removeEventListener("click", click);
+    };
+  }, [commentRefs, comments]);
+};
 // const useCommentHighlights = () => {
 //   const { commentRefs, comments } = React.useContext(CommentsContext);
 //   const { editorRef } = React.useContext(EditorContext);

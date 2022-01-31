@@ -141,6 +141,11 @@ const useCommentOffsets = () => {
     }
     const newOffsets: { [key: string]: number } = {};
     const focusCommentIndex = getFocusCommentIndex();
+    if (focusCommentIndex === 0 && commentDetails.length) {
+      const comment = commentDetails[0]!;
+      const topOffset = comment.top - commentGap;
+      setExtraOffset(topOffset < 0 ? -topOffset : 0);
+    }
     for (let i = focusCommentIndex - 1; i >= 0; --i) {
       const belowComment = commentDetails[i + 1]!;
       const comment = commentDetails[i]!;
