@@ -25,7 +25,7 @@ export const useEditorScrollSync = (
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         if (!getIsRecent(lastCommentsPaneScrollRef.current, 100)) {
-          commentsPane.scrollTop = e.scrollTop + extraOffset;
+          commentsPane.scrollTop = e.scrollTop + extraOffset + scrollOffset;
           lastEditorScrollRef.current = new Date().toISOString();
         }
       });
@@ -47,7 +47,9 @@ export const useEditorScrollSync = (
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         if (!getIsRecent(lastEditorScrollRef.current, 100)) {
-          editor.setScrollTop(commentsPane.scrollTop - extraOffset);
+          editor.setScrollTop(
+            commentsPane.scrollTop - extraOffset - scrollOffset
+          );
           lastCommentsPaneScrollRef.current = new Date().toISOString();
         }
       });

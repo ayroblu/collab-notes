@@ -23,6 +23,7 @@ import { useEditorHeight } from "./useEditorHeight";
 import { useEditorScrollSync } from "./useEditorScrollSync";
 
 export const CommentsPane: React.FC = () => {
+  const settings = useRecoilValue(settingsSelector);
   const [, setFocusCommentId] = useFocusCommentIdState();
   const { commentRefs } = React.useContext(CommentsContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
@@ -40,8 +41,8 @@ export const CommentsPane: React.FC = () => {
     const comment: CommentData = {
       selection,
       id: uuidv4(),
-      byId: "",
-      byName: "",
+      byId: settings.id,
+      byName: settings.name,
       dateCreated: now,
       dateUpdated: now,
       text: "",
