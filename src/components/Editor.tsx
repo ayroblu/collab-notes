@@ -167,11 +167,11 @@ const useCommentSelections = () => {
     ];
     const editor = editorRef.current;
     if (!editor) return;
-    setDecorations((decorations) => 
-      // console.log(decorations, newDecorations);
-      // console.log("lineDecorations", editor.getLineDecorations(1));
-       editor.deltaDecorations(decorations, newDecorations)
-    );
+    setDecorations((decorations) => {
+      console.log(decorations, newDecorations);
+      console.log("lineDecorations", editor.getLineDecorations(1));
+      return editor.deltaDecorations(decorations, newDecorations);
+    });
   }, [inProgressComments, comments, editorRef]);
 };
 
