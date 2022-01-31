@@ -4,5 +4,5 @@
   justify-content: space-between;
   flex-direction: column;
   height: 100vh;
-  background: var(--lighter-color);
+  background: var(--fade-color);
 }

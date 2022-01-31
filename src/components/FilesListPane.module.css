@@ -18,9 +18,9 @@
   border-radius: var(--button-border-radius);
 }
 .deleteButton:hover {
-  background-color: var(--lighter-color);
+  background-color: var(--fade-color);
 }
 .fileslist {
-  background: var(--darker-color);
+  background: var(--deep-color);
   height: 100vh;
 }

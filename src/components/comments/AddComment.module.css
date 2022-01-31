@@ -6,7 +6,7 @@
   position: absolute;
   inset-inline-start: var(--spacing-8);
   inset-inline-end: var(--spacing-8);
-  border: 1px solid var(--lighter-color);
+  border: 1px solid var(--fade-color);
   top: 0;
 }
 @media screen and (prefers-reduced-motion: no-preference) {

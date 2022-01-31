@@ -1,6 +1,6 @@
 .commentsPane {
   min-width: 200px;
   position: relative;
-  background-color: var(--darker-color);
+  background-color: var(--deep-color);
   overflow-y: auto;
 }

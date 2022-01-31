@@ -5,10 +5,10 @@
   padding: var(--spacing-4) var(--spacing-8);
 }
 .filesListItem:hover {
-  background-color: var(--lighter-color);
+  background-color: var(--fade-color);
 }
 .highlight {
-  background: var(--darker-color);
+  background: var(--deep-color);
 }
 .file {
   display: flex;
@@ -31,7 +31,7 @@
   margin-inline-end: var(--spacing-4);
 }
 .newFileButton:hover {
-  background: var(--lighter-color);
+  background: var(--fade-color);
 }
 .subtitle {
   color: var(--subtle-text-color);

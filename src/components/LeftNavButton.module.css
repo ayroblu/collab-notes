@@ -15,7 +15,7 @@
 }
 .leftNavButton:hover,
 .leftNavButton:focus {
-  background: var(--lighter-color);
+  background: var(--fade-color);
 }
 .leftNavButton:focus {
   outline: 1px solid #fff;
@@ -25,5 +25,5 @@
   transform: scale(0.99);
 }
 .highlight {
-  background-color: var(--darker-color);
+  background-color: var(--deep-color);
 }

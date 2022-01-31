@@ -8,14 +8,14 @@
   text-align: start;
 }
 .roomButton:hover {
-  background: var(--lighter-color);
+  background: var(--fade-color);
 }
 .subtitle {
   color: var(--subtle-text-color);
   font-size: var(--font-size-0-6);
 }
 .active {
-  background-color: var(--darker-color);
+  background-color: var(--deep-color);
 }
 .headingBar {
   display: flex;
