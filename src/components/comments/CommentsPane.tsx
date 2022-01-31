@@ -22,15 +22,16 @@ import styles from "./CommentsPane.module.css";
 
 export const CommentsPane: React.FC = () => {
   const [, setFocusCommentId] = useFocusCommentIdState();
+  const { commentRefs } = React.useContext(CommentsContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
     inProgressCommentsSelector
   );
   const comments = useComments();
   const createComment = useCreateComment();
-  const { extraOffset, offsets } = useCommentOffsets();
+  const { extraOffset, offsets, scrollOffset } = useCommentOffsets();
   const { editorDivHeight, editorHeight } = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
-  useEditorScrollSync(commentsPaneRef, extraOffset);
+  useEditorScrollSync(commentsPaneRef, extraOffset, scrollOffset);
 
   const addInProgressComment = (selection: SelectionRange) => {
     const now = new Date().toISOString();
@@ -52,10 +53,11 @@ export const CommentsPane: React.FC = () => {
     );
     createComment && createComment(comment);
   };
-  const cancelCommentFn = (selectionId: string) => () => {
+  const cancelCommentFn = (commentId: string) => () => {
     setInProgressComments(
-      inProgressComments.filter(({ id }) => id !== selectionId)
+      inProgressComments.filter(({ id }) => id !== commentId)
     );
+    delete commentRefs.current[commentId];
     setFocusCommentId(null);
   };
   return (
@@ -118,11 +120,18 @@ const useCommentOffsets = () => {
   const inProgressComments = useRecoilValue(inProgressCommentsSelector);
   const [offsets, setOffsets] = React.useState<{ [key: string]: number }>({});
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
+  const [scrollOffset, setScrollOffset] = React.useState<number>(0);
   React.useEffect(() => {
+    const commentIdsSet = new Set(
+      comments
+        .map(({ id }) => id)
+        .concat(inProgressComments.map(({ id }) => id))
+    );
     const commentDetails = Object.entries(commentRefs.current)
       .map(([id, { el, height, top }]) => ({ id, el, top, height }))
+      .filter(({ id }) => commentIdsSet.has(id))
       .sort(sortBy([({ top }) => top], ["asc"]));
-    if (commentDetails.length < 2) return;
+
     function getFocusCommentIndex() {
       if (typeof focusCommentId === "string") {
         const index = commentDetails.findIndex(
@@ -134,13 +143,19 @@ const useCommentOffsets = () => {
         return 0;
       }
     }
-    const newOffsets: { [key: string]: number } = {};
     const focusCommentIndex = getFocusCommentIndex();
     if (focusCommentIndex === 0 && commentDetails.length) {
       const comment = commentDetails[0]!;
       const topOffset = comment.top - commentGap;
       setExtraOffset(topOffset < 0 ? -topOffset : 0);
+      setScrollOffset(topOffset);
+    } else {
+      setScrollOffset(0);
     }
+
+    if (commentDetails.length < 2) return;
+
+    const newOffsets: { [key: string]: number } = {};
     for (let i = focusCommentIndex - 1; i >= 0; --i) {
       const belowComment = commentDetails[i + 1]!;
       const comment = commentDetails[i]!;
@@ -169,7 +184,7 @@ const useCommentOffsets = () => {
     }
     setOffsets(newOffsets);
   }, [focusCommentId, comments, inProgressComments, commentRefs]);
-  return { offsets, extraOffset };
+  return { offsets, extraOffset, scrollOffset };
 };
 
 const useEditorHeight = () => {
@@ -184,9 +199,13 @@ const useEditorHeight = () => {
   React.useEffect(() => {
     if (!editor || !editorDiv) return;
     const ro = new ResizeObserver(() => {
-      setEditorDivHeight(editorDiv.getBoundingClientRect().height);
+      const editorDivHeight = editorDiv.getBoundingClientRect().height;
+      const editorHeight = editor.getContentHeight();
+      setEditorDivHeight(editorDivHeight);
 
-      setEditorHeight(editor.getContentHeight());
+      const alteredEditorHeight =
+        editorHeight < editorDivHeight ? editorDivHeight : editorHeight;
+      setEditorHeight(alteredEditorHeight);
     });
 
     // Observe the scrollingElement for when the window gets resized
@@ -200,12 +219,15 @@ const useEditorHeight = () => {
 
 const useEditorScrollSync = (
   commentsPaneRef: React.RefObject<HTMLElement>,
-  extraOffset: number
+  extraOffset: number,
+  scrollOffset: number
 ) => {
   const { editorRef } = React.useContext(EditorContext);
   const lastEditorScrollRef = React.useRef<string | null>(null);
   const lastCommentsPaneScrollRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
+    // When the editor scrolls, reflect in the CommentsPane
     const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
@@ -227,7 +249,7 @@ const useEditorScrollSync = (
   }, [commentsPaneRef, editorRef, extraOffset]);
 
   React.useEffect(() => {
-    // For when commentspane scrolls, reflect in editor
+    // For when CommentsPane scrolls, reflect in editor
     const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
@@ -258,8 +280,8 @@ const useEditorScrollSync = (
     const commentsPane = commentsPaneRef.current;
     if (!editor) return;
     if (!commentsPane) return;
-    commentsPane.scrollTop = editor.getScrollTop() + extraOffset;
-  }, [commentsPaneRef, editorRef, extraOffset]);
+    commentsPane.scrollTop = editor.getScrollTop() + extraOffset + scrollOffset;
+  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
 };
 
 function getIsRecent(date: string | null, diff: number): boolean {

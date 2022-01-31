@@ -87,5 +87,6 @@ const usePosition = (selection: SelectionRange) => {
     selection.startLineNumber,
     selection.startColumn
   );
-  return top - 12;
+  const lineHeight = editor.getRawOptions().lineHeight || 24;
+  return top - lineHeight;
 };

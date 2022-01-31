@@ -88,6 +88,7 @@ function useMonacoEditor(
       editor.dispose();
       model.dispose();
       text.unobserve(changeListener);
+      editorRef.current = undefined;
     };
   }, [
     editorDivRef,
@@ -166,8 +167,10 @@ const useCommentSelections = () => {
     ];
     const editor = editorRef.current;
     if (!editor) return;
-    setDecorations((decorations) =>
-      editor.deltaDecorations(decorations, newDecorations)
+    setDecorations((decorations) => 
+      // console.log(decorations, newDecorations);
+      // console.log("lineDecorations", editor.getLineDecorations(1));
+       editor.deltaDecorations(decorations, newDecorations)
     );
   }, [inProgressComments, comments, editorRef]);
 };
