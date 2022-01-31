@@ -21,7 +21,6 @@ import { CommentButton } from "./CommentButton";
 import styles from "./CommentsPane.module.css";
 
 export const CommentsPane: React.FC = () => {
-  const { editorDivRef } = React.useContext(EditorContext);
   const [, setFocusCommentId] = useFocusCommentIdState();
   const [inProgressComments, setInProgressComments] = useRecoilState(
     inProgressCommentsSelector
@@ -29,13 +28,9 @@ export const CommentsPane: React.FC = () => {
   const comments = useComments();
   const createComment = useCreateComment();
   const { extraOffset, offsets } = useCommentOffsets();
-  const editorHeight = useEditorHeight();
+  const { editorDivHeight, editorHeight } = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
   useEditorScrollSync(commentsPaneRef, extraOffset);
-
-  const editorDivHeight = editorDivRef.current
-    ? editorDivRef.current.getBoundingClientRect().height
-    : window.innerHeight;
 
   const addInProgressComment = (selection: SelectionRange) => {
     const now = new Date().toISOString();
@@ -178,10 +173,29 @@ const useCommentOffsets = () => {
 };
 
 const useEditorHeight = () => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editorDivRef, editorRef } = React.useContext(EditorContext);
+  const [editorHeight, setEditorHeight] = React.useState(window.innerHeight);
+  const [editorDivHeight, setEditorDivHeight] = React.useState(
+    window.innerHeight
+  );
   const editor = editorRef.current;
-  if (!editor) return;
-  return editor.getContentHeight();
+  const editorDiv = editorDivRef.current;
+  // return editor.getContentHeight();
+  React.useEffect(() => {
+    if (!editor || !editorDiv) return;
+    const ro = new ResizeObserver(() => {
+      setEditorDivHeight(editorDiv.getBoundingClientRect().height);
+
+      setEditorHeight(editor.getContentHeight());
+    });
+
+    // Observe the scrollingElement for when the window gets resized
+    ro.observe(editorDiv);
+    return () => {
+      ro.unobserve(editorDiv);
+    };
+  }, [editor, editorDiv]);
+  return { editorHeight, editorDivHeight };
 };
 
 const useEditorScrollSync = (

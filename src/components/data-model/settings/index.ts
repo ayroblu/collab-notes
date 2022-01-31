@@ -48,18 +48,3 @@ export const settingsSelector = selector<Settings>({
     return;
   },
 });
-export const yRoomSelector = selector<void>({
-  key: "yRoomSelector",
-  get: async ({ get }) => {
-    const settings = get(settingsSelector);
-    const activeRoomId = get(activeRoomIdSelector);
-    const room = settings.rooms.find(({ id }) => activeRoomId === id);
-    if (!room) return;
-    const { initialConnectionPromise, initialDbPromise } = getRoom(
-      room.id,
-      room.password
-    );
-    await initialDbPromise;
-    await timeoutPromiseSuccess(initialConnectionPromise, 3000);
-  },
-});

@@ -6,16 +6,18 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- Bug with new joining user - no text?
 - fix DefaultValue usage in recoil for settings
+- Add threads to comments
 - comments
   - Focus highlights + selection highlights
     - Focus on comment focuses selection too
   - selection when adjusting text
 - Auto update settings without save button
-- react hooks eslint
+- decoration size changes
+- settings save triggers loading screen, due to connections requirement
 
 ### Longer term
+- performance - it takes 5+ seconds to load locally!!
 - minify webpack
 - gdoc / gdrive sync
 - dropbox sync

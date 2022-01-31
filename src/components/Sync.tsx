@@ -2,6 +2,7 @@ import React from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
+import { useSuspensePromise } from "@/hooks/useSuspensePromise";
 import {
   deduplicateFiles,
   getAllFilesMetaData,
@@ -9,6 +10,7 @@ import {
   getRoom,
   syncCommentNamesFn,
 } from "@/modules/documents";
+import { timeoutPromiseSuccess } from "@/modules/utils";
 
 import {
   activeFileNameState,
@@ -142,7 +144,8 @@ const useFileNameInitSync = () => {
 export const SetupSync: React.FC = ({ children }) => {
   const settings = useRecoilValue(settingsSelector);
   useSetupNewRoomSync();
-  useRecoilValue(yRoomSelector);
+  // useRecoilValue(yRoomSelector);
+  useYRoomLoad();
 
   if (!settings.rooms.length) {
     return null;
@@ -189,4 +192,23 @@ const useSetupNewRoomSync = () => {
     settings.rooms,
   ]);
   return;
+};
+
+const useYRoomLoad = () => {
+  const settings = useRecoilValue(settingsSelector);
+  const activeRoomId = useRecoilValue(activeRoomIdSelector);
+  useSuspensePromise(
+    "yroomload",
+    async () => {
+      const room = settings.rooms.find(({ id }) => activeRoomId === id);
+      if (!room) return;
+      const { initialConnectionPromise, initialDbPromise } = getRoom(
+        room.id,
+        room.password
+      );
+      await initialDbPromise;
+      await timeoutPromiseSuccess(initialConnectionPromise, 1000);
+    },
+    [activeRoomId]
+  );
 };
