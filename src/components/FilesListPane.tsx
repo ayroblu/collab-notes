@@ -49,7 +49,7 @@ const useDeleteFile = () => {
 
       const { files } = getRoom(room.id, room.password);
       const newIndex = index >= files.length ? files.length - 1 : index;
-      const name = getYFileMetaData(files.get(newIndex)).name;
+      const {name} = getYFileMetaData(files.get(newIndex));
       setFileName(name);
       setSearchParams({ name });
     }

@@ -21,7 +21,7 @@ export function createCache<T, V>(func: (params: T) => V) {
 
   return (params: T) => {
     const cacheKey = stringify(params);
-    const cachedValue = cache[cacheKey];
+    const { cacheKey: cachedValue } = cache;
     if (cachedValue) {
       return cachedValue;
     }

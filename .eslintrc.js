@@ -33,19 +33,19 @@ module.exports = {
     "prefer-arrow-callback": "error",
     "no-return-assign": "error",
     "no-return-await": "error",
-    "no-unused-expressions": "error",
     "no-unneeded-ternary": "error",
     "prefer-exponentiation-operator": "error",
     "no-useless-return": "error",
-    "prefer-destructuring": [
-      "error",
-      {
-        array: true,
-        object: true,
-      },
-      { enforceForRenamedProperties: true },
-    ],
     "prefer-template": "error",
+    // "no-unused-expressions": "error",
+    // "prefer-destructuring": [
+    //   "error",
+    //   {
+    //     array: false,
+    //     object: true,
+    //   },
+    //   { enforceForRenamedProperties: true },
+    // ],
 
     // Plugin rules follow:
     "import/order": [

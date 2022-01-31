@@ -209,7 +209,7 @@ const useSetupNewRoomSync = () => {
     }));
     setActiveRoomId(roomId);
     setActiveFileName(paramFileName || "README.md");
-    return;
+    
   }, [
     roomId,
     searchParams,
@@ -218,7 +218,7 @@ const useSetupNewRoomSync = () => {
     setSettings,
     settings.rooms,
   ]);
-  return;
+  
 };
 
 const useYRoomLoad = () => {

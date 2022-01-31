@@ -161,8 +161,8 @@ export const parseVimrc = (vimrc: string) => {
       .split("\n")
       .filter((l) => l.trim())
       .map((l) => {
-        const regex = /^([ni])map +(\S+) +(\S+) *$/g;
-        const [, m, before, after] = regex.exec(l)!;
+        const regex = /^(?<m>[ni])map +(?<before>\S+) +(?<after>\S+) *$/g;
+        const { after, before, m } = regex.exec(l)!.groups!;
         return { mode: m === "i" ? "insert" : "normal", before, after };
       });
   } catch {

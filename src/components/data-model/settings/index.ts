@@ -48,7 +48,7 @@ export const settingsSelector = selector<Settings>({
     set(activeRoomIdSelector, roomId);
     set(activeFileNameState(roomId), "README.md");
     set(isNewUserState, true);
-    return;
+    
   },
 });
 

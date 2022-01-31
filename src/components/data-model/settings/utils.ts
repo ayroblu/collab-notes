@@ -48,7 +48,7 @@ function broadcastUpdate() {
 function listenToUpdates(func: (message: SettingsBroadcast) => void) {
   if (bc) {
     bc.onmessage = (ev) => {
-      const data: SettingsBroadcast = ev.data;
+      const {data} = ev;
       func(data);
     };
   }

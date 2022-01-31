@@ -201,7 +201,7 @@ function setupYjsMonacoCursorData(
     provider.awareness.setLocalStateField("user", getLocalState());
   });
 
-  let timeoutIds: { [clientId: string]: number } = {};
+  const timeoutIds: { [clientId: string]: number } = {};
   type AwarenessEvent = {
     updated: string[];
     added: string[];
@@ -227,7 +227,7 @@ function setupYjsMonacoCursorData(
       }
     );
     const tempCursorStyles = cursorData
-      .filter(({ clientId }) => updated.includes(clientId + ""))
+      .filter(({ clientId }) => updated.includes(`${clientId  }`))
       .map(
         ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
       );
