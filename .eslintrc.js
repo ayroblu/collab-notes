@@ -25,6 +25,27 @@ module.exports = {
   rules: {
     "arrow-body-style": ["error", "as-needed"],
     "no-useless-rename": "error",
+    eqeqeq: "error",
+    "prefer-const": "error",
+    "no-throw-literal": "error",
+    "prefer-promise-reject-errors": "error",
+    "prefer-named-capture-group": "error",
+    "prefer-arrow-callback": "error",
+    "no-return-assign": "error",
+    "no-return-await": "error",
+    "no-unused-expressions": "error",
+    "no-unneeded-ternary": "error",
+    "prefer-exponentiation-operator": "error",
+    "no-useless-return": "error",
+    "prefer-destructuring": [
+      "error",
+      {
+        array: true,
+        object: true,
+      },
+      { enforceForRenamedProperties: true },
+    ],
+    "prefer-template": "error",
 
     // Plugin rules follow:
     "import/order": [

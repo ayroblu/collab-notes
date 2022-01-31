@@ -64,9 +64,9 @@ export const FilesList = () => {
 };
 
 const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
-  const match = /(\.\w+)$/g.exec(name);
+  const match = /(?<ext>\.\w+)$/g.exec(name);
   if (!match) return <SiFiles />;
-  switch (match[1]) {
+  switch (match.groups?.["ext"]) {
     case ".md":
       return <SiMarkdown />;
     case ".ts":
@@ -117,7 +117,7 @@ const NewFile: React.FC = () => {
         return handleNewFile(e.currentTarget.value.trim());
       case "Escape":
         setIsNewFileInput(false);
-        return;
+        
     }
   };
 
