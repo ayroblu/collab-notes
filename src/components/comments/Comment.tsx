@@ -1,13 +1,13 @@
 import React from "react";
 import { VscClose } from "react-icons/vsc";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getComments, getThread } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
 import { cn, getHashColor, nonNullable, uuidv4 } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
-import { settingsSelector } from "../data-model";
+import { settingsSelector, showThreadSaveState } from "../data-model";
 import { SubmitButton } from "../shared/Button";
 import { FacePileFace } from "../shared/FacePile";
 import { useFileName, useFocusCommentIdState, useRoom } from "../utils";
@@ -92,6 +92,8 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
   const room = useRoom();
   const fileName = useFileName();
   const settings = useRecoilValue(settingsSelector);
+  const [isShowThreadSave, setShowThreadSave] =
+    useRecoilState(showThreadSaveState);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     const isCmd = e.getModifierState("Meta");
@@ -137,10 +139,14 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
           placeholder="Reply to comment"
           className={styles.textarea}
           onKeyDown={handleKeyDown}
+          onFocus={() => setShowThreadSave(true)}
+          onBlur={() => setShowThreadSave(false)}
         />
-        <div className={styles.flexEnd}>
-          <SubmitButton value="Save" disabled={!text} />
-        </div>
+        {isShowThreadSave && (
+          <div className={styles.flexEnd}>
+            <SubmitButton value="Save" disabled={!text} />
+          </div>
+        )}
       </section>
     </form>
   );

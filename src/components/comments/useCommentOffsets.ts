@@ -5,7 +5,7 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 import { sortBy } from "@/modules/utils";
 
 import { CommentsContext } from "../Contexts";
-import { inProgressCommentsSelector } from "../data-model";
+import { inProgressCommentsSelector, showThreadSaveState } from "../data-model";
 import { useComments, useFocusCommentIdState } from "../utils";
 
 const commentGap = 8;
@@ -18,6 +18,7 @@ export const useCommentOffsets = () => {
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   const [scrollOffset, setScrollOffset] = React.useState<number>(0);
   const getIsMounted = useIsMounted();
+  const isShowThreadSave = useRecoilValue(showThreadSaveState);
 
   React.useEffect(() => {
     const commentIdsSet = new Set(
@@ -51,7 +52,14 @@ export const useCommentOffsets = () => {
         });
       }
     );
-  }, [focusCommentId, comments, inProgressComments, commentRefs, getIsMounted]);
+  }, [
+    focusCommentId,
+    comments,
+    inProgressComments,
+    commentRefs,
+    getIsMounted,
+    isShowThreadSave,
+  ]);
   return { offsets, extraOffset, scrollOffset };
 };
 

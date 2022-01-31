@@ -155,3 +155,8 @@ export const threadsSelector = selectorFamily<
       });
     },
 });
+
+export const showThreadSaveState = atom<boolean>({
+  key: "showThreadSaveState",
+  default: false,
+});
