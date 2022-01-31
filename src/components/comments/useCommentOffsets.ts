@@ -39,19 +39,6 @@ export const useCommentOffsets = () => {
       setScrollOffset,
       getIsMounted,
     });
-    attachResizeObserver(
-      commentDetails.map(({ el }) => el),
-      () => {
-        updateOffsets({
-          commentDetails,
-          focusCommentId,
-          setExtraOffset,
-          setOffsets,
-          setScrollOffset,
-          getIsMounted,
-        });
-      }
-    );
   }, [
     focusCommentId,
     comments,
@@ -134,25 +121,4 @@ function updateOffsets({
     }
   }
   setOffsets(newOffsets);
-}
-
-function attachResizeObserver(els: HTMLElement[], func: () => void) {
-  let rafId = 0;
-  const disposes = els.map((el) => {
-    const ro = new ResizeObserver(() => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        func();
-      });
-    });
-
-    // Observe the scrollingElement for when the window gets resized
-    ro.observe(el);
-    return () => {
-      ro.unobserve(el);
-    };
-  });
-  return () => {
-    disposes.forEach((dispose) => dispose());
-  };
 }
