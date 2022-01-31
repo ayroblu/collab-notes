@@ -33,7 +33,7 @@ export const useEditorScrollSync = (
     return () => {
       dispose();
     };
-  }, [commentsPaneRef, editorRef, extraOffset]);
+  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
 
   React.useEffect(() => {
     // For when CommentsPane scrolls, reflect in editor
@@ -61,7 +61,7 @@ export const useEditorScrollSync = (
     return () => {
       dispose();
     };
-  }, [commentsPaneRef, editorRef, extraOffset]);
+  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
 
   // For when focus comment changes usually
   React.useEffect(() => {

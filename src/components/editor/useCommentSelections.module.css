@@ -1,0 +1,6 @@
+.selection {
+  background: rgba(213, 169, 45, 0.3);
+}
+.selection:hover {
+  background: rgba(213, 169, 45, 0.6);
+}

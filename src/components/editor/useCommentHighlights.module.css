@@ -1,8 +1,3 @@
-.editor {
-  width: 100%;
-  height: calc(100vh - var(--nav-bar-height));
-  border: none;
-}
 .selection {
   background: rgba(213, 169, 45, 0.3);
 }

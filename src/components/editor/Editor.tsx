@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor";
 import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
@@ -16,22 +16,21 @@ import {
   getYFileText,
 } from "@/modules/documents";
 import type { AwarenessStates, LocalState } from "@/modules/documents";
-import { cn, getHashColor } from "@/modules/utils";
+import { getHashColor } from "@/modules/utils";
 
-import { CommentsContext, EditorContext } from "./Contexts";
+import { EditorContext } from "../Contexts";
+import { parseVimrc } from "../Settings";
+import { isNewUserState, settingsSelector } from "../data-model";
+import type { Room, Settings } from "../data-model";
+import { useFileName, useRoom } from "../utils";
+
 import "./Editor.css";
 import styles from "./Editor.module.css";
-import { parseVimrc } from "./Settings";
-import type { Room, Settings } from "./data-model";
 import {
-  activeFileNameState,
-  activeRoomIdSelector,
-  focusCommentIdState,
-  inProgressCommentsSelector,
-  isNewUserState,
-  settingsSelector,
-} from "./data-model";
-import { useComments, useFileName, useRoom } from "./utils";
+  useCommentHighlights,
+  useHighlightClick,
+} from "./useCommentHighlights";
+import { useCommentSelections } from "./useCommentSelections";
 
 export const Editor: React.FC = () => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
@@ -121,182 +120,6 @@ function useMonacoEditor(
     editor.layout();
   }, [editorRef]);
 }
-
-const useCommentSelections = () => {
-  const { editorRef } = React.useContext(EditorContext);
-  const comments = useComments();
-  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
-  const [, setDecorations] = React.useState<string[]>([]);
-  React.useEffect(() => {
-    const newDecorations = [
-      ...comments.map(
-        ({
-          id,
-          selection: { endColumn, endLineNumber, startColumn, startLineNumber },
-          text,
-        }) => ({
-          range: new monaco.Range(
-            startLineNumber,
-            startColumn,
-            endLineNumber,
-            endColumn
-          ),
-          options: {
-            // inlineClassName: cn(styles.selection, `comment-${id}`),
-            className: cn(styles.selection, `comment-${id}`),
-            hoverMessage: { value: text },
-          },
-        })
-      ),
-      ...inProgressComments.map(
-        ({
-          id,
-          selection: { endColumn, endLineNumber, startColumn, startLineNumber },
-        }) => ({
-          range: new monaco.Range(
-            startLineNumber,
-            startColumn,
-            endLineNumber,
-            endColumn
-          ),
-          options: {
-            className: cn(styles.selection, `comment-${id}`),
-          },
-        })
-      ),
-    ];
-    const editor = editorRef.current;
-    if (!editor) return;
-    setDecorations((decorations) => {
-      console.log(decorations, newDecorations);
-      console.log("lineDecorations", editor.getLineDecorations(1));
-      return editor.deltaDecorations(decorations, newDecorations);
-    });
-  }, [inProgressComments, comments, editorRef]);
-};
-
-const useCommentHighlights = () => {
-  const { commentRefs } = React.useContext(CommentsContext);
-  const comments = useComments();
-  React.useEffect(() => {
-    let rafId = 0;
-    const mouseMove = (e: MouseEvent) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
-          const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
-          if (isIn && !v.classList.contains(styles.selectionHover)) {
-            v.classList.add(styles.selectionHover);
-          } else if (!isIn && v.classList.contains(styles.selectionHover)) {
-            v.classList.remove(styles.selectionHover);
-          }
-
-          const classes = [...v.classList];
-          const commentClass = classes.find((c) => c.startsWith("comment-"));
-          if (!commentClass) return;
-          const commentId = commentClass.replace("comment-", "");
-          const el = commentRefs.current[commentId]?.el;
-          if (!el) return;
-          if (isIn) {
-            el.classList.add(styles.commentHover);
-          } else if (!isIn) {
-            el.classList.remove(styles.commentHover);
-          }
-        });
-      });
-    };
-    document.body.addEventListener("mousemove", mouseMove);
-    return () => {
-      document.body.removeEventListener("mousemove", mouseMove);
-    };
-  }, [commentRefs, comments]);
-};
-function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
-  const isIn =
-    e.clientX > r.left &&
-    e.clientX < r.right &&
-    e.clientY > r.top &&
-    e.clientY < r.bottom;
-  return isIn;
-}
-const useHighlightClick = () => {
-  const { commentRefs } = React.useContext(CommentsContext);
-  const comments = useComments();
-  const roomId = useRecoilValue(activeRoomIdSelector);
-  const fileName = useRecoilValue(activeFileNameState(roomId));
-  const setFocusCommentId = useSetRecoilState(
-    focusCommentIdState({ fileName, roomId })
-  );
-  React.useEffect(() => {
-    let rafId = 0;
-    const click = (e: MouseEvent) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
-          const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
-
-          const classes = [...v.classList];
-          const commentClass = classes.find((c) => c.startsWith("comment-"));
-          if (!commentClass) return;
-          const commentId = commentClass.replace("comment-", "");
-          const el = commentRefs.current[commentId]?.el;
-          if (!el) return;
-          if (isIn) {
-            setFocusCommentId(commentId);
-          }
-        });
-      });
-    };
-    document.body.addEventListener("click", click);
-    return () => {
-      document.body.removeEventListener("click", click);
-    };
-  }, [commentRefs, comments]);
-};
-// const useCommentHighlights = () => {
-//   const { commentRefs, comments } = React.useContext(CommentsContext);
-//   const { editorRef } = React.useContext(EditorContext);
-//   React.useEffect(() => {
-//     const editor = editorRef.current;
-//     if (!editor) return;
-//     let disposes: (() => void)[] = [];
-//     const { dispose } = editor.onDidChangeModelDecorations(() => {
-//       if (disposes.length === comments.length) return;
-//       disposes.forEach((d) => d());
-//       disposes = [...document.querySelectorAll(`.${styles.selection}`)].map(
-//         (v) => {
-//           const mouseEnter = () => {
-//             const classes = [...v.classList];
-//             const commentClass = classes.find((c) => c.startsWith("comment-"));
-//             if (!commentClass) return;
-//             const commentId = commentClass.replace("comment-", "");
-//             const el = commentRefs.current[commentId]?.el;
-//             if (!el) return;
-//             el.classList.add(styles.commentHover);
-//           };
-//           const mouseLeave = () => {
-//             const classes = [...v.classList];
-//             const commentClass = classes.find((c) => c.startsWith("comment-"));
-//             if (!commentClass) return;
-//             const commentId = commentClass.replace("comment-", "");
-//             const el = commentRefs.current[commentId]?.el;
-//             if (!el) return;
-//             el.classList.remove(styles.commentHover);
-//           };
-//           v.addEventListener("mouseenter", mouseEnter);
-//           v.addEventListener("mouseleave", mouseLeave);
-//           return () => {
-//             v.removeEventListener("mouseenter", mouseEnter);
-//             v.removeEventListener("mouseenter", mouseLeave);
-//           };
-//         }
-//       );
-//     });
-//     return () => {
-//       dispose();
-//     };
-//   }, [comments]);
-// };
 
 function createMonacoEditor(
   divEl: HTMLDivElement,
