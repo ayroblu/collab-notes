@@ -1,6 +1,5 @@
 import React from "react";
 import { VscTrash } from "react-icons/vsc";
-import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";

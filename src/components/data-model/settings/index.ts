@@ -1,7 +1,7 @@
 import { atom, DefaultValue, selector } from "recoil";
 
 import { getRoom } from "@/modules/documents";
-import { generatePassword, getRandomName } from "@/modules/utils";
+import { generatePassword } from "@/modules/utils";
 
 import type { Settings } from "..";
 import { activeFileNameState, activeRoomIdSelector, isNewUserState } from "..";
