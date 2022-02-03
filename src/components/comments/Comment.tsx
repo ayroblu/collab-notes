@@ -1,16 +1,26 @@
 import React from "react";
-import { VscClose } from "react-icons/vsc";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import { getComments, getThread } from "@/modules/documents";
-import type { CommentData, SelectionRange } from "@/modules/documents/types";
-import { cn, getHashColor, nonNullable, uuidv4 } from "@/modules/utils";
+import { addThread, getComments, removeThread } from "@/modules/documents";
+import type {
+  CommentData,
+  SelectionRange,
+  ThreadData,
+} from "@/modules/documents/types";
+import { cn, getHashColor, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import { settingsSelector, showThreadSaveState } from "../data-model";
 import { SubmitButton } from "../shared/Button";
 import { FacePileFace } from "../shared/FacePile";
-import { useFileName, useFocusCommentIdState, useRoom } from "../utils";
+import type { MenuOption } from "../shared/Menu";
+import { Menu } from "../shared/Menu";
+import {
+  useFileName,
+  useFocusCommentIdState,
+  useRoom,
+  useThreadParams,
+} from "../utils";
 
 import styles from "./Comment.module.css";
 import { useThreadValue } from "./useThread";
@@ -21,6 +31,7 @@ type Props = CommentData & {
 
 export const Comment: React.FC<Props> = ({
   byName,
+  dateUpdated,
   id,
   offset,
   selection,
@@ -52,6 +63,10 @@ export const Comment: React.FC<Props> = ({
     }
     delete commentRefs.current[id];
   };
+  const options = [
+    { label: "Edit", onClick: () => {} },
+    { label: "Delete", onClick: deleteComment },
+  ];
   const isFocusComment = focusCommentId === id;
   return (
     <section
@@ -71,14 +86,12 @@ export const Comment: React.FC<Props> = ({
       }}
       onClick={() => setFocusCommentId(id)}
     >
-      <div className={styles.userHeading}>
-        <FacePileFace color={getHashColor(byName)} name={byName} />
-        <h4 className={styles.userNameHeading}>{byName}</h4>
-      </div>
-      <p className={styles.text}>{text}</p>
-      <button className={styles.close} onClick={deleteComment}>
-        <VscClose />
-      </button>
+      <CommentThreadItem
+        byName={byName}
+        options={options}
+        text={text}
+        dateUpdated={dateUpdated}
+      />
       <CommentThread commentId={id} />
       {isFocusComment && <div className={styles.ruledLine} />}
       {isFocusComment && <CommentAddThread commentId={id} />}
@@ -101,33 +114,29 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
     switch (e.key) {
       case "Enter":
         if (isCmd || isCtrl) {
-          return addThread();
+          return addThreadHandler();
         }
     }
   };
-  const addThread = () => {
+  const addThreadHandler = () => {
     if (!room) return;
-    const thread = getThread(room.id, room.password, fileName, commentId);
-    if (text && thread) {
-      const now = new Date().toISOString();
-      thread.push([
-        {
-          id: uuidv4(),
-          commentId,
-          text,
-          byId: settings.id,
-          byName: settings.name,
-          dateCreated: now,
-          dateUpdated: now,
-        },
-      ]);
+    const isSuccess = addThread({
+      roomId: room.id,
+      roomPassword: room.password,
+      fileName,
+      commentId,
+      text,
+      byId: settings.id,
+      byName: settings.name,
+    });
+    if (isSuccess) {
       setText("");
       textareaRef.current?.blur();
     }
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addThread();
+    addThreadHandler();
   };
   return (
     <form onSubmit={onSubmit}>
@@ -156,16 +165,79 @@ const CommentThread: React.FC<{ commentId: string }> = ({ commentId }) => {
   const thread = useThreadValue(commentId);
   return (
     <>
-      {thread.map(({ byName, id, text }) => (
-        <section className={styles.thread} key={id}>
-          <div className={styles.userHeading}>
-            <FacePileFace color={getHashColor(byName)} name={byName} />
-            <h4 className={styles.userNameHeading}>{byName}</h4>
-          </div>
-          <p className={styles.text}>{text}</p>
+      {thread.map((thread) => (
+        <section key={thread.id} className={styles.thread}>
+          <ThreadItem {...thread} />
         </section>
       ))}
     </>
+  );
+};
+
+const ThreadItem: React.FC<ThreadData> = ({
+  byName,
+  commentId,
+  dateUpdated,
+  id,
+  text,
+}) => {
+  const { fileName, roomId, roomPassword } = useThreadParams();
+  const options = [
+    { label: "Edit", onClick: () => {} },
+    {
+      label: "Delete",
+      onClick: () =>
+        removeThread({
+          threadId: id,
+          commentId,
+          fileName,
+          roomPassword,
+          roomId,
+        }),
+    },
+  ];
+  return (
+    <CommentThreadItem
+      byName={byName}
+      dateUpdated={dateUpdated}
+      text={text}
+      options={options}
+    />
+  );
+};
+
+type CommentThreadItemProps = {
+  options: MenuOption[];
+  byName: string;
+  dateUpdated: string;
+  text: string;
+};
+const CommentThreadItem: React.FC<CommentThreadItemProps> = ({
+  byName,
+  dateUpdated,
+  options,
+  text,
+}) => {
+  const formatedDate = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(dateUpdated));
+  return (
+    <section>
+      <div className={styles.heading}>
+        <div className={styles.userHeading}>
+          <FacePileFace color={getHashColor(byName)} name={byName} />
+          <div className={styles.reduced}>
+            <h4 className={styles.userNameHeading}>{byName}</h4>
+            <p className={styles.headingDate}>{formatedDate}</p>
+          </div>
+        </div>
+        <div>
+          <Menu options={options} />
+        </div>
+      </div>
+      <p className={styles.text}>{text}</p>
+    </section>
   );
 };
 

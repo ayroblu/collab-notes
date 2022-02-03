@@ -2,7 +2,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
 
-import { nonNullable, sortBy } from "../utils";
+import { nonNullable, sortBy, uuidv4 } from "../utils";
 
 import type { CommentData, FileMetaData, ThreadData, YRoom } from "./types";
 
@@ -175,6 +175,66 @@ export function getThread(
     threads.set(commentId, new Y.Array<ThreadData>());
   }
   return threads.get(commentId)!;
+}
+
+type ThreadParams = {
+  roomId: string;
+  roomPassword: string;
+  fileName: string;
+  commentId: string;
+};
+type AddThreadParams = ThreadParams & {
+  text: string;
+  byId: string;
+  byName: string;
+};
+export function addThread({
+  byId,
+  byName,
+  commentId,
+  fileName,
+  roomId,
+  roomPassword,
+  text,
+}: AddThreadParams): boolean {
+  const thread = getThread(roomId, roomPassword, fileName, commentId);
+  if (text && thread) {
+    const now = new Date().toISOString();
+    thread.push([
+      {
+        id: uuidv4(),
+        commentId,
+        text,
+        byId,
+        byName,
+        dateCreated: now,
+        dateUpdated: now,
+      },
+    ]);
+    return true;
+  }
+  return false;
+}
+
+type RemoveThreadParams = ThreadParams & {
+  threadId: string;
+};
+export function removeThread({
+  commentId,
+  fileName,
+  roomId,
+  roomPassword,
+  threadId,
+}: RemoveThreadParams): boolean {
+  const thread = getThread(roomId, roomPassword, fileName, commentId);
+  if (thread) {
+    const index = thread.map(({ id }) => id).findIndex((id) => id === threadId);
+    if (index !== -1) {
+      thread.delete(index, 1);
+    }
+    return true;
+  }
+  return false;
 }
 
 export const syncCommentNamesFn = (

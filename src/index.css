@@ -11,6 +11,8 @@
 
   --darker-color: rgba(0, 0, 0, 0.2);
   --lighter-color: rgba(255, 255, 255, 0.1);
+  --darker-filter: brightness(85%);
+  --lighter-filter: brightness(130%);
 
   --primary-color: #5bf;
   --background-color: var(--dark-background-color);
@@ -19,7 +21,10 @@
   --subtle-text-color: var(--dark-subtle-text-color);
   --deep-color: var(--darker-color);
   --fade-color: var(--lighter-color);
+  --deep-filter: var(--darker-filter);
+  --fade-filter: var(--lighter-filter);
   --standard-font-size: 20px;
+  --box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
 
   --spacing-1: 1px;
   --spacing-2: 2px;

@@ -9,6 +9,9 @@
   border: 1px solid var(--fade-color);
   top: 0;
 }
+.comment:hover {
+  z-index: 1;
+}
 @media screen and (prefers-reduced-motion: no-preference) {
   .comment {
     transition: transform 0.2s;
@@ -19,10 +22,11 @@
 }
 .userHeading {
   display: flex;
+  align-items: center;
 }
 .userNameHeading {
-  margin-inline-start: var(--spacing-8);
   font-weight: 500;
+  font-size: 0.8rem;
 }
 .text {
   margin-block-start: var(--spacing-8);
@@ -31,25 +35,13 @@
 .focus {
   border: 1px solid var(--text-color);
 }
-.close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border-radius: 50%;
-  width: 1.5rem;
-  height: 1.5rem;
-  display: block;
-  justify-content: center;
-  align-items: center;
-  padding-block-start: 1px;
-}
-.close:hover {
-  background: var(--background-color);
-  border: 1px solid var(--deep-color);
-}
 .thread {
   border-block-start: 1px solid var(--fade-color);
   padding-block-start: var(--spacing-8);
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
 }
 .addThread {
   margin-block-start: var(--spacing-8);
@@ -66,4 +58,10 @@
 }
 .ruledLine {
   border-block-end: 1px solid var(--fade-color);
+}
+.reduced {
+  margin-inline-start: var(--spacing-8);
+}
+.headingDate {
+  font-size: 0.5rem;
 }

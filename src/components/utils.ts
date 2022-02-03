@@ -21,6 +21,20 @@ export const useFileName = () => {
   return useRecoilValue(activeFileNameState(getNonNullable(room).id));
 };
 
+export const useThreadParams = () => {
+  const settings = useRecoilValue(settingsSelector);
+  const activeRoomId = useRecoilValue(activeRoomIdSelector);
+  const room = getNonNullable(
+    settings.rooms.find(({ id }) => id === activeRoomId)
+  );
+  const fileName = useRecoilValue(activeFileNameState(room.id));
+  return {
+    roomId: room.id,
+    roomPassword: room.password,
+    fileName,
+  };
+};
+
 export const useFileNameState = () => {
   const room = useRoom();
   return useRecoilState(activeFileNameState(getNonNullable(room).id));

@@ -1,0 +1,29 @@
+.menu {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-4);
+  border-radius: var(--button-border-radius);
+}
+.menu:hover {
+  background-color: var(--fade-color);
+}
+.dropdown {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-end: 0;
+  background-color: var(--main-background-color);
+  z-index: 1;
+  border: 1px solid var(--darker-color);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+.menuItem {
+  padding: var(--spacing-4) var(--spacing-16);
+  text-align: initial;
+}
+.menuItem:hover,
+.menuItemSelected {
+  background-color: var(--deep-color);
+}
