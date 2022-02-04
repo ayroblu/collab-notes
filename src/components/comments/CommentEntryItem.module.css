@@ -1,0 +1,22 @@
+.heading {
+  display: flex;
+  justify-content: space-between;
+}
+.userHeading {
+  display: flex;
+  align-items: center;
+}
+.reduced {
+  margin-inline-start: var(--spacing-8);
+}
+.userNameHeading {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+.headingDate {
+  font-size: 0.5rem;
+}
+.text {
+  margin-block-start: var(--spacing-8);
+  margin-block-end: var(--spacing-8);
+}

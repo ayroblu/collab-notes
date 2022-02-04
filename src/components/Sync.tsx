@@ -8,7 +8,7 @@ import {
   getAllFilesMetaData,
   getComments,
   getRoom,
-  getThreads,
+  getAllThreads,
   syncCommentNamesFn,
 } from "@/modules/documents";
 import { timeoutPromiseSuccess } from "@/modules/utils";
@@ -105,7 +105,7 @@ const useThreadsSync = () => {
 
   React.useEffect(() => {
     if (!room) return;
-    const yThread = getThreads(room.id, room.password, fileName);
+    const yThread = getAllThreads(room.id, room.password, fileName);
     if (!yThread) return;
     const threads = yThread.toJSON();
 

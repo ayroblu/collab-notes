@@ -1,47 +1,33 @@
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 
-import { addThread, getComments, removeThread } from "@/modules/documents";
-import type {
-  CommentData,
-  SelectionRange,
-  ThreadData,
-} from "@/modules/documents/types";
-import { cn, getHashColor, nonNullable } from "@/modules/utils";
+import { addThread, editComment, removeComment } from "@/modules/documents";
+import type { CommentData, SelectionRange } from "@/modules/documents/types";
+import { cn, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
-import { settingsSelector, showThreadSaveState } from "../data-model";
-import { SubmitButton } from "../shared/Button";
-import { FacePileFace } from "../shared/FacePile";
-import type { MenuOption } from "../shared/Menu";
-import { Menu } from "../shared/Menu";
+import { settingsSelector } from "../data-model";
 import {
   useFileName,
+  useFileParams,
   useFocusCommentIdState,
   useRoom,
-  useThreadParams,
 } from "../utils";
 
 import styles from "./Comment.module.css";
-import { useThreadValue } from "./useThread";
+import { CommentEntryItem } from "./CommentEntryItem";
+import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
+import { CommentThread } from "./CommentThread";
 
 type Props = CommentData & {
   offset: number | undefined;
 };
 
-export const Comment: React.FC<Props> = ({
-  byName,
-  dateUpdated,
-  id,
-  offset,
-  selection,
-  text,
-}) => {
+export const Comment: React.FC<Props> = (comment) => {
+  const { id, offset, selection } = comment;
   const { commentRefs } = React.useContext(CommentsContext);
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
   const position = usePosition(selection);
-  const room = useRoom();
-  const fileName = useFileName();
   const offsetTop =
     nonNullable(position) && nonNullable(offset)
       ? position + offset
@@ -49,24 +35,6 @@ export const Comment: React.FC<Props> = ({
       ? position
       : undefined;
 
-  const deleteComment = () => {
-    if (!room) return;
-    if (!fileName) return;
-    const yComments = getComments(room.id, room.password, fileName);
-    if (!yComments) return;
-    const index = yComments.toArray().findIndex((comment) => comment.id === id);
-    if (index === -1) return;
-
-    yComments.delete(index);
-    if (focusCommentId === id) {
-      setFocusCommentId(null);
-    }
-    delete commentRefs.current[id];
-  };
-  const options = [
-    { label: "Edit", onClick: () => {} },
-    { label: "Delete", onClick: deleteComment },
-  ];
   const isFocusComment = focusCommentId === id;
   return (
     <section
@@ -86,12 +54,7 @@ export const Comment: React.FC<Props> = ({
       }}
       onClick={() => setFocusCommentId(id)}
     >
-      <CommentThreadItem
-        byName={byName}
-        options={options}
-        text={text}
-        dateUpdated={dateUpdated}
-      />
+      <CommentMain {...comment} />
       <CommentThread commentId={id} />
       {isFocusComment && <div className={styles.ruledLine} />}
       {isFocusComment && <CommentAddThread commentId={id} />}
@@ -100,27 +63,13 @@ export const Comment: React.FC<Props> = ({
 };
 
 const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
-  const [text, setText] = React.useState("");
-  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const room = useRoom();
   const fileName = useFileName();
   const settings = useRecoilValue(settingsSelector);
-  const [isShowThreadSave, setShowThreadSave] =
-    useRecoilState(showThreadSaveState);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    const isCmd = e.getModifierState("Meta");
-    const isCtrl = e.getModifierState("Ctrl");
-    switch (e.key) {
-      case "Enter":
-        if (isCmd || isCtrl) {
-          return addThreadHandler();
-        }
-    }
-  };
-  const addThreadHandler = () => {
-    if (!room) return;
-    const isSuccess = addThread({
+  const addThreadHandler = (text: string) => {
+    if (!room) return false;
+    return addThread({
       roomId: room.id,
       roomPassword: room.password,
       fileName,
@@ -129,115 +78,56 @@ const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
       byId: settings.id,
       byName: settings.name,
     });
-    if (isSuccess) {
-      setText("");
-      textareaRef.current?.blur();
-    }
-  };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    addThreadHandler();
   };
   return (
-    <form onSubmit={onSubmit}>
-      <section className={styles.addThread}>
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.currentTarget.value)}
-          placeholder="Reply to comment"
-          className={styles.textarea}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setShowThreadSave(true)}
-          onBlur={() => setShowThreadSave(false)}
-        />
-        {isShowThreadSave && (
-          <div className={styles.flexEnd}>
-            <SubmitButton value="Save" disabled={!text} />
-          </div>
-        )}
-      </section>
-    </form>
+    <section className={styles.addThread}>
+      <CommentTextareaWithSave onSubmit={addThreadHandler} />
+    </section>
   );
 };
 
-const CommentThread: React.FC<{ commentId: string }> = ({ commentId }) => {
-  const thread = useThreadValue(commentId);
-  return (
-    <>
-      {thread.map((thread) => (
-        <section key={thread.id} className={styles.thread}>
-          <ThreadItem {...thread} />
-        </section>
-      ))}
-    </>
-  );
-};
-
-const ThreadItem: React.FC<ThreadData> = ({
+const CommentMain: React.FC<CommentData> = ({
   byName,
-  commentId,
   dateUpdated,
   id,
   text,
 }) => {
-  const { fileName, roomId, roomPassword } = useThreadParams();
+  const [isEdit, setIsEdit] = React.useState(false);
+  const { commentRefs } = React.useContext(CommentsContext);
+  const { fileName, roomId, roomPassword } = useFileParams();
+  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+
+  const onEditSubmit = (text: string) => {
+    editComment(roomId, roomPassword, fileName, id, text);
+    setIsEdit(false);
+    return false;
+  };
+  const deleteComment = () => {
+    const success = removeComment(roomId, roomPassword, fileName, id);
+    if (!success) return;
+
+    if (focusCommentId === id) {
+      setFocusCommentId(null);
+    }
+    delete commentRefs.current[id];
+  };
+  const onEdit = () => {
+    setIsEdit(true);
+    setFocusCommentId(id);
+  };
   const options = [
-    { label: "Edit", onClick: () => {} },
-    {
-      label: "Delete",
-      onClick: () =>
-        removeThread({
-          threadId: id,
-          commentId,
-          fileName,
-          roomPassword,
-          roomId,
-        }),
-    },
+    { label: "Edit", onClick: onEdit },
+    { label: "Delete", onClick: deleteComment },
   ];
   return (
-    <CommentThreadItem
+    <CommentEntryItem
       byName={byName}
-      dateUpdated={dateUpdated}
-      text={text}
       options={options}
+      text={text}
+      dateUpdated={dateUpdated}
+      isEdit={isEdit}
+      onEditSubmit={onEditSubmit}
     />
-  );
-};
-
-type CommentThreadItemProps = {
-  options: MenuOption[];
-  byName: string;
-  dateUpdated: string;
-  text: string;
-};
-const CommentThreadItem: React.FC<CommentThreadItemProps> = ({
-  byName,
-  dateUpdated,
-  options,
-  text,
-}) => {
-  const formatedDate = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(dateUpdated));
-  return (
-    <section>
-      <div className={styles.heading}>
-        <div className={styles.userHeading}>
-          <FacePileFace color={getHashColor(byName)} name={byName} />
-          <div className={styles.reduced}>
-            <h4 className={styles.userNameHeading}>{byName}</h4>
-            <p className={styles.headingDate}>{formatedDate}</p>
-          </div>
-        </div>
-        <div>
-          <Menu options={options} />
-        </div>
-      </div>
-      <p className={styles.text}>{text}</p>
-    </section>
   );
 };
 

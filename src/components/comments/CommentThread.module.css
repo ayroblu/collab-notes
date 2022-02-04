@@ -1,0 +1,4 @@
+.thread {
+  border-block-start: 1px solid var(--fade-color);
+  padding-block-start: var(--spacing-8);
+}

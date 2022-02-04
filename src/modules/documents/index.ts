@@ -152,8 +152,45 @@ export function getComments(
   if (!file) return;
   return getYFileComments(file);
 }
+export function editComment(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  commentId: string,
+  text: string
+) {
+  const { ydoc } = getRoom(roomId, roomPassword);
+  const yComments = getComments(roomId, roomPassword, fileName);
+  if (!yComments) return;
+  const index = yComments
+    .map(({ id }) => id)
+    .findIndex((id) => id === commentId);
 
-export function getThreads(
+  const now = new Date().toISOString();
+  const comment = yComments.get(index);
+  ydoc.transact(() => {
+    yComments.delete(index);
+    yComments.insert(index, [{ ...comment, text, dateUpdated: now }]);
+  });
+}
+export function removeComment(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  commentId: string
+): boolean {
+  const yComments = getComments(roomId, roomPassword, fileName);
+  if (!yComments) return false;
+  const index = yComments
+    .map(({ id }) => id)
+    .findIndex((id) => id === commentId);
+  if (index === -1) return false;
+
+  yComments.delete(index);
+  return true;
+}
+
+export function getAllThreads(
   roomId: string,
   roomPassword: string,
   fileName: string
@@ -163,13 +200,13 @@ export function getThreads(
   return getYFileThreads(file);
 }
 
-export function getThread(
+export function getThreads(
   roomId: string,
   roomPassword: string,
   fileName: string,
   commentId: string
 ): Y.Array<ThreadData> | void {
-  const threads = getThreads(roomId, roomPassword, fileName);
+  const threads = getAllThreads(roomId, roomPassword, fileName);
   if (!threads) return;
   if (!threads.has(commentId)) {
     threads.set(commentId, new Y.Array<ThreadData>());
@@ -177,13 +214,13 @@ export function getThread(
   return threads.get(commentId)!;
 }
 
-type ThreadParams = {
+type CommentParams = {
   roomId: string;
   roomPassword: string;
   fileName: string;
   commentId: string;
 };
-type AddThreadParams = ThreadParams & {
+type AddThreadParams = CommentParams & {
   text: string;
   byId: string;
   byName: string;
@@ -197,7 +234,7 @@ export function addThread({
   roomPassword,
   text,
 }: AddThreadParams): boolean {
-  const thread = getThread(roomId, roomPassword, fileName, commentId);
+  const thread = getThreads(roomId, roomPassword, fileName, commentId);
   if (text && thread) {
     const now = new Date().toISOString();
     thread.push([
@@ -216,17 +253,41 @@ export function addThread({
   return false;
 }
 
-type RemoveThreadParams = ThreadParams & {
+type ThreadParams = CommentParams & {
   threadId: string;
 };
+type EditThreadParams = ThreadParams & {
+  text: string;
+};
+export function editThread({
+  commentId,
+  fileName,
+  roomId,
+  roomPassword,
+  text,
+  threadId,
+}: EditThreadParams) {
+  const { ydoc } = getRoom(roomId, roomPassword);
+  const threads = getThreads(roomId, roomPassword, fileName, commentId);
+  if (!threads) return;
+  const index = threads.map(({ id }) => id).findIndex((id) => id === threadId);
+
+  const now = new Date().toISOString();
+  const thread = threads.get(index);
+  ydoc.transact(() => {
+    threads.delete(index);
+    threads.insert(index, [{ ...thread, text, dateUpdated: now }]);
+  });
+}
+
 export function removeThread({
   commentId,
   fileName,
   roomId,
   roomPassword,
   threadId,
-}: RemoveThreadParams): boolean {
-  const thread = getThread(roomId, roomPassword, fileName, commentId);
+}: ThreadParams): boolean {
+  const thread = getThreads(roomId, roomPassword, fileName, commentId);
   if (thread) {
     const index = thread.map(({ id }) => id).findIndex((id) => id === threadId);
     if (index !== -1) {

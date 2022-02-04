@@ -21,7 +21,7 @@ export const useFileName = () => {
   return useRecoilValue(activeFileNameState(getNonNullable(room).id));
 };
 
-export const useThreadParams = () => {
+export const useFileParams = () => {
   const settings = useRecoilValue(settingsSelector);
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
   const room = getNonNullable(

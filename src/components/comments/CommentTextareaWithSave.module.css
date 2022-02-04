@@ -1,0 +1,10 @@
+.textarea {
+  width: 100%;
+}
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+.flexEnd > *:not(:first-child) {
+  margin-inline-start: var(--spacing-8);
+}
