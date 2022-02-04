@@ -1,7 +1,5 @@
 import React from "react";
-import { useRecoilState } from "recoil";
 
-import { showThreadSaveState } from "../data-model";
 import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./CommentTextareaWithSave.module.css";
@@ -14,7 +12,6 @@ export const CommentTextareaWithSave: React.FC<{
 }> = ({ autoFocus, defaultText = "", onCancel, onSubmit }) => {
   const [text, setText] = React.useState(defaultText);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const [isShowSave, setShowSave] = useRecoilState(showThreadSaveState);
 
   const handleCancel = () => {
     setText("");
@@ -43,7 +40,6 @@ export const CommentTextareaWithSave: React.FC<{
       e.currentTarget.value.length,
       e.currentTarget.value.length
     );
-    setShowSave(true);
   };
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,20 +55,14 @@ export const CommentTextareaWithSave: React.FC<{
         className={styles.textarea}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
-        onBlur={() => setShowSave(false)}
         autoFocus={autoFocus}
       />
-      {isShowSave && (
-        <div className={styles.flexEnd}>
-          <SubmitButton value="Save" disabled={!text} />
-          <Button
-            buttonType="form"
-            value="Cancel"
-            disabled={!text}
-            onClick={handleCancel}
-          />
-        </div>
-      )}
+      <div className={styles.flexEnd}>
+        <SubmitButton value="Save" disabled={!text} />
+        <Button buttonType="form" disabled={!text} onClick={handleCancel}>
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 };

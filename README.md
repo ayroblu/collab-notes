@@ -8,8 +8,7 @@ TODO
 ### MVP
 - comments
   - Focus highlights + selection highlights - make prettier?
-- delete threads
-- edit comments
+- Focus comments when cursor moves to highlight (remove the click handler)
 - "resolve" comments
 
 ### Longer term
