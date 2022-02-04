@@ -102,6 +102,9 @@ const CommentMain: React.FC<CommentData> = ({
     setIsEdit(false);
     return false;
   };
+  const onEditCancel = () => {
+    setIsEdit(false);
+  };
   const deleteComment = () => {
     const success = removeComment(roomId, roomPassword, fileName, id);
     if (!success) return;
@@ -127,6 +130,7 @@ const CommentMain: React.FC<CommentData> = ({
       dateUpdated={dateUpdated}
       isEdit={isEdit}
       onEditSubmit={onEditSubmit}
+      onEditCancel={onEditCancel}
     />
   );
 };

@@ -34,6 +34,9 @@ const ThreadItem: React.FC<ThreadData> = ({
   const [isEdit, setIsEdit] = React.useState(false);
   const { fileName, roomId, roomPassword } = useFileParams();
 
+  const onEditCancel = () => {
+    setIsEdit(false);
+  };
   const onEditSubmit = (text: string) => {
     editThread({
       roomId,
@@ -68,6 +71,7 @@ const ThreadItem: React.FC<ThreadData> = ({
       options={options}
       isEdit={isEdit}
       onEditSubmit={onEditSubmit}
+      onEditCancel={onEditCancel}
     />
   );
 };

@@ -16,11 +16,13 @@ type CommentEntryItemProps = {
   text: string;
   isEdit: boolean;
   onEditSubmit: (text: string) => boolean;
+  onEditCancel: () => void;
 };
 export const CommentEntryItem: React.FC<CommentEntryItemProps> = ({
   byName,
   dateUpdated,
   isEdit,
+  onEditCancel,
   onEditSubmit,
   options,
   text,
@@ -48,6 +50,7 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = ({
           onSubmit={onEditSubmit}
           defaultText={text}
           autoFocus
+          onCancel={onEditCancel}
         />
       ) : (
         <p className={styles.text}>{text}</p>

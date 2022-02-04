@@ -2,7 +2,7 @@ import React from "react";
 import { useRecoilState } from "recoil";
 
 import { showThreadSaveState } from "../data-model";
-import { SubmitButton } from "../shared/Button";
+import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./CommentTextareaWithSave.module.css";
 
@@ -10,11 +10,17 @@ export const CommentTextareaWithSave: React.FC<{
   onSubmit: (text: string) => boolean;
   defaultText?: string;
   autoFocus?: boolean;
-}> = ({ autoFocus, defaultText = "", onSubmit }) => {
+  onCancel?: () => void;
+}> = ({ autoFocus, defaultText = "", onCancel, onSubmit }) => {
   const [text, setText] = React.useState(defaultText);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const [isShowSave, setShowSave] = useRecoilState(showThreadSaveState);
 
+  const handleCancel = () => {
+    setText("");
+    textareaRef.current?.blur();
+    onCancel?.();
+  };
   const handleSubmit = () => {
     const isSuccess = onSubmit(text);
     if (isSuccess) {
@@ -32,6 +38,13 @@ export const CommentTextareaWithSave: React.FC<{
         }
     }
   };
+  const onFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    e.currentTarget.setSelectionRange(
+      e.currentTarget.value.length,
+      e.currentTarget.value.length
+    );
+    setShowSave(true);
+  };
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSubmit();
@@ -45,13 +58,19 @@ export const CommentTextareaWithSave: React.FC<{
         placeholder="Reply to comment"
         className={styles.textarea}
         onKeyDown={handleKeyDown}
-        onFocus={() => setShowSave(true)}
+        onFocus={onFocus}
         onBlur={() => setShowSave(false)}
         autoFocus={autoFocus}
       />
       {isShowSave && (
         <div className={styles.flexEnd}>
           <SubmitButton value="Save" disabled={!text} />
+          <Button
+            buttonType="form"
+            value="Cancel"
+            disabled={!text}
+            onClick={handleCancel}
+          />
         </div>
       )}
     </form>
