@@ -35,7 +35,7 @@ export const CommentButton: React.FC<CommentButtonProps> = ({
       style={{
         top: offsetTop,
       }}
-      onClick={() => selection && onClick(selection)}
+      onClick={() => onClick(selection)}
     >
       <VscComment />
     </button>

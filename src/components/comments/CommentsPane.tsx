@@ -72,7 +72,7 @@ export const CommentsPane: React.FC = () => {
     delete commentRefs.current[commentId];
     // TODO: setFocusCommentId
     setFocusCommentId(null);
-    setFocusCommentIsActive(true);
+    setFocusCommentIsActive(false);
   };
   return (
     <section
