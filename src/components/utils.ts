@@ -17,8 +17,8 @@ export const useRoom = () => {
 };
 
 export const useFileName = () => {
-  const room = useRoom();
-  return useRecoilValue(activeFileNameState(getNonNullable(room).id));
+  const activeRoomId = useRecoilValue(activeRoomIdSelector);
+  return useRecoilValue(activeFileNameState(activeRoomId));
 };
 
 export const useFileParams = () => {
@@ -36,30 +36,30 @@ export const useFileParams = () => {
 };
 
 export const useFileNameState = () => {
-  const room = useRoom();
-  return useRecoilState(activeFileNameState(getNonNullable(room).id));
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  return useRecoilState(activeFileNameState(roomId));
 };
 
 export const useComments = () => {
   const fileName = useFileName();
-  const room = useRoom();
-  return useRecoilValue(
-    commentsState({ fileName, roomId: getNonNullable(room).id })
-  );
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  return useRecoilValue(commentsState({ fileName, roomId }));
 };
 
 export const useSetComments = () => {
   const fileName = useFileName();
-  const room = useRoom();
-  return useSetRecoilState(
-    commentsState({ fileName, roomId: getNonNullable(room).id })
-  );
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  return useSetRecoilState(commentsState({ fileName, roomId }));
 };
 
 export const useFocusCommentIdState = () => {
   const fileName = useFileName();
-  const room = useRoom();
-  return useRecoilState(
-    focusCommentIdState({ fileName, roomId: getNonNullable(room).id })
-  );
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  return useRecoilState(focusCommentIdState({ fileName, roomId }));
+};
+
+export const useSetFocusCommentIdState = () => {
+  const fileName = useFileName();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  return useSetRecoilState(focusCommentIdState({ fileName, roomId }));
 };

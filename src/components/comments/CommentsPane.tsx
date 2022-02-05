@@ -10,8 +10,8 @@ import { inProgressCommentsSelector, settingsSelector } from "../data-model";
 import {
   useComments,
   useFileName,
-  useFocusCommentIdState,
   useRoom,
+  useSetFocusCommentIdState,
 } from "../utils";
 
 import { AddComment } from "./AddComment";
@@ -24,7 +24,7 @@ import { useEditorScrollSync } from "./useEditorScrollSync";
 
 export const CommentsPane: React.FC = () => {
   const settings = useRecoilValue(settingsSelector);
-  const [, setFocusCommentId] = useFocusCommentIdState();
+  const setFocusCommentId = useSetFocusCommentIdState();
   const { commentRefs } = React.useContext(CommentsContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
     inProgressCommentsSelector

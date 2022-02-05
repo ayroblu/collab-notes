@@ -28,7 +28,6 @@ import "./Editor.css";
 import styles from "./Editor.module.css";
 import {
   useCommentDecorations,
-  useCommentDecorationsClick,
   useCommentDecorationsHover,
   useSelectionHandler,
 } from "./useCommentHighlights";
