@@ -1,15 +1,20 @@
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
-import { getComments } from "@/modules/documents";
+import { createComment, getComments } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents";
 
 import { CommentsContext } from "../Contexts";
-import { inProgressCommentsSelector, settingsSelector } from "../data-model";
+import {
+  focusCommentIsActiveState,
+  inProgressCommentsSelector,
+  settingsSelector,
+} from "../data-model";
 import {
   useComments,
   useFileName,
+  useFileParams,
   useRoom,
   useSetFocusCommentIdState,
 } from "../utils";
@@ -30,10 +35,13 @@ export const CommentsPane: React.FC = () => {
     inProgressCommentsSelector
   );
   const comments = useComments();
-  const createComment = useCreateComment();
+  const { fileName, roomId, roomPassword } = useFileParams();
   const { extraOffset, offsets, scrollOffset } = useCommentOffsets();
   const { editorDivHeight, editorHeight } = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
+  const setFocusCommentIsActive = useSetRecoilState(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
   useEditorScrollSync(commentsPaneRef, extraOffset, scrollOffset);
 
   const addInProgressComment = (selection: SelectionRange) => {
@@ -49,19 +57,22 @@ export const CommentsPane: React.FC = () => {
     };
     setInProgressComments([...inProgressComments, comment]);
     setFocusCommentId(comment.id);
+    setFocusCommentIsActive(true);
   };
   const createCommentFn = (comment: CommentData) => () => {
     setInProgressComments(
       inProgressComments.filter(({ id }) => comment.id !== id)
     );
-    createComment && createComment(comment);
+    createComment(roomId, roomPassword, fileName, comment);
   };
   const cancelCommentFn = (commentId: string) => () => {
     setInProgressComments(
       inProgressComments.filter(({ id }) => id !== commentId)
     );
     delete commentRefs.current[commentId];
+    // TODO: setFocusCommentId
     setFocusCommentId(null);
+    setFocusCommentIsActive(true);
   };
   return (
     <section

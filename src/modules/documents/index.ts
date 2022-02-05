@@ -152,6 +152,23 @@ export function getComments(
   if (!file) return;
   return getYFileComments(file);
 }
+export function createComment(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  comment: CommentData
+) {
+  const yComments = getComments(roomId, roomPassword, fileName);
+  if (!yComments) return;
+  const now = new Date().toISOString();
+  yComments.push([
+    {
+      ...comment,
+      dateCreated: now,
+      dateUpdated: now,
+    },
+  ]);
+}
 export function editComment(
   roomId: string,
   roomPassword: string,
