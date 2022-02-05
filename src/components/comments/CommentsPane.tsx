@@ -2,7 +2,7 @@ import React from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
-import { createComment, getComments } from "@/modules/documents";
+import { createComment } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents";
 
 import { CommentsContext } from "../Contexts";
@@ -13,9 +13,7 @@ import {
 } from "../data-model";
 import {
   useComments,
-  useFileName,
   useFileParams,
-  useRoom,
   useSetFocusCommentIdState,
 } from "../utils";
 
@@ -26,6 +24,7 @@ import styles from "./CommentsPane.module.css";
 import { useCommentOffsets } from "./useCommentOffsets";
 import { useEditorHeight } from "./useEditorHeight";
 import { useEditorScrollSync } from "./useEditorScrollSync";
+import { getNearestCommentId } from "./utils";
 
 export const CommentsPane: React.FC = () => {
   const settings = useRecoilValue(settingsSelector);
@@ -69,10 +68,15 @@ export const CommentsPane: React.FC = () => {
     setInProgressComments(
       inProgressComments.filter(({ id }) => id !== commentId)
     );
-    delete commentRefs.current[commentId];
-    // TODO: setFocusCommentId
-    setFocusCommentId(null);
+    setFocusCommentId(
+      getNearestCommentId(
+        commentRefs.current,
+        comments.concat(inProgressComments).map(({ id }) => id),
+        commentId
+      )
+    );
     setFocusCommentIsActive(false);
+    delete commentRefs.current[commentId];
   };
   return (
     <section
@@ -106,25 +110,4 @@ export const CommentsPane: React.FC = () => {
       />
     </section>
   );
-};
-
-const useCreateComment = () => {
-  const settings = useRecoilValue(settingsSelector);
-  const room = useRoom();
-  const fileName = useFileName();
-  if (!room) return;
-  const yComments = getComments(room.id, room.password, fileName);
-  if (!yComments) return;
-  return (comment: CommentData) => {
-    const now = new Date().toISOString();
-    yComments.push([
-      {
-        ...comment,
-        byId: settings.id,
-        byName: settings.name,
-        dateCreated: now,
-        dateUpdated: now,
-      },
-    ]);
-  };
 };

@@ -2,7 +2,6 @@ import React from "react";
 import { useRecoilValue } from "recoil";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
-import { sortBy } from "@/modules/utils";
 
 import { CommentsContext } from "../Contexts";
 import {
@@ -13,6 +12,8 @@ import {
   showThreadSaveState,
 } from "../data-model";
 import { useComments, useFocusCommentIdState } from "../utils";
+
+import { getCommentDetails } from "./utils";
 
 const commentGap = 8;
 export const useCommentOffsets = () => {
@@ -32,15 +33,10 @@ export const useCommentOffsets = () => {
   );
 
   React.useEffect(() => {
-    const commentIdsSet = new Set(
-      comments
-        .map(({ id }) => id)
-        .concat(inProgressComments.map(({ id }) => id))
+    const commentDetails = getCommentDetails(
+      commentRefs.current,
+      comments.concat(inProgressComments).map(({ id }) => id)
     );
-    const commentDetails = Object.entries(commentRefs.current)
-      .map(([id, { el, height, top }]) => ({ id, el, top, height }))
-      .filter(({ id }) => commentIdsSet.has(id))
-      .sort(sortBy([({ top }) => top], ["asc"]));
 
     updateOffsets({
       commentDetails,

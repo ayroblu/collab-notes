@@ -10,9 +10,11 @@ import {
   activeFileNameState,
   activeRoomIdSelector,
   focusCommentIsActiveState,
+  inProgressCommentsSelector,
   settingsSelector,
 } from "../data-model";
 import {
+  useComments,
   useFileName,
   useFileParams,
   useFocusCommentIdState,
@@ -23,6 +25,7 @@ import styles from "./Comment.module.css";
 import { CommentEntryItem } from "./CommentEntryItem";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 import { CommentThread } from "./CommentThread";
+import { getNearestCommentId } from "./utils";
 
 type Props = CommentData & {
   offset: number | undefined;
@@ -141,6 +144,8 @@ const CommentMain: React.FC<CommentData> = ({
   const setFocusCommentIsActive = useSetRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
+  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
+  const comments = useComments();
 
   const onEditSubmit = (text: string) => {
     editComment(roomId, roomPassword, fileName, id, text);
@@ -155,8 +160,13 @@ const CommentMain: React.FC<CommentData> = ({
     if (!success) return;
 
     if (focusCommentId === id) {
-      // TODO: get next closest comment id
-      setFocusCommentId(null);
+      setFocusCommentId(
+        getNearestCommentId(
+          commentRefs.current,
+          comments.concat(inProgressComments).map(({ id }) => id),
+          id
+        )
+      );
       setFocusCommentIsActive(false);
     }
     delete commentRefs.current[id];

@@ -11,7 +11,7 @@ export const EditorContext = React.createContext<EditorContext>({} as any);
 type CommentsContext = {
   commentRefs: React.MutableRefObject<{ [key: string]: CommentLayout }>;
 };
-type CommentLayout = {
+export type CommentLayout = {
   el: HTMLElement;
   height: number;
   top: number;

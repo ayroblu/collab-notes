@@ -220,7 +220,9 @@ export const useCommentDecorations = () => {
     const { dispose } = editor.onDidChangeModelDecorations(() => {
       clearTimeout(commentsThrottleTimeoutId);
       commentsThrottleTimeoutId = window.setTimeout(() => {
-        const decorations = editor.getModel()!.getAllDecorations();
+        const model = editor.getModel();
+        if (!model) return;
+        const decorations = model.getAllDecorations();
         decorations
           .map(({ options, range }) => ({
             commentId: options.className
