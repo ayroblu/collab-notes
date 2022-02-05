@@ -16,7 +16,7 @@
 .headingDate {
   font-size: 0.5rem;
 }
-.text {
+.main {
   margin-block-start: var(--spacing-8);
   margin-block-end: var(--spacing-8);
 }

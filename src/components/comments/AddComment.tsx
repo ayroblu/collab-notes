@@ -1,15 +1,13 @@
 import React from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
-import type { SelectionRange } from "@/modules/documents";
-import { cn, nonNullable } from "@/modules/utils";
-
-import { CommentsContext, EditorContext } from "../Contexts";
-import { inProgressCommentSelector } from "../data-model";
+import { inProgressCommentSelector, settingsSelector } from "../data-model";
 import { Button, SubmitButton } from "../shared/Button";
-import { useFileName, useFocusCommentIdState } from "../utils";
+import { useFileName } from "../utils";
 
 import styles from "./AddComment.module.css";
+import { CommentHolder } from "./Comment";
+import { CommentHeading } from "./CommentEntryItem";
 
 type AddCommentProps = {
   offset: number | undefined;
@@ -23,12 +21,11 @@ export const AddComment: React.FC<AddCommentProps> = ({
   onCancel,
   onSubmit,
 }) => {
-  const { commentRefs } = React.useContext(CommentsContext);
-  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
   const fileName = useFileName();
   const [comment, setComment] = useRecoilState(
     inProgressCommentSelector({ fileName, commentId: id })
   );
+  const settings = useRecoilValue(settingsSelector);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit();
@@ -36,14 +33,6 @@ export const AddComment: React.FC<AddCommentProps> = ({
   const handleCancel = () => {
     onCancel();
   };
-  const position = usePosition(comment.selection);
-  const offsetTop =
-    nonNullable(position) && nonNullable(offset)
-      ? position + offset
-      : nonNullable(position)
-      ? position
-      : undefined;
-
   const onBlur = () => {
     if (!comment.text) {
       handleCancel();
@@ -61,24 +50,9 @@ export const AddComment: React.FC<AddCommentProps> = ({
   };
 
   return (
-    <section
-      className={cn(styles.addComment, focusCommentId === id && styles.focus)}
-      ref={(r) =>
-        r &&
-        typeof position === "number" &&
-        (commentRefs.current[id] = {
-          el: r,
-          top: position,
-          height: r.getBoundingClientRect().height,
-        })
-      }
-      style={{
-        transform: `translateY(${offsetTop}px)`,
-        display: !nonNullable(position) ? "none" : undefined,
-      }}
-      onClick={() => setFocusCommentId(id)}
-    >
-      <form onSubmit={handleSubmit}>
+    <CommentHolder id={id} offset={offset} selection={comment.selection}>
+      <CommentHeading byName={settings.name} />
+      <form onSubmit={handleSubmit} className={styles.main}>
         <textarea
           className={styles.textarea}
           value={comment.text}
@@ -96,18 +70,6 @@ export const AddComment: React.FC<AddCommentProps> = ({
           </Button>
         </div>
       </form>
-    </section>
+    </CommentHolder>
   );
-};
-
-const usePosition = (selection: SelectionRange) => {
-  const { editorRef } = React.useContext(EditorContext);
-  const editor = editorRef.current;
-  if (!editor) return;
-
-  const top = editor.getTopForPosition(
-    selection.startLineNumber,
-    selection.startColumn
-  );
-  return top - 12;
 };

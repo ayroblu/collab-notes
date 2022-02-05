@@ -29,7 +29,37 @@ type Props = CommentData & {
 };
 
 export const Comment: React.FC<Props> = (comment) => {
-  const { id, offset, selection } = comment;
+  const { id } = comment;
+  const [focusCommentId] = useFocusCommentIdState();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const [focusCommentIsActive] = useRecoilState(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
+  const isFocusComment = focusCommentId === id;
+  const isActiveComment = focusCommentIsActive && isFocusComment;
+
+  return (
+    <CommentHolder {...comment}>
+      <CommentMain {...comment} />
+      <CommentThread commentId={id} />
+      {isActiveComment && <div className={styles.ruledLine} />}
+      {isActiveComment && <CommentAddThread commentId={id} />}
+    </CommentHolder>
+  );
+};
+
+type CommentHolderProps = {
+  id: string;
+  offset: number | undefined;
+  selection: SelectionRange;
+};
+export const CommentHolder: React.FC<CommentHolderProps> = ({
+  children,
+  id,
+  offset,
+  selection,
+}) => {
   const { commentRefs } = React.useContext(CommentsContext);
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
   const roomId = useRecoilValue(activeRoomIdSelector);
@@ -69,10 +99,7 @@ export const Comment: React.FC<Props> = (comment) => {
         setFocusCommentIsActive(true);
       }}
     >
-      <CommentMain {...comment} />
-      <CommentThread commentId={id} />
-      {isActiveComment && <div className={styles.ruledLine} />}
-      {isActiveComment && <CommentAddThread commentId={id} />}
+      {children}
     </section>
   );
 };

@@ -1,19 +1,3 @@
-.addComment {
-  padding: var(--spacing-8);
-  margin-inline-start: var(--spacing-40);
-  background-color: var(--main-background-color);
-  border-radius: var(--button-border-radius);
-  position: absolute;
-  inset-inline-start: var(--spacing-8);
-  inset-inline-end: var(--spacing-8);
-  border: 1px solid var(--fade-color);
-  top: 0;
-}
-@media screen and (prefers-reduced-motion: no-preference) {
-  .addComment {
-    transition: transform 0.2s;
-  }
-}
 .textarea {
   width: 100%;
 }
@@ -24,6 +8,7 @@
 .flexEnd > *:not(:first-child) {
   margin-inline-start: var(--spacing-8);
 }
-.focus {
-  border: 1px solid var(--text-color);
+.main {
+  margin-block-start: var(--spacing-8);
+  margin-block-end: var(--spacing-8);
 }

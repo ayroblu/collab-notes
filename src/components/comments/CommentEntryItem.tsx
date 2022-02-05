@@ -10,9 +10,9 @@ import styles from "./CommentEntryItem.module.css";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 
 type CommentEntryItemProps = {
-  options: MenuOption[];
+  options?: MenuOption[];
   byName: string;
-  dateUpdated: string;
+  dateUpdated?: string;
   text: string;
   isEdit: boolean;
   onEditSubmit: (text: string) => boolean;
@@ -27,10 +27,12 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = ({
   options,
   text,
 }) => {
-  const formatedDate = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(dateUpdated));
+  const formatedDate =
+    dateUpdated &&
+    new Intl.DateTimeFormat("en-GB", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(dateUpdated));
   return (
     <section>
       <div className={styles.heading}>
@@ -38,23 +40,63 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = ({
           <FacePileFace color={getHashColor(byName)} name={byName} />
           <div className={styles.reduced}>
             <h4 className={styles.userNameHeading}>{byName}</h4>
-            <p className={styles.headingDate}>{formatedDate}</p>
+            {formatedDate && (
+              <p className={styles.headingDate}>{formatedDate}</p>
+            )}
           </div>
         </div>
+        {options && (
+          <div>
+            <Menu options={options} />
+          </div>
+        )}
+      </div>
+      <div className={styles.main}>
+        {isEdit ? (
+          <CommentTextareaWithSave
+            onSubmit={onEditSubmit}
+            defaultText={text}
+            autoFocus
+            onCancel={onEditCancel}
+          />
+        ) : (
+          <span>{text}</span>
+        )}
+      </div>
+    </section>
+  );
+};
+
+type CommentHeadingProps = {
+  byName: string;
+  dateUpdated?: string;
+  options?: MenuOption[];
+};
+export const CommentHeading: React.FC<CommentHeadingProps> = ({
+  byName,
+  dateUpdated,
+  options,
+}) => {
+  const formatedDate =
+    dateUpdated &&
+    new Intl.DateTimeFormat("en-GB", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(dateUpdated));
+  return (
+    <div className={styles.heading}>
+      <div className={styles.userHeading}>
+        <FacePileFace color={getHashColor(byName)} name={byName} />
+        <div className={styles.reduced}>
+          <h4 className={styles.userNameHeading}>{byName}</h4>
+          {formatedDate && <p className={styles.headingDate}>{formatedDate}</p>}
+        </div>
+      </div>
+      {options?.length && (
         <div>
           <Menu options={options} />
         </div>
-      </div>
-      {isEdit ? (
-        <CommentTextareaWithSave
-          onSubmit={onEditSubmit}
-          defaultText={text}
-          autoFocus
-          onCancel={onEditCancel}
-        />
-      ) : (
-        <p className={styles.text}>{text}</p>
       )}
-    </section>
+    </div>
   );
 };
