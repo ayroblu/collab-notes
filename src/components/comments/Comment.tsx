@@ -6,7 +6,12 @@ import type { CommentData, SelectionRange } from "@/modules/documents/types";
 import { cn, nonNullable } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
-import { settingsSelector } from "../data-model";
+import {
+  activeFileNameState,
+  activeRoomIdSelector,
+  focusCommentIsActiveState,
+  settingsSelector,
+} from "../data-model";
 import {
   useFileName,
   useFileParams,
@@ -27,15 +32,21 @@ export const Comment: React.FC<Props> = (comment) => {
   const { id, offset, selection } = comment;
   const { commentRefs } = React.useContext(CommentsContext);
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const focusCommentIsActive = useRecoilValue(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
   const position = usePosition(selection);
   const offsetTop =
     nonNullable(position) && nonNullable(offset)
       ? position + offset
       : nonNullable(position)
       ? position
-      : undefined;
-
+      : 0;
   const isFocusComment = focusCommentId === id;
+  const offsetLeft = focusCommentIsActive && isFocusComment ? "-32px" : "0";
+
   return (
     <section
       ref={(r) =>
@@ -47,9 +58,13 @@ export const Comment: React.FC<Props> = (comment) => {
           height: r.getBoundingClientRect().height,
         })
       }
-      className={cn(styles.comment, focusCommentId === id && styles.focus)}
+      className={cn(
+        styles.comment,
+        focusCommentId === id && styles.focus,
+        focusCommentIsActive && styles.active
+      )}
       style={{
-        transform: `translateY(${offsetTop}px)`,
+        transform: `translate(${offsetLeft}, ${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
       }}
       onClick={() => setFocusCommentId(id)}

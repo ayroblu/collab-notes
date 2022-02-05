@@ -30,6 +30,7 @@ import {
   useCommentDecorations,
   useCommentDecorationsClick,
   useCommentDecorationsHover,
+  useSelectionHandler,
 } from "./useCommentHighlights";
 
 export const Editor: React.FC = () => {
@@ -111,7 +112,7 @@ function useMonacoEditor(
   }, [fileName, isNewUser, room, setIsNewUser]);
   useCommentDecorations();
   useCommentDecorationsHover();
-  useCommentDecorationsClick();
+  useSelectionHandler();
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -227,7 +228,7 @@ function setupYjsMonacoCursorData(
       }
     );
     const tempCursorStyles = cursorData
-      .filter(({ clientId }) => updated.includes(`${clientId  }`))
+      .filter(({ clientId }) => updated.includes(`${clientId}`))
       .map(
         ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
       );

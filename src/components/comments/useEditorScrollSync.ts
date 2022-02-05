@@ -12,6 +12,7 @@ export const useEditorScrollSync = (
   const { editorRef } = React.useContext(EditorContext);
   const lastEditorScrollRef = React.useRef<string | null>(null);
   const lastCommentsPaneScrollRef = React.useRef<string | null>(null);
+  const lastSmoothScrollRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     // When the editor scrolls, reflect in the CommentsPane
@@ -24,7 +25,10 @@ export const useEditorScrollSync = (
     const { dispose } = editor.onDidScrollChange((e) => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        if (!getIsRecent(lastCommentsPaneScrollRef.current, 100)) {
+        if (
+          !getIsRecent(lastCommentsPaneScrollRef.current, 100) &&
+          !getIsRecent(lastSmoothScrollRef.current, 500)
+        ) {
           commentsPane.scrollTop = e.scrollTop + extraOffset + scrollOffset;
           lastEditorScrollRef.current = new Date().toISOString();
         }
@@ -46,7 +50,10 @@ export const useEditorScrollSync = (
     const handler = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        if (!getIsRecent(lastEditorScrollRef.current, 100)) {
+        if (
+          !getIsRecent(lastEditorScrollRef.current, 100) &&
+          !getIsRecent(lastSmoothScrollRef.current, 500)
+        ) {
           editor.setScrollTop(
             commentsPane.scrollTop - extraOffset - scrollOffset
           );
@@ -69,7 +76,11 @@ export const useEditorScrollSync = (
     const commentsPane = commentsPaneRef.current;
     if (!editor) return;
     if (!commentsPane) return;
-    commentsPane.scrollTop = editor.getScrollTop() + extraOffset + scrollOffset;
+    commentsPane.scroll({
+      top: editor.getScrollTop() + extraOffset + scrollOffset,
+      behavior: "smooth",
+    });
+    lastSmoothScrollRef.current = new Date().toISOString();
   }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
 };
 

@@ -121,6 +121,14 @@ export const focusCommentIdState = atomFamily<
   default: () => null,
 });
 
+export const focusCommentIsActiveState = atomFamily<
+  boolean,
+  { fileName: string; roomId: string }
+>({
+  key: "focusCommentIsActiveState",
+  default: () => false,
+});
+
 export const threadState = atomFamily<
   ThreadData[],
   { fileName: string; roomId: string; commentId: string }

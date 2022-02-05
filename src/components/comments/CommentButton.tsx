@@ -1,11 +1,18 @@
 import React from "react";
 import { VscComment } from "react-icons/vsc";
+import { useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 import type { SelectionRange } from "@/modules/documents";
+import { nonNullable } from "@/modules/utils";
 
 import { EditorContext } from "../Contexts";
+import {
+  activeFileNameState,
+  activeRoomIdSelector,
+  focusCommentIsActiveState,
+} from "../data-model";
 
 import styles from "./CommentButton.module.css";
 
@@ -17,14 +24,16 @@ export const CommentButton: React.FC<CommentButtonProps> = ({
   offset,
   onClick,
 }) => {
-  const { position, selection } = useShowCommentButton();
-  const offsetTop = (position ?? 0) + offset;
+  const showComment = useShowCommentButton();
+  if (!showComment) return null;
+  const { position, selection } = showComment;
+
+  const offsetTop = position + offset;
   return (
     <button
       className={styles.commentButton}
       style={{
         top: offsetTop,
-        display: position === null ? "none" : undefined,
       }}
       onClick={() => selection && onClick(selection)}
     >
@@ -34,6 +43,22 @@ export const CommentButton: React.FC<CommentButtonProps> = ({
 };
 
 const useShowCommentButton = () => {
+  const { position, selection } = useSelectionPosition();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const focusCommentIsActive = useRecoilValue(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
+  if (
+    nonNullable(selection) &&
+    nonNullable(position) &&
+    !focusCommentIsActive
+  ) {
+    return { selection, position };
+  }
+  return null;
+};
+const useSelectionPosition = () => {
   const { editorRef } = React.useContext(EditorContext);
   const [position, setPosition] = React.useState<number | null>(null);
   const [selection, setSelection] = React.useState<SelectionRange | null>(null);
@@ -42,14 +67,6 @@ const useShowCommentButton = () => {
   React.useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
-    const { dispose: disposeBlur } = editor.onDidBlurEditorText(() => {
-      setTimeout(() => {
-        if (getIsMounted()) {
-          setPosition(null);
-          setSelection(null);
-        }
-      }, 100);
-    });
     const { dispose } = editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection;
       if (
@@ -77,7 +94,6 @@ const useShowCommentButton = () => {
     });
     return () => {
       dispose();
-      disposeBlur();
     };
   }, [editorRef, getIsMounted]);
   return { position, selection };

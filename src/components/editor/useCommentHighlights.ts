@@ -4,7 +4,7 @@ import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { getComments, getRoom } from "@/modules/documents";
-import type { CommentData } from "@/modules/documents";
+import type { CommentData, SelectionRange } from "@/modules/documents";
 import { cn } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
@@ -12,6 +12,7 @@ import {
   activeFileNameState,
   activeRoomIdSelector,
   focusCommentIdState,
+  focusCommentIsActiveState,
   inProgressCommentsSelector,
 } from "../data-model";
 import { useComments, useRoom } from "../utils";
@@ -62,40 +63,6 @@ function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
     e.clientY < r.bottom;
   return isIn;
 }
-export const useCommentDecorationsClick = () => {
-  const { commentRefs } = React.useContext(CommentsContext);
-  const comments = useComments();
-  const roomId = useRecoilValue(activeRoomIdSelector);
-  const fileName = useRecoilValue(activeFileNameState(roomId));
-  const setFocusCommentId = useSetRecoilState(
-    focusCommentIdState({ fileName, roomId })
-  );
-  React.useEffect(() => {
-    let rafId = 0;
-    const click = (e: MouseEvent) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        [...document.querySelectorAll(`.${styles.selection}`)].forEach((v) => {
-          const isIn = isMouseInDOMRect(e, v.getBoundingClientRect());
-
-          const classes = [...v.classList];
-          const commentClass = classes.find((c) => c.startsWith("comment-"));
-          if (!commentClass) return;
-          const commentId = commentClass.replace("comment-", "");
-          const el = commentRefs.current[commentId]?.el;
-          if (!el) return;
-          if (isIn) {
-            setFocusCommentId(commentId);
-          }
-        });
-      });
-    };
-    document.body.addEventListener("click", click);
-    return () => {
-      document.body.removeEventListener("click", click);
-    };
-  }, [commentRefs, comments, setFocusCommentId]);
-};
 // const useCommentHighlights = () => {
 //   const { commentRefs, comments } = React.useContext(CommentsContext);
 //   const { editorRef } = React.useContext(EditorContext);
@@ -140,6 +107,64 @@ export const useCommentDecorationsClick = () => {
 //     };
 //   }, [comments]);
 // };
+export const useSelectionHandler = () => {
+  const { editorRef } = React.useContext(EditorContext);
+  const comments = useComments();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const setFocusCommentId = useSetRecoilState(
+    focusCommentIdState({ fileName, roomId })
+  );
+  const setFocusCommentIsActive = useSetRecoilState(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
+  const editor = editorRef.current;
+  React.useEffect(() => {
+    let rafId = 0;
+    if (!editor) return;
+    const { dispose } = editor.onDidChangeCursorSelection((e) => {
+      const sel = e.selection;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const foundComment = comments.find(({ selection }) =>
+          cursorInSelection(selection, sel.startLineNumber, sel.startColumn)
+        );
+        if (foundComment) {
+          if (
+            cursorInSelection(
+              foundComment.selection,
+              sel.startLineNumber,
+              sel.endColumn
+            )
+          ) {
+            setFocusCommentId(foundComment.id);
+            setFocusCommentIsActive(true);
+          } else {
+            setFocusCommentIsActive(false);
+          }
+        } else {
+          setFocusCommentIsActive(false);
+        }
+      });
+    });
+    return () => {
+      dispose();
+    };
+  }, [comments, editor, setFocusCommentId, setFocusCommentIsActive]);
+};
+
+function cursorInSelection(
+  selection: SelectionRange,
+  lineNumber: number,
+  columnNumber: number
+) {
+  return (
+    selection.startLineNumber <= lineNumber &&
+    selection.endLineNumber >= lineNumber &&
+    selection.startColumn <= columnNumber &&
+    selection.endColumn >= columnNumber
+  );
+}
 
 export const useCommentDecorations = () => {
   const { editorRef } = React.useContext(EditorContext);
@@ -185,7 +210,7 @@ export const useCommentDecorations = () => {
       setDecorations((decorations) =>
         editor.deltaDecorations(decorations, newDecorations)
       );
-    }, 100);
+    }, 500);
   }, [inProgressComments, comments, editorRef, focusCommentId]);
 
   const editor = editorRef.current;
