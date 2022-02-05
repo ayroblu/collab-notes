@@ -10,6 +10,7 @@ TODO
   - Focus highlights + selection highlights - make prettier?
 - Focus comments when cursor moves to highlight (remove the click handler)
 - "resolve" comments - menu?
+- save current cursor and scroll state
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!

@@ -192,11 +192,7 @@ export const useCommentDecorations = () => {
           ),
           options: {
             // inlineClassName: cn(styles.selection, `comment-${id}`),
-            className: cn(
-              styles.selection,
-              id === focusCommentId && styles.selectionFocus,
-              `comment-${id}`
-            ),
+            className: cn(styles.selection, `comment-${id}`),
             hoverMessage: { value: text },
           },
         })
@@ -266,3 +262,40 @@ export const useCommentDecorations = () => {
 };
 let timeoutId = 0;
 let commentsThrottleTimeoutId = 0;
+
+export const useCommentHighlightActive = () => {
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const focusCommentId = useRecoilValue(
+    focusCommentIdState({ fileName, roomId })
+  );
+  const oldFocusCommentIdRef = React.useRef<string | null>(null);
+  const focusCommentIsActive = useRecoilValue(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
+
+  React.useEffect(() => {
+    const highlight = document.querySelector(
+      `.${styles.selection}.comment-${focusCommentId}`
+    );
+    if (highlight) {
+      if (focusCommentIsActive) {
+        highlight.classList.add(styles.selectionFocus);
+      } else {
+        highlight.classList.remove(styles.selectionFocus);
+      }
+    }
+    const oldCommentId = oldFocusCommentIdRef.current;
+    if (oldCommentId !== focusCommentId) {
+      if (oldCommentId) {
+        const highlight = document.querySelector(
+          `.${styles.selection}.comment-${oldCommentId}`
+        );
+        if (highlight) {
+          highlight.classList.remove(styles.selectionFocus);
+        }
+      }
+      oldFocusCommentIdRef.current = focusCommentId;
+    }
+  }, [focusCommentId, focusCommentIsActive]);
+};

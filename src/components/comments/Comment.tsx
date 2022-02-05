@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { addThread, editComment, removeComment } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
@@ -34,7 +34,7 @@ export const Comment: React.FC<Props> = (comment) => {
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
-  const focusCommentIsActive = useRecoilValue(
+  const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
   const position = usePosition(selection);
@@ -45,7 +45,8 @@ export const Comment: React.FC<Props> = (comment) => {
       ? position
       : 0;
   const isFocusComment = focusCommentId === id;
-  const offsetLeft = focusCommentIsActive && isFocusComment ? "-32px" : "0";
+  const isActiveComment = focusCommentIsActive && isFocusComment;
+  const offsetLeft = isActiveComment ? "-32px" : "0";
 
   return (
     <section
@@ -58,21 +59,20 @@ export const Comment: React.FC<Props> = (comment) => {
           height: r.getBoundingClientRect().height,
         })
       }
-      className={cn(
-        styles.comment,
-        focusCommentId === id && styles.focus,
-        focusCommentIsActive && styles.active
-      )}
+      className={cn(styles.comment, focusCommentId === id && styles.focus)}
       style={{
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
       }}
-      onClick={() => setFocusCommentId(id)}
+      onClick={() => {
+        setFocusCommentId(id);
+        setFocusCommentIsActive(true);
+      }}
     >
       <CommentMain {...comment} />
       <CommentThread commentId={id} />
-      {isFocusComment && <div className={styles.ruledLine} />}
-      {isFocusComment && <CommentAddThread commentId={id} />}
+      {isActiveComment && <div className={styles.ruledLine} />}
+      {isActiveComment && <CommentAddThread commentId={id} />}
     </section>
   );
 };
@@ -111,6 +111,9 @@ const CommentMain: React.FC<CommentData> = ({
   const { commentRefs } = React.useContext(CommentsContext);
   const { fileName, roomId, roomPassword } = useFileParams();
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+  const setFocusCommentIsActive = useSetRecoilState(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
 
   const onEditSubmit = (text: string) => {
     editComment(roomId, roomPassword, fileName, id, text);
@@ -125,13 +128,16 @@ const CommentMain: React.FC<CommentData> = ({
     if (!success) return;
 
     if (focusCommentId === id) {
+      // TODO: get next closest comment id
       setFocusCommentId(null);
+      setFocusCommentIsActive(false);
     }
     delete commentRefs.current[id];
   };
   const onEdit = () => {
     setIsEdit(true);
     setFocusCommentId(id);
+    setFocusCommentIsActive(true);
   };
   const options = [
     { label: "Edit", onClick: onEdit },

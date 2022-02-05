@@ -5,7 +5,13 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 import { sortBy } from "@/modules/utils";
 
 import { CommentsContext } from "../Contexts";
-import { inProgressCommentsSelector, showThreadSaveState } from "../data-model";
+import {
+  activeFileNameState,
+  activeRoomIdSelector,
+  focusCommentIsActiveState,
+  inProgressCommentsSelector,
+  showThreadSaveState,
+} from "../data-model";
 import { useComments, useFocusCommentIdState } from "../utils";
 
 const commentGap = 8;
@@ -19,6 +25,11 @@ export const useCommentOffsets = () => {
   const [scrollOffset, setScrollOffset] = React.useState<number>(0);
   const getIsMounted = useIsMounted();
   const isShowThreadSave = useRecoilValue(showThreadSaveState);
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+  const focusCommentIsActive = useRecoilValue(
+    focusCommentIsActiveState({ fileName, roomId })
+  );
 
   React.useEffect(() => {
     const commentIdsSet = new Set(
@@ -46,6 +57,7 @@ export const useCommentOffsets = () => {
     commentRefs,
     getIsMounted,
     isShowThreadSave,
+    focusCommentIsActive,
   ]);
   return { offsets, extraOffset, scrollOffset };
 };

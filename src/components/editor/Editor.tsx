@@ -29,6 +29,7 @@ import styles from "./Editor.module.css";
 import {
   useCommentDecorations,
   useCommentDecorationsHover,
+  useCommentHighlightActive,
   useSelectionHandler,
 } from "./useCommentHighlights";
 
@@ -112,6 +113,7 @@ function useMonacoEditor(
   useCommentDecorations();
   useCommentDecorationsHover();
   useSelectionHandler();
+  useCommentHighlightActive();
 
   React.useEffect(() => {
     const editor = editorRef.current;
