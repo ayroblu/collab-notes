@@ -3,6 +3,7 @@ const path = require("path");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const TerserWebpackPlugin = require("terser-webpack-plugin");
 const webpack = require("webpack");
 const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
 // const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
@@ -25,16 +26,18 @@ module.exports = {
     // hot: true,
     historyApiFallback: true,
   },
-  devtool: "eval-source-map",
+  // devtool: "eval-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
       "@": path.resolve(__dirname, "src"),
+      // vs: "monaco-editor/min/vs",
+      // "monaco-editor": "monaco-editor/min/vs/editor/editor.main.js",
     },
   },
   output: {
     globalObject: "self",
-    filename: "[name].bundle.js",
+    filename: "[name].[contenthash:8].min.js",
     path: path.resolve(__dirname, "dist"),
     chunkFilename: isProduction
       ? "static/js/[name].[contenthash:8].chunk.js"
@@ -98,5 +101,20 @@ module.exports = {
   //https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
   optimization: {
     runtimeChunk: "single",
+    minimize: true,
+    // minimizer: [
+    //   new TerserWebpackPlugin({
+    //     minify: TerserWebpackPlugin.swcMinify,
+
+    //     terserOptions: {
+    //       format: {
+    //         comments: false,
+    //       },
+
+    //       compress: true,
+    //     },
+    //     extractComments: false,
+    //   }),
+    // ],
   },
 };

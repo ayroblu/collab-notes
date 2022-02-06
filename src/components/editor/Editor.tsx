@@ -41,8 +41,6 @@ import {
   useSelectionHandler,
 } from "./useCommentHighlights";
 
-import isEqual from "lodash/isEqual";
-
 export const Editor: React.FC = React.memo(() => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { editorDivRef } = React.useContext(EditorContext);
