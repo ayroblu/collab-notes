@@ -17,10 +17,12 @@ TODO
   - collapse comments
   - "resolve" comments - menu?
   - markdown comments
-- migrate to create react app
+- changing left nav removes decorations
+- no autocomplete? figure out why autocomplete always shows "loading"
+- rollback history
 
 ### Longer term
-- performance - it takes 5+ seconds to load locally!!
+- migrate to create react app
 - gdoc / gdrive sync
 - dropbox sync
 - output files
@@ -29,3 +31,4 @@ TODO
 - image uploads?
 - design language (hover v active / focused etc)
 - try have a really big editor, with normal scrolling?
+- performance
