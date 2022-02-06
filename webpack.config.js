@@ -28,6 +28,7 @@ module.exports = {
   },
   devServer: {
     // hot: true,
+    compress: true,
     historyApiFallback: true,
   },
   devtool: isDevelopment ? "eval-source-map" : undefined,
@@ -43,9 +44,9 @@ module.exports = {
     globalObject: "self",
     filename: "[name].bundle.js", // necessary for hardcoded worker names
     path: path.resolve(__dirname, "dist"),
-    chunkFilename: isProduction
-      ? "static/js/[name].[contenthash:8].chunk.js"
-      : isDevelopment && "static/js/[name].chunk.js",
+    // chunkFilename: isProduction
+    //   ? "static/js/[name].[contenthash:8].chunk.js"
+    //   : isDevelopment && "static/js/[name].chunk.js",
     clean: true,
   },
   module: {
