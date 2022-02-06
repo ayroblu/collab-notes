@@ -16,6 +16,11 @@ module.exports = {
   mode: isDevelopment ? "development" : "production",
   entry: {
     app: "./src/index.tsx",
+    // "editor.worker": "monaco-editor/min/vs/editor/editor.main.js",
+    // "json.worker": "monaco-editor/min/vs/language/json/jsonWorker",
+    // "css.worker": "monaco-editor/min/vs/language/css/cssWorker",
+    // "html.worker": "monaco-editor/min/vs/language/html/htmlWorker",
+    // "ts.worker": "monaco-editor/min/vs/language/typescript/tsWorker",
     "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
     "json.worker": "monaco-editor/esm/vs/language/json/json.worker",
     "css.worker": "monaco-editor/esm/vs/language/css/css.worker",
@@ -37,11 +42,12 @@ module.exports = {
   },
   output: {
     globalObject: "self",
-    filename: "[name].[contenthash:8].min.js",
+    filename: "[name].bundle.js", // necessary for hardcoded worker names
     path: path.resolve(__dirname, "dist"),
     chunkFilename: isProduction
       ? "static/js/[name].[contenthash:8].chunk.js"
       : isDevelopment && "static/js/[name].chunk.js",
+    clean: true,
   },
   module: {
     rules: [
@@ -102,6 +108,11 @@ module.exports = {
   optimization: {
     runtimeChunk: "single",
     minimize: true,
+    // minimizer: [
+    //   new TerserWebpackPlugin({
+    //     minify: TerserWebpackPlugin.esbuildMinify,
+    //   }),
+    // ],
     // minimizer: [
     //   new TerserWebpackPlugin({
     //     minify: TerserWebpackPlugin.swcMinify,
