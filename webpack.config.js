@@ -3,6 +3,7 @@ const path = require("path");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const webpack = require("webpack");
 const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
@@ -13,23 +14,9 @@ const swSrc = "./src/service-worker.ts";
 
 module.exports = {
   mode: isDevelopment ? "development" : "production",
-  entry: {
-    app: "./src/index.tsx",
-    // "editor.worker": "monaco-editor/min/vs/editor/editor.main.js",
-    // "json.worker": "monaco-editor/min/vs/language/json/jsonWorker",
-    // "css.worker": "monaco-editor/min/vs/language/css/cssWorker",
-    // "html.worker": "monaco-editor/min/vs/language/html/htmlWorker",
-    // "ts.worker": "monaco-editor/min/vs/language/typescript/tsWorker",
-    "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
-    "json.worker": "monaco-editor/esm/vs/language/json/json.worker",
-    "css.worker": "monaco-editor/esm/vs/language/css/css.worker",
-    "html.worker": "monaco-editor/esm/vs/language/html/html.worker",
-    "ts.worker": "monaco-editor/esm/vs/language/typescript/ts.worker",
-  },
+  entry: "./src/index.tsx",
   devServer: {
-    // hot: true,
     compress: true,
-    historyApiFallback: true,
   },
   devtool: isDevelopment ? "eval-source-map" : undefined,
   resolve: {
@@ -87,6 +74,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [{ from: "public" }],
     }),
+    new MonacoWebpackPlugin(),
     isProduction &&
       fs.existsSync(swSrc) &&
       new WorkboxWebpackPlugin.InjectManifest({
