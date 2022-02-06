@@ -12,16 +12,19 @@ TODO
 - refactor new room, and new file experience, no longer autojoin
 - scroll comments too as part of line restoration
 - race condition for undo decorations
+  - if commented text no longer exists on page - hide them
 - comments v2
   - notifications for when you have new comments / threads
   - collapse comments
   - "resolve" comments - menu?
   - markdown comments
 - changing left nav removes decorations
-- rollback history
+- creating file doesn't go to new file
+- loading page has double flash
 
 ### Longer term
 - migrate to create react app
+- rollback history
 - gdoc / gdrive sync
 - dropbox sync
 - output files
