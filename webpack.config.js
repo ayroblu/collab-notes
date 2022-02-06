@@ -101,27 +101,25 @@ module.exports = {
   ].filter(Boolean),
 
   //https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
-  optimization: {
-    runtimeChunk: "single",
-    minimize: true,
-    // minimizer: [
-    //   new TerserWebpackPlugin({
-    //     minify: TerserWebpackPlugin.esbuildMinify,
-    //   }),
-    // ],
-    // minimizer: [
-    //   new TerserWebpackPlugin({
-    //     minify: TerserWebpackPlugin.swcMinify,
-
-    //     terserOptions: {
-    //       format: {
-    //         comments: false,
-    //       },
-
-    //       compress: true,
-    //     },
-    //     extractComments: false,
-    //   }),
-    // ],
-  },
+  // optimization: {
+  // runtimeChunk: "single",
+  // minimize: true,
+  // minimizer: [
+  //   new TerserWebpackPlugin({
+  //     minify: TerserWebpackPlugin.esbuildMinify,
+  //   }),
+  // ],
+  // minimizer: [
+  //   new TerserWebpackPlugin({
+  //     minify: TerserWebpackPlugin.swcMinify,
+  //     terserOptions: {
+  //       format: {
+  //         comments: false,
+  //       },
+  //       compress: true,
+  //     },
+  //     extractComments: false,
+  //   }),
+  // ],
+  // },
 };

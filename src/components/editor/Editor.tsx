@@ -3,8 +3,8 @@ import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { MonacoBinding } from "y-monaco";
-import { WebrtcProvider } from "y-webrtc";
-import * as Y from "yjs";
+import type { WebrtcProvider } from "y-webrtc";
+import type * as Y from "yjs";
 
 import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
@@ -55,44 +55,6 @@ export const Editor: React.FC = React.memo(() => {
   );
 });
 
-// window.MonacoEnvironment = {
-//   getWorkerUrl: function (moduleId, label) {
-//     if (label === "json") {
-//       return "/monaco/dist/json.worker.bundle.js";
-//     }
-//     if (label === "css") {
-//       return "/monaco/dist/css.worker.bundle.js";
-//     }
-//     if (label === "html") {
-//       return "/monaco/dist/html.worker.bundle.js";
-//     }
-//     if (label === "typescript" || label === "javascript") {
-//       return "/monaco/dist/ts.worker.bundle.js";
-//     }
-//     return "/monaco/dist/editor.worker.bundle.js";
-//   },
-// };
-
-function run(el: HTMLElement) {
-  const ydoc = new Y.Doc();
-  // @ts-expect-error - types are wrong
-  const provider = new WebrtcProvider("monaco", ydoc, { password: "monaco" });
-
-  const ytext = ydoc.getText("monaco");
-
-  const editor = monaco.editor.create(el, {
-    value: "",
-    language: "typescript",
-    theme: "vs-dark",
-  });
-  new MonacoBinding(
-    ytext,
-    /** @type {monaco.editor.ITextModel} */ editor.getModel(),
-    new Set([editor]),
-    provider.awareness
-  );
-}
-
 function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
 ) {
@@ -110,8 +72,6 @@ function useMonacoEditor(
       return;
     }
     if (!room) return;
-    run(editorDivRef.current);
-    return;
     const { editor, model, text } = createMonacoEditor(
       editorDivRef.current,
       setCursorStyles,
@@ -356,7 +316,7 @@ declare global {
   }
 }
 
-window.MonacoEnvironment = {
+self.MonacoEnvironment = {
   getWorkerUrl: function (_moduleId: any, label: string) {
     if (label === "json") {
       return "./json.worker.bundle.js";
