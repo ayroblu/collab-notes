@@ -8,12 +8,12 @@ TODO
 ### MVP
 - comments
   - Focus highlights + selection highlights - make prettier?
-  - hover effect - use fainter border
   - on click if scroll required, scroll page to where comment actually is
   - separte button to create comment into its own scoll section
-- Focus comments when cursor moves to highlight (remove the click handler)
 - "resolve" comments - menu?
 - refactor new room, and new file experience, no longer autojoin
+- try have a really big editor, with normal scrolling?
+- scroll comments too as part of line restoration
 
 ### Longer term
 - performance - it takes 5+ seconds to load locally!!
