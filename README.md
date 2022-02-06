@@ -18,7 +18,6 @@ TODO
   - "resolve" comments - menu?
   - markdown comments
 - changing left nav removes decorations
-- no autocomplete? figure out why autocomplete always shows "loading"
 - rollback history
 
 ### Longer term

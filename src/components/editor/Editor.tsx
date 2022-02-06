@@ -278,10 +278,10 @@ function useLineRestoration() {
     const editor = editorRef.current;
     if (!editor) return;
     editor.setPosition(cursorPosition);
-    setTimeout(() => {
-      // editor is not setup yet, needs to wait a bit for accuracy
+    const { dispose: disposeLayoutChange } = editor.onDidLayoutChange(() => {
+      disposeLayoutChange();
       editor.revealLineInCenter(cursorPosition.lineNumber);
-    }, 100);
+    });
     editor.onDidChangeCursorPosition((e) => {
       clearTimeout(lineRestorationTimeoutId);
       lineRestorationTimeoutId = window.setTimeout(() => {

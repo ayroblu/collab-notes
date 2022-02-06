@@ -27,7 +27,7 @@ export const useEditorScrollSync = (
       rafId = requestAnimationFrame(() => {
         if (
           !getIsRecent(lastCommentsPaneScrollRef.current, 100) &&
-          !getIsRecent(lastSmoothScrollRef.current, 500)
+          !getIsRecent(lastSmoothScrollRef.current, 800)
         ) {
           commentsPane.scrollTop = e.scrollTop + extraOffset + scrollOffset;
           lastEditorScrollRef.current = new Date().toISOString();
@@ -52,7 +52,7 @@ export const useEditorScrollSync = (
       rafId = requestAnimationFrame(() => {
         if (
           !getIsRecent(lastEditorScrollRef.current, 100) &&
-          !getIsRecent(lastSmoothScrollRef.current, 500)
+          !getIsRecent(lastSmoothScrollRef.current, 800)
         ) {
           editor.setScrollTop(
             commentsPane.scrollTop - extraOffset - scrollOffset
