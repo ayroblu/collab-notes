@@ -1,6 +1,5 @@
 {
   "name": "collab-notes",
-  "license": "MIT",
   "scripts": {
     "start": "webpack-dev-server --open",
     "lint": "eslint src --ext .ts,.tsx",
