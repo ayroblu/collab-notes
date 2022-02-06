@@ -86,7 +86,11 @@ export const CommentsPane: React.FC = () => {
       style={{ height: editorDivHeight }}
       ref={commentsPaneRef}
     >
-      <ul style={{ height: editorHeight && editorHeight + extraOffset }}>
+      <ul
+        style={{
+          height: editorHeight && editorHeight + extraOffset + scrollOffset,
+        }}
+      >
         {comments.map((comment) => (
           <li key={comment.id}>
             <Comment

@@ -11,6 +11,7 @@ import { EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  editorDidCreateState,
   focusCommentIsActiveState,
 } from "../data-model";
 
@@ -20,27 +21,26 @@ type CommentButtonProps = {
   onClick: (selection: SelectionRange) => void;
   offset: number;
 };
-export const CommentButton: React.FC<CommentButtonProps> = ({
-  offset,
-  onClick,
-}) => {
-  const showComment = useShowCommentButton();
-  if (!showComment) return null;
-  const { position, selection } = showComment;
+export const CommentButton: React.FC<CommentButtonProps> = React.memo(
+  ({ offset, onClick }) => {
+    const showComment = useShowCommentButton();
+    if (!showComment) return null;
+    const { position, selection } = showComment;
 
-  const offsetTop = position + offset;
-  return (
-    <button
-      className={styles.commentButton}
-      style={{
-        top: offsetTop,
-      }}
-      onClick={() => onClick(selection)}
-    >
-      <VscComment />
-    </button>
-  );
-};
+    const offsetTop = position + offset;
+    return (
+      <button
+        className={styles.commentButton}
+        style={{
+          top: offsetTop,
+        }}
+        onClick={() => onClick(selection)}
+      >
+        <VscComment />
+      </button>
+    );
+  }
+);
 
 const useShowCommentButton = () => {
   const { position, selection } = useSelectionPosition();
@@ -63,6 +63,7 @@ const useSelectionPosition = () => {
   const [position, setPosition] = React.useState<number | null>(null);
   const [selection, setSelection] = React.useState<SelectionRange | null>(null);
   const getIsMounted = useIsMounted();
+  const editorDidRender = useRecoilValue(editorDidCreateState);
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -95,6 +96,6 @@ const useSelectionPosition = () => {
     return () => {
       dispose();
     };
-  }, [editorRef, getIsMounted]);
+  }, [editorRef, getIsMounted, editorDidRender]);
   return { position, selection };
 };
