@@ -6,7 +6,6 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const webpack = require("webpack");
 const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
-// const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const isProduction = process.env.NODE_ENV === "production";
@@ -63,9 +62,6 @@ module.exports = {
                 "@babel/preset-typescript",
                 ["@babel/preset-react", { runtime: "automatic" }],
               ],
-              plugins: [
-                // isDevelopment && require.resolve("react-refresh/babel"),
-              ].filter(Boolean),
             },
           },
         ],
@@ -101,7 +97,6 @@ module.exports = {
         // See https://github.com/cra-template/pwa/issues/13#issuecomment-722667270
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       }),
-    // isDevelopment && new ReactRefreshWebpackPlugin(),
   ].filter(Boolean),
 
   //https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
