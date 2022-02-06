@@ -30,7 +30,7 @@ module.exports = {
     // hot: true,
     historyApiFallback: true,
   },
-  // devtool: "eval-source-map",
+  devtool: isDevelopment ? "eval-source-map" : undefined,
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
