@@ -1,4 +1,5 @@
 import stringify from "fast-json-stable-stringify";
+import isEqual from "lodash/isEqual";
 import {
   adjectives,
   animals,
@@ -29,4 +30,8 @@ export function createCache<T, V>(func: (params: T) => V) {
     cache[cacheKey] = result;
     return result;
   };
+}
+
+export function checkEqual<T>(prev: T, next: T): T {
+  return isEqual(prev, next) ? prev : next;
 }

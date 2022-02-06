@@ -19,6 +19,7 @@ import type { Room } from "./types";
 export * from "./selectors";
 export * from "./settings";
 export * from "./types";
+export * from "./ui-state";
 
 const activeRoomIdState = atom<string>({
   key: "activeRoomIdState",
@@ -167,4 +168,13 @@ export const threadsSelector = selectorFamily<
 export const showThreadSaveState = atom<boolean>({
   key: "showThreadSaveState",
   default: false,
+});
+
+export const editorDidCreateState = atom<{}>({
+  key: "editorDidCreateState",
+  default: {},
+});
+export const commentDidCreateState = atom<{}>({
+  key: "commentDidCreateState",
+  default: {},
 });

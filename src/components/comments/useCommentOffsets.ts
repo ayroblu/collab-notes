@@ -7,6 +7,7 @@ import { CommentsContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  commentDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
   showThreadSaveState,
@@ -31,6 +32,7 @@ export const useCommentOffsets = () => {
   const focusCommentIsActive = useRecoilValue(
     focusCommentIsActiveState({ fileName, roomId })
   );
+  const commentDidCreate = useRecoilValue(commentDidCreateState);
 
   React.useEffect(() => {
     const commentDetails = getCommentDetails(
@@ -54,6 +56,7 @@ export const useCommentOffsets = () => {
     getIsMounted,
     isShowThreadSave,
     focusCommentIsActive,
+    commentDidCreate,
   ]);
   return { offsets, extraOffset, scrollOffset };
 };

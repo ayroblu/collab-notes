@@ -1,5 +1,6 @@
 import React from "react";
 
 export const useLayoutEffectOnce = (func: () => void) => {
-  React.useLayoutEffect(func);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useLayoutEffect(func, []);
 };

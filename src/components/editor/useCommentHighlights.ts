@@ -118,9 +118,9 @@ export const useSelectionHandler = () => {
   const setFocusCommentIsActive = useSetRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
-  const editor = editorRef.current;
   React.useEffect(() => {
     let rafId = 0;
+    const editor = editorRef.current;
     if (!editor) return;
     const { dispose } = editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection;
@@ -150,7 +150,7 @@ export const useSelectionHandler = () => {
     return () => {
       dispose();
     };
-  }, [comments, editor, setFocusCommentId, setFocusCommentIsActive]);
+  }, [comments, editorRef, setFocusCommentId, setFocusCommentIsActive]);
 };
 
 function cursorInSelection(
@@ -209,9 +209,9 @@ export const useCommentDecorations = () => {
     }, 500);
   }, [inProgressComments, comments, editorRef, focusCommentId]);
 
-  const editor = editorRef.current;
   const room = useRoom();
   React.useEffect(() => {
+    const editor = editorRef.current;
     // Adjust decorations based on typing that happens
     if (!editor || !room) return;
     const comments = getComments(room.id, room.password, fileName);
@@ -260,7 +260,7 @@ export const useCommentDecorations = () => {
     return () => {
       dispose();
     };
-  }, [editor, fileName, room]);
+  }, [editorRef, fileName, room]);
 };
 let timeoutId = 0;
 let commentsThrottleTimeoutId = 0;

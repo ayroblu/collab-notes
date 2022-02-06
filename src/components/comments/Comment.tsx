@@ -9,6 +9,7 @@ import { CommentsContext, EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  commentDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
   settingsSelector,
@@ -31,7 +32,7 @@ type Props = CommentData & {
   offset: number | undefined;
 };
 
-export const Comment: React.FC<Props> = (comment) => {
+export const Comment: React.FC<Props> = ({ offset, ...comment }) => {
   const { id } = comment;
   const [focusCommentId] = useFocusCommentIdState();
   const roomId = useRecoilValue(activeRoomIdSelector);
@@ -43,7 +44,7 @@ export const Comment: React.FC<Props> = (comment) => {
   const isActiveComment = focusCommentIsActive && isFocusComment;
 
   return (
-    <CommentHolder {...comment}>
+    <CommentHolder {...comment} offset={offset}>
       <CommentMain {...comment} />
       <CommentThread commentId={id} />
       {isActiveComment && <div className={styles.ruledLine} />}
@@ -65,6 +66,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
 }) => {
   const { commentRefs } = React.useContext(CommentsContext);
   const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+  const setCommentDidCreate = useSetRecoilState(commentDidCreateState);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
@@ -80,18 +82,24 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   const isFocusComment = focusCommentId === id;
   const isActiveComment = focusCommentIsActive && isFocusComment;
   const offsetLeft = isActiveComment ? "-32px" : "0";
+  const handleRef = (r: HTMLElement | null) => {
+    if (!r || typeof position !== "number") return;
+
+    const old = commentRefs.current[id];
+    const height = r.getBoundingClientRect().height;
+    commentRefs.current[id] = {
+      el: r,
+      top: position,
+      height,
+    };
+    if (!old || old.height !== height) {
+      setCommentDidCreate({});
+    }
+  };
 
   return (
     <section
-      ref={(r) =>
-        r &&
-        typeof position === "number" &&
-        (commentRefs.current[id] = {
-          el: r,
-          top: position,
-          height: r.getBoundingClientRect().height,
-        })
-      }
+      ref={handleRef}
       className={cn(styles.comment, focusCommentId === id && styles.focus)}
       style={{
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,
@@ -107,91 +115,90 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   );
 };
 
-const CommentAddThread: React.FC<{ commentId: string }> = ({ commentId }) => {
-  const room = useRoom();
-  const fileName = useFileName();
-  const settings = useRecoilValue(settingsSelector);
+const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
+  ({ commentId }) => {
+    const room = useRoom();
+    const fileName = useFileName();
+    const settings = useRecoilValue(settingsSelector);
 
-  const addThreadHandler = (text: string) => {
-    if (!room) return false;
-    return addThread({
-      roomId: room.id,
-      roomPassword: room.password,
-      fileName,
-      commentId,
-      text,
-      byId: settings.id,
-      byName: settings.name,
-    });
-  };
-  return (
-    <section className={styles.addThread}>
-      <CommentTextareaWithSave onSubmit={addThreadHandler} />
-    </section>
-  );
-};
+    const addThreadHandler = (text: string) => {
+      if (!room) return false;
+      return addThread({
+        roomId: room.id,
+        roomPassword: room.password,
+        fileName,
+        commentId,
+        text,
+        byId: settings.id,
+        byName: settings.name,
+      });
+    };
+    return (
+      <section className={styles.addThread}>
+        <CommentTextareaWithSave onSubmit={addThreadHandler} />
+      </section>
+    );
+  }
+);
 
-const CommentMain: React.FC<CommentData> = ({
-  byName,
-  dateUpdated,
-  id,
-  text,
-}) => {
-  const [isEdit, setIsEdit] = React.useState(false);
-  const { commentRefs } = React.useContext(CommentsContext);
-  const { fileName, roomId, roomPassword } = useFileParams();
-  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
-  const setFocusCommentIsActive = useSetRecoilState(
-    focusCommentIsActiveState({ fileName, roomId })
-  );
-  const inProgressComments = useRecoilValue(inProgressCommentsSelector);
-  const comments = useComments();
+const CommentMain: React.FC<CommentData> = React.memo(
+  ({ byName, dateUpdated, id, text }) => {
+    const [isEdit, setIsEdit] = React.useState(false);
+    const { commentRefs } = React.useContext(CommentsContext);
+    const { fileName, roomId, roomPassword } = useFileParams();
+    const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+    const setFocusCommentIsActive = useSetRecoilState(
+      focusCommentIsActiveState({ fileName, roomId })
+    );
+    const inProgressComments = useRecoilValue(inProgressCommentsSelector);
+    const comments = useComments();
 
-  const onEditSubmit = (text: string) => {
-    editComment(roomId, roomPassword, fileName, id, text);
-    setIsEdit(false);
-    return false;
-  };
-  const onEditCancel = () => {
-    setIsEdit(false);
-  };
-  const deleteComment = () => {
-    const success = removeComment(roomId, roomPassword, fileName, id);
-    if (!success) return;
+    const onEditSubmit = (text: string) => {
+      editComment(roomId, roomPassword, fileName, id, text);
+      setIsEdit(false);
+      return false;
+    };
+    const onEditCancel = () => {
+      setIsEdit(false);
+    };
+    const deleteComment = () => {
+      const success = removeComment(roomId, roomPassword, fileName, id);
+      if (!success) return;
 
-    if (focusCommentId === id) {
-      setFocusCommentId(
-        getNearestCommentId(
-          commentRefs.current,
-          comments.concat(inProgressComments).map(({ id }) => id),
-          id
-        )
-      );
-      setFocusCommentIsActive(false);
-    }
-    delete commentRefs.current[id];
-  };
-  const onEdit = () => {
-    setIsEdit(true);
-    setFocusCommentId(id);
-    setFocusCommentIsActive(true);
-  };
-  const options = [
-    { label: "Edit", onClick: onEdit },
-    { label: "Delete", onClick: deleteComment },
-  ];
-  return (
-    <CommentEntryItem
-      byName={byName}
-      options={options}
-      text={text}
-      dateUpdated={dateUpdated}
-      isEdit={isEdit}
-      onEditSubmit={onEditSubmit}
-      onEditCancel={onEditCancel}
-    />
-  );
-};
+      if (focusCommentId === id) {
+        setFocusCommentId(
+          getNearestCommentId(
+            commentRefs.current,
+            comments.concat(inProgressComments).map(({ id }) => id),
+            id
+          )
+        );
+        setFocusCommentIsActive(false);
+      }
+      delete commentRefs.current[id];
+    };
+    const onEdit = () => {
+      setIsEdit(true);
+      setFocusCommentId(id);
+      setFocusCommentIsActive(true);
+    };
+    const options = [
+      { label: "Edit", onClick: onEdit },
+      { label: "Delete", onClick: deleteComment },
+    ];
+    return (
+      <CommentEntryItem
+        byName={byName}
+        options={options}
+        text={text}
+        dateUpdated={dateUpdated}
+        isEdit={isEdit}
+        onEditSubmit={onEditSubmit}
+        onEditCancel={onEditCancel}
+      />
+    );
+  }
+);
 
 const usePosition = (selection: SelectionRange) => {
   const { editorRef } = React.useContext(EditorContext);

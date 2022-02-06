@@ -1,11 +1,12 @@
 import * as monaco from "monaco-editor";
 import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
 
+import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   createNewFile,
@@ -16,11 +17,18 @@ import {
   getYFileText,
 } from "@/modules/documents";
 import type { AwarenessStates, LocalState } from "@/modules/documents";
-import { getHashColor } from "@/modules/utils";
+import { checkEqual, getHashColor } from "@/modules/utils";
 
 import { EditorContext } from "../Contexts";
 import { parseVimrc } from "../Settings";
-import { isNewUserState, settingsSelector } from "../data-model";
+import {
+  activeFileNameState,
+  activeRoomIdSelector,
+  cursorPositionState,
+  editorDidCreateState,
+  isNewUserState,
+  settingsSelector,
+} from "../data-model";
 import type { Room, Settings } from "../data-model";
 import { useFileName, useRoom } from "../utils";
 
@@ -33,7 +41,9 @@ import {
   useSelectionHandler,
 } from "./useCommentHighlights";
 
-export const Editor: React.FC = () => {
+import isEqual from "lodash/isEqual";
+
+export const Editor: React.FC = React.memo(() => {
   const [cursorStyles, setCursorStyles] = React.useState<string[]>([]);
   const { editorDivRef } = React.useContext(EditorContext);
 
@@ -45,7 +55,7 @@ export const Editor: React.FC = () => {
       <div className={styles.editor} ref={editorDivRef}></div>
     </>
   );
-};
+});
 
 function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
@@ -57,6 +67,7 @@ function useMonacoEditor(
   const room = useRoom();
   const fileName = useFileName();
   const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
+  const setEditorDidCreate = useSetRecoilState(editorDidCreateState);
 
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
@@ -72,6 +83,10 @@ function useMonacoEditor(
       getIsMounted
     );
     editorRef.current = editor;
+    const { dispose: disposeLayoutChange } = editor.onDidLayoutChange(() => {
+      disposeLayoutChange();
+      setEditorDidCreate({});
+    });
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
       if (!file) return;
@@ -97,6 +112,7 @@ function useMonacoEditor(
     getIsMounted,
     room,
     setCursorStyles,
+    setEditorDidCreate,
     settings,
   ]);
   React.useEffect(() => {
@@ -114,6 +130,7 @@ function useMonacoEditor(
   useCommentDecorationsHover();
   useSelectionHandler();
   useCommentHighlightActive();
+  useLineRestoration();
 
   React.useEffect(() => {
     const editor = editorRef.current;
@@ -233,18 +250,49 @@ function setupYjsMonacoCursorData(
       .map(
         ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
       );
-    setCursorStyles([...mainCursorStyles, ...tempCursorStyles]);
+    setCursorStyles((cursorStyles) =>
+      checkEqual(cursorStyles, [...mainCursorStyles, ...tempCursorStyles])
+    );
     cursorData.forEach(({ clientId }) => {
       clearTimeout(timeoutIds[clientId]);
       timeoutIds[clientId] = window.setTimeout(() => {
         if (!getIsMounted()) return;
         setCursorStyles((cursorStyles) =>
-          cursorStyles.filter((c) => !tempCursorStyles.includes(c))
+          checkEqual(
+            cursorStyles,
+            cursorStyles.filter((c) => !tempCursorStyles.includes(c))
+          )
         );
       }, 3000);
     });
   });
 }
+
+function useLineRestoration() {
+  const { editorRef } = React.useContext(EditorContext);
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const fileName = useRecoilValue(activeFileNameState(roomId));
+
+  const [cursorPosition, setCursorPosition] = useRecoilState(
+    cursorPositionState({ fileName, roomId })
+  );
+  useEffectOnce(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.setPosition(cursorPosition);
+    setTimeout(() => {
+      // editor is not setup yet, needs to wait a bit for accuracy
+      editor.revealLineInCenter(cursorPosition.lineNumber);
+    }, 100);
+    editor.onDidChangeCursorPosition((e) => {
+      clearTimeout(lineRestorationTimeoutId);
+      lineRestorationTimeoutId = window.setTimeout(() => {
+        setCursorPosition(e.position);
+      }, 1000);
+    });
+  });
+}
+let lineRestorationTimeoutId = 0;
 
 function setupVimBindings(
   editor: monaco.editor.IStandaloneCodeEditor,

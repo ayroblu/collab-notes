@@ -7,6 +7,7 @@ import type { CommentData, SelectionRange } from "@/modules/documents";
 
 import { CommentsContext } from "../Contexts";
 import {
+  editorDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
   settingsSelector,
@@ -42,6 +43,7 @@ export const CommentsPane: React.FC = () => {
     focusCommentIsActiveState({ fileName, roomId })
   );
   useEditorScrollSync(commentsPaneRef, extraOffset, scrollOffset);
+  useRecoilValue(editorDidCreateState);
 
   const addInProgressComment = (selection: SelectionRange) => {
     const now = new Date().toISOString();
