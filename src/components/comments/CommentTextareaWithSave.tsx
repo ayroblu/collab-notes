@@ -45,6 +45,16 @@ export const CommentTextareaWithSave: React.FC<{
     e.preventDefault();
     handleSubmit();
   };
+
+  React.useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = `${getTextareaHeight(textarea.scrollHeight)}px`;
+    textarea.addEventListener("input", () => {
+      // textarea.style.height = "auto";
+      textarea.style.height = `${getTextareaHeight(textarea.scrollHeight)}px`;
+    });
+  }, []);
   return (
     <form onSubmit={submitHandler}>
       <textarea
@@ -66,3 +76,10 @@ export const CommentTextareaWithSave: React.FC<{
     </form>
   );
 };
+
+function getTextareaHeight(scrollHeight: number) {
+  const maxHeight = window.innerHeight;
+  const lineHeight = 1.15 * 20;
+  const minTextareaHeight = lineHeight * 2 + 8;
+  return Math.max(Math.min(maxHeight, scrollHeight), minTextareaHeight);
+}

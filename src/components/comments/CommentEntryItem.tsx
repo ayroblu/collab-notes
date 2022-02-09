@@ -3,6 +3,7 @@ import React from "react";
 import { getHashColor } from "@/modules/utils";
 
 import { FacePileFace } from "../shared/FacePile";
+import { Markdown } from "../shared/Markdown";
 import type { MenuOption } from "../shared/Menu";
 import { Menu } from "../shared/Menu";
 
@@ -60,7 +61,7 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = ({
             onCancel={onEditCancel}
           />
         ) : (
-          <span>{text}</span>
+          <Markdown text={text} />
         )}
       </div>
     </section>
