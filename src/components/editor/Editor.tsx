@@ -11,7 +11,6 @@ import { useIsMounted } from "@/hooks/useIsMounted";
 import {
   getDocument,
   getFileFromFileName,
-  getFileTextFromFileName,
   getRoom,
   getYFileMetaData,
 } from "@/modules/documents";
@@ -70,7 +69,7 @@ function useMonacoEditor(
     if (!editorDivRef.current || !fileName) {
       return;
     }
-    const text = getFileTextFromFileName(room.id, room.password, fileName);
+    const text = getDocument(room.id, room.password, fileName);
     if (!text) return;
     const { editor, model } = createMonacoEditor(
       editorDivRef.current,

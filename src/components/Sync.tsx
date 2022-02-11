@@ -152,8 +152,10 @@ const useFileNameInitSync = () => {
 
   React.useEffect(() => {
     if (!fileName) {
-      const name = filesData[0]?.name ?? "README.md";
-      setSearchParams({ name });
+      const name = filesData[0]?.name;
+      if (name) {
+        setSearchParams({ name });
+      }
     } else if (activeFileName !== fileName) {
       setActiveFileName(fileName);
     }
@@ -183,7 +185,7 @@ const useSetupNewRoomSync = () => {
     const paramRoomPassword = searchParams.get("password");
     const paramFileName = searchParams.get("name");
 
-    if (!roomId) {
+    if (!roomId || !paramFileName) {
       return;
     }
     const room = settings.rooms.find(({ id }) => id === roomId);
@@ -200,7 +202,7 @@ const useSetupNewRoomSync = () => {
       ],
     }));
     setActiveRoomId(roomId);
-    setActiveFileName(paramFileName || "README.md");
+    setActiveFileName(paramFileName);
   }, [
     roomId,
     searchParams,

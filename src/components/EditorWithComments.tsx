@@ -1,4 +1,4 @@
-import { getFileTextFromFileName } from "@/modules/documents";
+import { getDocument } from "@/modules/documents";
 
 import styles from "./EditorWithComments.module.css";
 import { NavBar } from "./NavBar";
@@ -8,22 +8,26 @@ import { CommentsPane } from "./comments/CommentsPane";
 import { Editor } from "./editor/Editor";
 import { useFileName, useRoom } from "./utils";
 
-export const EditorWithComments: React.FC = () => {
+export const EditorWithComments: React.FC = () => (
+  <FilesParamsSync>
+    <MainEditorWithComments />
+  </FilesParamsSync>
+);
+
+const MainEditorWithComments: React.FC = () => {
   const room = useRoom();
   const fileName = useFileName();
-  const text = getFileTextFromFileName(room.id, room.password, fileName);
+  const text = getDocument(room.id, room.password, fileName);
   if (!text) {
     return <NoMatchFile />;
   }
   return (
-    <FilesParamsSync>
-      <section className={styles.wrapper}>
-        <NavBar />
-        <div className={styles.editorWithComments}>
-          <Editor />
-          <CommentsPane />
-        </div>
-      </section>
-    </FilesParamsSync>
+    <section className={styles.wrapper}>
+      <NavBar />
+      <div className={styles.editorWithComments}>
+        <Editor />
+        <CommentsPane />
+      </div>
+    </section>
   );
 };

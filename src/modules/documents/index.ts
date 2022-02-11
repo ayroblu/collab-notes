@@ -106,15 +106,6 @@ export function getYFileThreads(file: Y.Map<any>): Y.Map<Y.Array<ThreadData>> {
   }
   return file.get("threads");
 }
-export function getFileTextFromFileName(
-  roomId: string,
-  roomPassword: string,
-  fileName: string
-): Y.Text | void {
-  const file = getFileFromFileName(roomId, roomPassword, fileName);
-  if (!file) return;
-  return getYFileText(file);
-}
 
 export function createNewFile(
   roomId: string,
