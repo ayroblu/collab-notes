@@ -3,7 +3,11 @@ import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import { getComments, getRoom } from "@/modules/documents";
+import {
+  getComments,
+  getRoom,
+  updateCommentSelection,
+} from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents";
 import { cn } from "@/modules/utils";
 
@@ -215,7 +219,6 @@ export const useCommentDecorations = () => {
     // Adjust decorations based on typing that happens
     if (!editor || !room) return;
     const comments = getComments(room.id, room.password, fileName);
-    const { ydoc } = getRoom(room.id, room.password);
     if (!comments) return;
     const { dispose } = editor.onDidChangeModelDecorations(() => {
       clearTimeout(commentsThrottleTimeoutId);
@@ -238,22 +241,14 @@ export const useCommentDecorations = () => {
           }))
           .filter(({ commentId }) => commentId)
           .forEach(({ commentId, range }) => {
-            let commentNum: { comment: CommentData; index: number } | null =
-              null;
-            for (let i = 0; i < comments.length; ++i) {
-              const c = comments.get(i)!;
-              if (c.id === commentId) {
-                commentNum = { comment: c, index: i };
-              }
-            }
-            if (!commentNum) return;
-            const { comment, index } = commentNum;
-            if (!isEqual(range, comment.selection)) {
-              ydoc.transact(() => {
-                comments.delete(index);
-                comments.insert(index, [{ ...comment, selection: range }]);
-              });
-            }
+            if (!commentId) return;
+            updateCommentSelection(
+              room.id,
+              room.password,
+              fileName,
+              commentId,
+              range
+            );
           });
       }, 1000);
     });

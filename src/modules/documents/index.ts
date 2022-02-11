@@ -1,10 +1,17 @@
+import isEqual from "lodash/isEqual";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
 
 import { nonNullable, sortBy, uuidv4 } from "../utils";
 
-import type { CommentData, FileMetaData, ThreadData, YRoom } from "./types";
+import type {
+  CommentData,
+  FileMetaData,
+  SelectionRange,
+  ThreadData,
+  YRoom,
+} from "./types";
 
 export * from "./types";
 
@@ -189,6 +196,28 @@ export function editComment(
     yComments.delete(index);
     yComments.insert(index, [{ ...comment, text, dateUpdated: now }]);
   });
+}
+export function updateCommentSelection(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  commentId: string,
+  selection: SelectionRange
+) {
+  const { ydoc } = getRoom(roomId, roomPassword);
+  const yComments = getComments(roomId, roomPassword, fileName);
+  if (!yComments) return;
+  const index = yComments
+    .map(({ id }) => id)
+    .findIndex((id) => id === commentId);
+
+  const comment = yComments.get(index);
+  if (!isEqual(selection, comment.selection)) {
+    ydoc.transact(() => {
+      yComments.delete(index);
+      yComments.insert(index, [{ ...comment, selection }]);
+    });
+  }
 }
 export function removeComment(
   roomId: string,
