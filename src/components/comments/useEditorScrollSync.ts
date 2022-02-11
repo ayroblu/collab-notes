@@ -6,20 +6,24 @@ import { EditorContext } from "../Contexts";
 
 export const useEditorScrollSync = (
   commentsPaneRef: React.RefObject<HTMLElement>,
+  commentButtonWrapperRef: React.RefObject<HTMLElement>,
   extraOffset: number,
   scrollOffset: number
 ) => {
   const { editorRef } = React.useContext(EditorContext);
   const lastEditorScrollRef = React.useRef<string | null>(null);
   const lastCommentsPaneScrollRef = React.useRef<string | null>(null);
+  const lastCommentButtonWrapperScrollRef = React.useRef<string | null>(null);
   const lastSmoothScrollRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    // When the editor scrolls, reflect in the CommentsPane
+    // When the editor scrolls
     const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
+    const commentButtonWrapper = commentButtonWrapperRef.current;
+    if (!commentButtonWrapper) return;
 
     let rafId = 0;
     const { dispose } = editor.onDidScrollChange((e) => {
@@ -27,24 +31,35 @@ export const useEditorScrollSync = (
       rafId = requestAnimationFrame(() => {
         if (
           !getIsRecent(lastCommentsPaneScrollRef.current, 100) &&
+          !getIsRecent(lastCommentButtonWrapperScrollRef.current, 100) &&
           !getIsRecent(lastSmoothScrollRef.current, 800)
         ) {
           commentsPane.scrollTop = e.scrollTop + extraOffset + scrollOffset;
+          commentButtonWrapper.scrollTop = e.scrollTop;
           lastEditorScrollRef.current = new Date().toISOString();
         }
       });
     });
     return () => {
+      cancelAnimationFrame(rafId);
       dispose();
     };
-  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
+  }, [
+    commentButtonWrapperRef,
+    commentsPaneRef,
+    editorRef,
+    extraOffset,
+    scrollOffset,
+  ]);
 
   React.useEffect(() => {
-    // For when CommentsPane scrolls, reflect in editor
+    // For when CommentsPane scrolls
     const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
+    const commentButtonWrapper = commentButtonWrapperRef.current;
+    if (!commentButtonWrapper) return;
 
     let rafId = 0;
     const handler = () => {
@@ -52,23 +67,73 @@ export const useEditorScrollSync = (
       rafId = requestAnimationFrame(() => {
         if (
           !getIsRecent(lastEditorScrollRef.current, 100) &&
+          !getIsRecent(lastCommentButtonWrapperScrollRef.current, 100) &&
           !getIsRecent(lastSmoothScrollRef.current, 800)
         ) {
-          editor.setScrollTop(
-            commentsPane.scrollTop - extraOffset - scrollOffset
-          );
+          const editorScrollTop =
+            commentsPane.scrollTop - extraOffset - scrollOffset;
+          editor.setScrollTop(editorScrollTop);
+          commentButtonWrapper.scrollTop = editorScrollTop;
           lastCommentsPaneScrollRef.current = new Date().toISOString();
         }
       });
     };
     commentsPane.addEventListener("scroll", handler);
     const dispose = () => {
+      cancelAnimationFrame(rafId);
       commentsPane.removeEventListener("scroll", handler);
     };
     return () => {
       dispose();
     };
-  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
+  }, [
+    commentButtonWrapperRef,
+    commentsPaneRef,
+    editorRef,
+    extraOffset,
+    scrollOffset,
+  ]);
+
+  React.useEffect(() => {
+    // For when CommentButtonWrapper scrolls
+    const editor = editorRef.current;
+    if (!editor) return;
+    const commentsPane = commentsPaneRef.current;
+    if (!commentsPane) return;
+    const commentButtonWrapper = commentButtonWrapperRef.current;
+    if (!commentButtonWrapper) return;
+
+    let rafId = 0;
+    const handler = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (
+          !getIsRecent(lastEditorScrollRef.current, 100) &&
+          !getIsRecent(lastCommentsPaneScrollRef.current, 100) &&
+          !getIsRecent(lastSmoothScrollRef.current, 800)
+        ) {
+          const editorScrollTop = commentButtonWrapper.scrollTop;
+          editor.setScrollTop(editorScrollTop);
+          commentsPane.scrollTop = editorScrollTop + extraOffset + scrollOffset;
+          lastCommentButtonWrapperScrollRef.current = new Date().toISOString();
+        }
+      });
+    };
+    commentButtonWrapper.addEventListener("scroll", handler);
+    const dispose = () => {
+      commentButtonWrapper.removeEventListener("scroll", handler);
+      cancelAnimationFrame(rafId);
+    };
+    return () => {
+      dispose();
+    };
+  }, [
+    commentButtonWrapperRef,
+    commentsPaneRef,
+    editorRef,
+    extraOffset,
+    scrollOffset,
+  ]);
 
   // For when focus comment changes usually
   React.useEffect(() => {

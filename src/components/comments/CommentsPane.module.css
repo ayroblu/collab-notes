@@ -3,4 +3,12 @@
   position: relative;
   background-color: var(--deep-color);
   overflow-y: auto;
+  flex: 1 1 auto;
+}
+.commentsWrapper {
+  display: flex;
+}
+.commentButtonContainer {
+  position: relative;
+  overflow-y: auto;
 }

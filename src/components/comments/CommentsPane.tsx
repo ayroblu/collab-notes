@@ -39,10 +39,16 @@ export const CommentsPane: React.FC = () => {
   const { extraOffset, offsets, scrollOffset } = useCommentOffsets();
   const { editorDivHeight, editorHeight } = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
+  const commentButtonWrapperRef = React.useRef<HTMLElement>(null);
   const setFocusCommentIsActive = useSetRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
-  useEditorScrollSync(commentsPaneRef, extraOffset, scrollOffset);
+  useEditorScrollSync(
+    commentsPaneRef,
+    commentButtonWrapperRef,
+    extraOffset,
+    scrollOffset
+  );
   useRecoilValue(editorDidCreateState);
 
   const addInProgressComment = (selection: SelectionRange) => {
@@ -81,39 +87,50 @@ export const CommentsPane: React.FC = () => {
     delete commentRefs.current[commentId];
   };
   return (
-    <section
-      className={styles.commentsPane}
-      style={{ height: editorDivHeight }}
-      ref={commentsPaneRef}
-    >
-      <ul
-        style={{
-          height: editorHeight && editorHeight + extraOffset + scrollOffset,
-        }}
+    <div className={styles.commentsWrapper}>
+      <section
+        className={styles.commentButtonContainer}
+        style={{ height: editorDivHeight }}
+        ref={commentButtonWrapperRef}
       >
-        {comments.map((comment) => (
-          <li key={comment.id}>
-            <Comment
-              offset={(offsets[comment.id] ?? 0) + extraOffset}
-              {...comment}
-            />
-          </li>
-        ))}
-        {inProgressComments.map((comment) => (
-          <li key={comment.id}>
-            <AddComment
-              offset={(offsets[comment.id] ?? 0) + extraOffset}
-              id={comment.id}
-              onSubmit={createCommentFn(comment)}
-              onCancel={cancelCommentFn(comment.id)}
-            />
-          </li>
-        ))}
-      </ul>
-      <CommentButton
-        offset={extraOffset + scrollOffset}
-        onClick={addInProgressComment}
-      />
-    </section>
+        <div
+          style={{
+            height: editorHeight,
+          }}
+        >
+          <CommentButton offset={0} onClick={addInProgressComment} />
+        </div>
+      </section>
+      <section
+        className={styles.commentsPane}
+        style={{ height: editorDivHeight }}
+        ref={commentsPaneRef}
+      >
+        <ul
+          style={{
+            height: editorHeight && editorHeight + extraOffset + scrollOffset,
+          }}
+        >
+          {comments.map((comment) => (
+            <li key={comment.id}>
+              <Comment
+                offset={(offsets[comment.id] ?? 0) + extraOffset}
+                {...comment}
+              />
+            </li>
+          ))}
+          {inProgressComments.map((comment) => (
+            <li key={comment.id}>
+              <AddComment
+                offset={(offsets[comment.id] ?? 0) + extraOffset}
+                id={comment.id}
+                onSubmit={createCommentFn(comment)}
+                onCancel={cancelCommentFn(comment.id)}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 };

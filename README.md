@@ -6,7 +6,6 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- refactor new room, and new file experience, no longer autojoin
 - seperate button to create comment into its own scoll section
 - race condition for undo decorations
   - if commented text no longer exists on page - hide them
@@ -19,6 +18,7 @@ TODO
   - collapse comments
   - "resolve" comments - menu?
   - scroll comments too as part of line restoration
+- playwright testing
 
 ### Longer term
 - migrate to create react app
