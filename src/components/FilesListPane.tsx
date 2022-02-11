@@ -3,10 +3,8 @@ import { VscTrash } from "react-icons/vsc";
 import { useSearchParams } from "react-router-dom";
 
 import {
-  deleteFile,
+  deleteFileAndGetNextName,
   getFileFromFileName,
-  getRoom,
-  getYFileMetaData,
 } from "@/modules/documents";
 
 import { FilesList } from "./FilesList";
@@ -44,14 +42,11 @@ const useDeleteFile = () => {
     );
     if (confirmation) {
       if (!room) return;
-      const index = deleteFile(room.id, room.password, fileName);
-      if (typeof index !== "number") return;
-
-      const { files } = getRoom(room.id, room.password);
-      const newIndex = index >= files.length ? files.length - 1 : index;
-      const {name} = getYFileMetaData(files.get(newIndex));
-      setFileName(name);
-      setSearchParams({ name });
+      const name = deleteFileAndGetNextName(room.id, room.password, fileName);
+      if (name) {
+        setFileName(name);
+        setSearchParams({ name });
+      }
     }
   };
 };

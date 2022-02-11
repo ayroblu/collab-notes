@@ -83,7 +83,7 @@ export function getFileIndexFromFileName(
   roomId: string,
   roomPassword: string,
   fileName: string
-): number | void {
+): number {
   const { files } = getRoom(roomId, roomPassword);
   return files
     .map((file) => getYFileMetaData(file))
@@ -132,12 +132,25 @@ export function deleteFile(
   roomId: string,
   roomPassword: string,
   fileName: string
-): number | void {
+): number {
   const { files } = getRoom(roomId, roomPassword);
   const index = getFileIndexFromFileName(roomId, roomPassword, fileName);
 
-  if (typeof index === "number") files.delete(index, 1);
+  if (index !== -1) files.delete(index, 1);
   return index;
+}
+export function deleteFileAndGetNextName(
+  roomId: string,
+  roomPassword: string,
+  fileName: string
+): string | void {
+  const index = deleteFile(roomId, roomPassword, fileName);
+  const { files } = getRoom(roomId, roomPassword);
+
+  const newIndex = index >= files.length ? files.length - 1 : index;
+  if (newIndex === -1) return;
+  const { name } = getYFileMetaData(files.get(newIndex));
+  return name;
 }
 
 export function getDocument(

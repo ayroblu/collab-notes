@@ -12,40 +12,10 @@ import { useRoom } from "../utils";
 import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {
-  const settings = useRecoilValue(settingsSelector);
   const [faces, setFaces] = React.useState<Face[]>([]);
   const room = useRoom();
-  React.useEffect(() => {
-    if (!room) return;
-    const { provider, ydoc } = getRoom(room.id, room.password);
-    const changeFunc = () => {
-      const faces = Array.from(
-        provider.awareness.getStates() as AwarenessStates
-      )
-        .slice(1)
-        .filter(([, { user }]) => user)
-        .map(
-          ([
-            clientId,
-            {
-              user: { colour, id, name },
-            },
-          ]) => ({ clientId, name, color: colour, id })
-        )
-        .filter(
-          ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
-        );
-      setFaces(uniqBy(faces, ({ id }) => id));
-    };
-    provider.awareness.on("change", changeFunc);
-    return () => {
-      awarenessProtocol.removeAwarenessStates(
-        provider.awareness,
-        [ydoc.clientID],
-        "left room"
-      );
-    };
-  }, [room, settings.id]);
+  useProviderListener(setFaces);
+
   if (!room) return null;
   if (faces.length < 6) {
     return (
@@ -95,4 +65,40 @@ const CondensedFacePile: React.FC<{ faces: Face[] }> = ({ faces }) => {
       />
     </div>
   );
+};
+
+const useProviderListener = (setFaces: (faces: Face[]) => void) => {
+  const settings = useRecoilValue(settingsSelector);
+  const room = useRoom();
+  React.useEffect(() => {
+    if (!room) return;
+    const { provider, ydoc } = getRoom(room.id, room.password);
+    const changeFunc = () => {
+      const faces = Array.from(
+        provider.awareness.getStates() as AwarenessStates
+      )
+        .slice(1)
+        .filter(([, { user }]) => user)
+        .map(
+          ([
+            clientId,
+            {
+              user: { colour, id, name },
+            },
+          ]) => ({ clientId, name, color: colour, id })
+        )
+        .filter(
+          ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
+        );
+      setFaces(uniqBy(faces, ({ id }) => id));
+    };
+    provider.awareness.on("change", changeFunc);
+    return () => {
+      awarenessProtocol.removeAwarenessStates(
+        provider.awareness,
+        [ydoc.clientID],
+        "left room"
+      );
+    };
+  }, [room, settings.id, setFaces]);
 };
