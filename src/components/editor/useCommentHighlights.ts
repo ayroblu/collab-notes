@@ -1,14 +1,9 @@
-import isEqual from "lodash/isEqual";
 import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import {
-  getComments,
-  getRoom,
-  updateCommentSelection,
-} from "@/modules/documents";
-import type { CommentData, SelectionRange } from "@/modules/documents";
+import type { SelectionRange } from "@/modules/documents";
+import { getComments, updateCommentSelection } from "@/modules/documents";
 import { cn } from "@/modules/utils";
 
 import { CommentsContext, EditorContext } from "../Contexts";
