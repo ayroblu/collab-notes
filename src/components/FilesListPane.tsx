@@ -41,7 +41,6 @@ const useDeleteFile = () => {
       `Are you sure you want to delete ${fileName}?`
     );
     if (confirmation) {
-      if (!room) return;
       const name = deleteFileAndGetNextName(room.id, room.password, fileName);
       if (name) {
         setFileName(name);
@@ -51,12 +50,8 @@ const useDeleteFile = () => {
   };
 };
 
-function getIsFileActive(
-  fileName: string | null,
-  room: Room | undefined
-): boolean {
+function getIsFileActive(fileName: string | null, room: Room): boolean {
   if (!fileName) return false;
-  if (!room) return false;
   const file = getFileFromFileName(room.id, room.password, fileName);
   return !!file;
 }

@@ -121,9 +121,8 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
     const fileName = useFileName();
     const settings = useRecoilValue(settingsSelector);
 
-    const addThreadHandler = (text: string) => {
-      if (!room) return false;
-      return addThread({
+    const addThreadHandler = (text: string) =>
+      addThread({
         roomId: room.id,
         roomPassword: room.password,
         fileName,
@@ -132,7 +131,6 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
         byId: settings.id,
         byName: settings.name,
       });
-    };
     return (
       <section className={styles.addThread}>
         <CommentTextareaWithSave onSubmit={addThreadHandler} />

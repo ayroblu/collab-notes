@@ -13,10 +13,8 @@ import styles from "./FacePile.module.css";
 
 export const FacePile: React.FC = () => {
   const [faces, setFaces] = React.useState<Face[]>([]);
-  const room = useRoom();
   useProviderListener(setFaces);
 
-  if (!room) return null;
   if (faces.length < 6) {
     return (
       <section className={styles.facepile}>
@@ -71,7 +69,6 @@ const useProviderListener = (setFaces: (faces: Face[]) => void) => {
   const settings = useRecoilValue(settingsSelector);
   const room = useRoom();
   React.useEffect(() => {
-    if (!room) return;
     const { provider, ydoc } = getRoom(room.id, room.password);
     const changeFunc = () => {
       const faces = Array.from(

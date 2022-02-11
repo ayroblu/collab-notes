@@ -29,9 +29,6 @@ export const FilesList = () => {
   const fileName = useFileName();
   const room = useRoom();
   const filesData = useRecoilValue(filesDataState);
-  if (!room) {
-    return null;
-  }
 
   return (
     <ul>
@@ -100,7 +97,6 @@ const NewFile: React.FC = () => {
   const [isNewFileInput, setIsNewFileInput] = React.useState(false);
   const room = useRoom();
   const [, setFileName] = useFileNameState();
-  if (!room) return null;
   const handleNewFileFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     handleNewFile(e.currentTarget.value.trim());
   };
@@ -117,7 +113,6 @@ const NewFile: React.FC = () => {
         return handleNewFile(e.currentTarget.value.trim());
       case "Escape":
         setIsNewFileInput(false);
-        
     }
   };
 

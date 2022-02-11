@@ -13,7 +13,7 @@ import {
 export const useRoom = () => {
   const settings = useRecoilValue(settingsSelector);
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
-  return settings.rooms.find(({ id }) => id === activeRoomId);
+  return getNonNullable(settings.rooms.find(({ id }) => id === activeRoomId));
 };
 
 export const useFileName = () => {

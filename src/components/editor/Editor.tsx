@@ -9,12 +9,11 @@ import type * as Y from "yjs";
 import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import {
-  createNewFile,
   getDocument,
   getFileFromFileName,
+  getFileTextFromFileName,
   getRoom,
   getYFileMetaData,
-  getYFileText,
 } from "@/modules/documents";
 import type { AwarenessStates, LocalState } from "@/modules/documents";
 import { checkEqual, getHashColor } from "@/modules/utils";
@@ -71,13 +70,15 @@ function useMonacoEditor(
     if (!editorDivRef.current || !fileName) {
       return;
     }
-    if (!room) return;
-    const { editor, model, text } = createMonacoEditor(
+    const text = getFileTextFromFileName(room.id, room.password, fileName);
+    if (!text) return;
+    const { editor, model } = createMonacoEditor(
       editorDivRef.current,
       setCursorStyles,
       settings,
       room,
       fileName,
+      text,
       getIsMounted
     );
     editorRef.current = editor;
@@ -114,7 +115,6 @@ function useMonacoEditor(
     settings,
   ]);
   React.useEffect(() => {
-    if (!room) return;
     const text = getDocument(room.id, room.password, fileName);
     if (!text) return;
     if (isNewUser) {
@@ -144,14 +144,10 @@ function createMonacoEditor(
   settings: Settings,
   room: Room,
   fileName: string,
+  text: Y.Text,
   getIsMounted: () => boolean
 ) {
   const { provider, ydoc } = getRoom(room.id, room.password);
-  let file = getFileFromFileName(room.id, room.password, fileName);
-  if (!file) {
-    file = createNewFile(room.id, room.password, fileName);
-  }
-  const text = getYFileText(file);
   // https://stackoverflow.com/questions/56681345/how-to-dynamically-set-language-according-to-file-extension-in-monaco-editor
   const model = monaco.editor.createModel(
     "",
@@ -195,7 +191,7 @@ function createMonacoEditor(
   !isBuiltInTheme && setupThemes(settings.theme);
 
   editor.focus();
-  return { editor, model, text };
+  return { editor, model };
 }
 const builtInThemes = ["vs", "vs-dark", "hc-black"];
 

@@ -40,7 +40,6 @@ const useFilesListSync = () => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
 
   React.useEffect(() => {
-    if (!room) return;
     const { files } = getRoom(room.id, room.password);
     deduplicateFiles(files);
 
@@ -64,7 +63,6 @@ const useCommentsSync = () => {
   const setComments = useSetComments();
 
   React.useEffect(() => {
-    if (!room) return;
     const yComments = getComments(room.id, room.password, fileName);
     if (!yComments) return;
 
@@ -86,7 +84,6 @@ const useCommentNamesSync = () => {
   const fileName = useFileName();
 
   React.useEffect(() => {
-    if (!room) return;
     const yComments = getComments(room.id, room.password, fileName);
     if (!yComments) return;
 
@@ -104,7 +101,6 @@ const useThreadsSync = () => {
   const setThreads = useSetThreads();
 
   React.useEffect(() => {
-    if (!room) return;
     const yThread = getAllThreads(room.id, room.password, fileName);
     if (!yThread) return;
     const threads = yThread.toJSON();
