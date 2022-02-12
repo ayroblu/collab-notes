@@ -136,12 +136,6 @@ function useMonacoEditor(
   useSelectionHandler();
   useCommentHighlightActive();
   useLineRestoration();
-
-  React.useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    editor.layout();
-  }, [editorRef]);
 }
 
 function createMonacoEditor(
