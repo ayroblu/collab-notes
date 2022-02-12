@@ -3,7 +3,7 @@ import { sortBy } from "@/modules/utils";
 export function getCommentDetails(
   commentSizes: { id: string; top: number; height: number }[]
 ) {
-  return commentSizes.sort(sortBy([({ top }) => top], ["asc"]));
+  return commentSizes.concat().sort(sortBy([({ top }) => top], ["asc"]));
 }
 
 export function getNearestCommentId(

@@ -8,10 +8,9 @@ export const useEditorHeight = () => {
   const [editorDivHeight, setEditorDivHeight] = React.useState(
     window.innerHeight
   );
-  const editor = editorRef.current;
-  const editorDiv = editorDivRef.current;
-  // return editor.getContentHeight();
   React.useEffect(() => {
+    const editor = editorRef.current;
+    const editorDiv = editorDivRef.current;
     if (!editor || !editorDiv) return;
     const ro = new ResizeObserver(() => {
       const editorDivHeight = editorDiv.offsetHeight;
@@ -28,6 +27,6 @@ export const useEditorHeight = () => {
     return () => {
       ro.unobserve(editorDiv);
     };
-  }, [editor, editorDiv]);
+  }, [editorDivRef, editorRef]);
   return { editorHeight, editorDivHeight };
 };

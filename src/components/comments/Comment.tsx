@@ -28,6 +28,7 @@ import styles from "./Comment.module.css";
 import { CommentEntryItem } from "./CommentEntryItem";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 import { CommentThread } from "./CommentThread";
+import { useCommentHeight } from "./useCommentHeight";
 
 type Props = CommentData & {
   offset: number | undefined;
@@ -80,6 +81,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   const setCommentSize = useSetRecoilState(
     commentSizeSelector({ commentIds: [id] })
   );
+  const observer = useCommentHeight(id);
   const position = usePosition(selection);
   const offsetTop =
     nonNullable(position) && nonNullable(offset)
@@ -95,8 +97,9 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
       const height = r.offsetHeight;
       commentRefs.current[id] = r;
       setCommentSize([{ id, top: position, height }]);
+      observer();
     },
-    [commentRefs, id, position, setCommentSize]
+    [commentRefs, id, observer, position, setCommentSize]
   );
 
   return (
