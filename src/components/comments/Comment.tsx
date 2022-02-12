@@ -205,7 +205,7 @@ const usePosition = (selection: SelectionRange) => {
   if (!editor) return;
   const editorDiv = editorDivRef.current;
   if (!editorDiv) return;
-  const editorTop = editorDiv.getBoundingClientRect().top;
+  const editorTop = editorDiv.getBoundingClientRect().top - 1;
   const top = editor.getTopForPosition(
     selection.startLineNumber,
     selection.startColumn
