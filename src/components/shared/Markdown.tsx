@@ -1,3 +1,4 @@
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import type { CodeProps } from "react-markdown/lib/ast-to-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -6,7 +7,7 @@ import remarkGfm from "remark-gfm";
 
 import styles from "./Markdown.module.css";
 
-export const Markdown: React.FC<{ text: string }> = ({ text }) => (
+export const Markdown: React.FC<{ text: string }> = React.memo(({ text }) => (
   <ReactMarkdown
     children={text}
     remarkPlugins={[remarkGfm]}
@@ -14,7 +15,7 @@ export const Markdown: React.FC<{ text: string }> = ({ text }) => (
       code: Code,
     }}
   />
-);
+));
 
 const Code: React.FC<CodeProps> = ({
   children,

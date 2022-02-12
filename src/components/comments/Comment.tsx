@@ -20,6 +20,7 @@ import {
   useFileParams,
   useFocusCommentIdState,
   useRoom,
+  useSetFocusCommentIdState,
 } from "../utils";
 
 import styles from "./Comment.module.css";
@@ -44,8 +45,13 @@ export const Comment: React.FC<Props> = ({ offset, ...comment }) => {
   const isActiveComment = focusCommentIsActive && isFocusComment;
 
   return (
-    <CommentHolder {...comment} offset={offset}>
-      <CommentMain {...comment} />
+    <CommentHolder
+      {...comment}
+      offset={offset}
+      isFocusComment={isFocusComment}
+      isActiveComment={isActiveComment}
+    >
+      <CommentMain {...comment} isFocusComment={isFocusComment} />
       <CommentThread commentId={id} />
       {isActiveComment && <div className={styles.ruledLine} />}
       {isActiveComment && <CommentAddThread commentId={id} />}
@@ -57,19 +63,23 @@ type CommentHolderProps = {
   id: string;
   offset: number | undefined;
   selection: SelectionRange;
+  isFocusComment: boolean;
+  isActiveComment: boolean;
 };
 export const CommentHolder: React.FC<CommentHolderProps> = ({
   children,
   id,
+  isActiveComment,
+  isFocusComment,
   offset,
   selection,
 }) => {
   const { commentRefs } = React.useContext(CommentsContext);
-  const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+  const setFocusCommentId = useSetFocusCommentIdState();
   const setCommentDidCreate = useSetRecoilState(commentDidCreateState);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
-  const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
+  const setFocusCommentIsActive = useSetRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
   const position = usePosition(selection);
@@ -79,8 +89,6 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
       : nonNullable(position)
       ? position
       : 0;
-  const isFocusComment = focusCommentId === id;
-  const isActiveComment = focusCommentIsActive && isFocusComment;
   const offsetLeft = isActiveComment ? "-32px" : "0";
   const handleRef = (r: HTMLElement | null) => {
     if (!r || typeof position !== "number") return;
@@ -100,7 +108,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   return (
     <section
       ref={handleRef}
-      className={cn(styles.comment, focusCommentId === id && styles.focus)}
+      className={cn(styles.comment, isFocusComment && styles.focus)}
       style={{
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
@@ -139,31 +147,34 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
   }
 );
 
-const CommentMain: React.FC<CommentData> = React.memo(
-  ({ byName, dateUpdated, id, text }) => {
+const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
+  React.memo(({ byName, dateUpdated, id, isFocusComment, text }) => {
     const [isEdit, setIsEdit] = React.useState(false);
     const { commentRefs } = React.useContext(CommentsContext);
     const { fileName, roomId, roomPassword } = useFileParams();
-    const [focusCommentId, setFocusCommentId] = useFocusCommentIdState();
+    const setFocusCommentId = useSetFocusCommentIdState();
     const setFocusCommentIsActive = useSetRecoilState(
       focusCommentIsActiveState({ fileName, roomId })
     );
     const inProgressComments = useRecoilValue(inProgressCommentsSelector);
     const comments = useComments();
 
-    const onEditSubmit = (text: string) => {
-      editComment(roomId, roomPassword, fileName, id, text);
+    const onEditSubmit = React.useCallback(
+      (text: string) => {
+        editComment(roomId, roomPassword, fileName, id, text);
+        setIsEdit(false);
+        return false;
+      },
+      [fileName, id, roomId, roomPassword]
+    );
+    const onEditCancel = React.useCallback(() => {
       setIsEdit(false);
-      return false;
-    };
-    const onEditCancel = () => {
-      setIsEdit(false);
-    };
-    const deleteComment = () => {
+    }, []);
+    const deleteComment = React.useCallback(() => {
       const success = removeComment(roomId, roomPassword, fileName, id);
       if (!success) return;
 
-      if (focusCommentId === id) {
+      if (isFocusComment) {
         setFocusCommentId(
           getNearestCommentId(
             commentRefs.current,
@@ -174,16 +185,30 @@ const CommentMain: React.FC<CommentData> = React.memo(
         setFocusCommentIsActive(false);
       }
       delete commentRefs.current[id];
-    };
-    const onEdit = () => {
+    }, [
+      commentRefs,
+      comments,
+      fileName,
+      id,
+      inProgressComments,
+      isFocusComment,
+      roomId,
+      roomPassword,
+      setFocusCommentId,
+      setFocusCommentIsActive,
+    ]);
+    const onEdit = React.useCallback(() => {
       setIsEdit(true);
       setFocusCommentId(id);
       setFocusCommentIsActive(true);
-    };
-    const options = [
-      { label: "Edit", onClick: onEdit },
-      { label: "Delete", onClick: deleteComment },
-    ];
+    }, [id, setFocusCommentId, setFocusCommentIsActive]);
+    const options = React.useMemo(
+      () => [
+        { label: "Edit", onClick: onEdit },
+        { label: "Delete", onClick: deleteComment },
+      ],
+      [deleteComment, onEdit]
+    );
     return (
       <CommentEntryItem
         byName={byName}
@@ -195,8 +220,7 @@ const CommentMain: React.FC<CommentData> = React.memo(
         onEditCancel={onEditCancel}
       />
     );
-  }
-);
+  });
 
 const usePosition = (selection: SelectionRange) => {
   const { editorDivRef, editorRef } = React.useContext(EditorContext);
