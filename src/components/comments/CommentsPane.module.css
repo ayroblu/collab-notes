@@ -7,12 +7,14 @@
 }
 .commentsWrapper {
   display: flex;
+  position: relative;
 }
 .commentButtonContainer {
   position: relative;
   overflow-y: auto;
   width: 35px;
-  background-color: var(--deep-color);
+  position: absolute;
+  z-index: 1;
 }
 /* Hide scrollbar for Chrome, Safari and Opera */
 .commentButtonContainer::-webkit-scrollbar {
