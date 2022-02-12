@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import { createComment } from "@/modules/documents";
@@ -8,6 +8,7 @@ import type { CommentData, SelectionRange } from "@/modules/documents";
 import { CommentsContext } from "../Contexts";
 import {
   focusCommentIsActiveState,
+  focusNearestCommentIdSelector,
   inProgressCommentsSelector,
   settingsSelector,
 } from "../data-model";
@@ -25,7 +26,6 @@ import styles from "./CommentsPane.module.css";
 import { useCommentOffsets } from "./useCommentOffsets";
 import { useEditorHeight } from "./useEditorHeight";
 import { useEditorScrollSync } from "./useEditorScrollSync";
-import { getNearestCommentId } from "./utils";
 
 export const CommentsPane: React.FC = () => {
   const settings = useRecoilValue(settingsSelector);
@@ -43,6 +43,9 @@ export const CommentsPane: React.FC = () => {
   const [focusCommentId] = useFocusCommentIdState();
   const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
+  );
+  const setNearestFocusCommentId = useSetRecoilState(
+    focusNearestCommentIdSelector
   );
   useEditorScrollSync(
     commentsPaneRef,
@@ -76,13 +79,8 @@ export const CommentsPane: React.FC = () => {
     setInProgressComments(
       inProgressComments.filter(({ id }) => id !== commentId)
     );
-    setFocusCommentId(
-      getNearestCommentId(
-        commentRefs.current,
-        comments.concat(inProgressComments).map(({ id }) => id),
-        commentId
-      )
-    );
+    const commentIds = comments.concat(inProgressComments).map(({ id }) => id);
+    setNearestFocusCommentId({ commentIds, commentId });
     setFocusCommentIsActive(false);
     delete commentRefs.current[commentId];
   };

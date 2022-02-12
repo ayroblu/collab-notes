@@ -7,7 +7,7 @@ import { CommentsContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
-  commentDidUpdateState,
+  commentSizeSelector,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
 } from "../data-model";
@@ -30,13 +30,11 @@ export const useCommentOffsets = () => {
   const focusCommentIsActive = useRecoilValue(
     focusCommentIsActiveState({ fileName, roomId })
   );
-  const commentDidUpdate = useRecoilValue(commentDidUpdateState);
+  const commentIds = comments.concat(inProgressComments).map(({ id }) => id);
+  const commentSizes = useRecoilValue(commentSizeSelector({ commentIds }));
 
   React.useEffect(() => {
-    const commentDetails = getCommentDetails(
-      commentRefs.current,
-      comments.concat(inProgressComments).map(({ id }) => id)
-    );
+    const commentDetails = getCommentDetails(commentSizes);
 
     updateOffsets({
       commentDetails,
@@ -53,8 +51,7 @@ export const useCommentOffsets = () => {
     commentRefs,
     getIsMounted,
     focusCommentIsActive,
-    // Special case, always rerender when manually declared
-    commentDidUpdate,
+    commentSizes,
   ]);
   return { offsets, extraOffset, scrollOffset };
 };
@@ -63,7 +60,6 @@ type UpdateOffsetsParams = {
   focusCommentId: string | null;
   commentDetails: {
     id: string;
-    el: HTMLElement;
     top: number;
     height: number;
   }[];

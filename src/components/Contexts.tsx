@@ -9,19 +9,14 @@ type EditorContext = {
 };
 export const EditorContext = React.createContext<EditorContext>({} as any);
 type CommentsContext = {
-  commentRefs: React.MutableRefObject<{ [key: string]: CommentLayout }>;
-};
-export type CommentLayout = {
-  el: HTMLElement;
-  height: number;
-  top: number;
+  commentRefs: React.MutableRefObject<{ [key: string]: HTMLElement }>;
 };
 export const CommentsContext = React.createContext<CommentsContext>({} as any);
 
 export const Contexts: React.FC = ({ children }) => {
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor>();
   const editorDivRef = React.useRef<HTMLDivElement>(null);
-  const commentRefs = React.useRef<{ [key: string]: CommentLayout }>({});
+  const commentRefs = React.useRef<{ [key: string]: HTMLElement }>({});
 
   return (
     <EditorContext.Provider value={{ editorRef, editorDivRef }}>

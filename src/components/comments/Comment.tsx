@@ -9,9 +9,10 @@ import { CommentsContext, EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
-  commentDidUpdateState,
+  commentSizeSelector,
   editorDidCreateState,
   focusCommentIsActiveState,
+  focusNearestCommentIdSelector,
   inProgressCommentsSelector,
   settingsSelector,
 } from "../data-model";
@@ -27,7 +28,6 @@ import styles from "./Comment.module.css";
 import { CommentEntryItem } from "./CommentEntryItem";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 import { CommentThread } from "./CommentThread";
-import { getNearestCommentId } from "./utils";
 
 type Props = CommentData & {
   offset: number | undefined;
@@ -72,11 +72,13 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
 }) => {
   const { commentRefs } = React.useContext(CommentsContext);
   const setFocusCommentId = useSetFocusCommentIdState();
-  const setCommentDidUpdate = useSetRecoilState(commentDidUpdateState);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const setFocusCommentIsActive = useSetRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
+  );
+  const setCommentSize = useSetRecoilState(
+    commentSizeSelector({ commentIds: [id] })
   );
   const position = usePosition(selection);
   const offsetTop =
@@ -86,20 +88,16 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
       ? position
       : 0;
   const offsetLeft = isActiveComment ? "-32px" : "0";
-  const handleRef = (r: HTMLElement | null) => {
-    if (!r || typeof position !== "number") return;
+  const handleRef = React.useCallback(
+    (r: HTMLElement | null) => {
+      if (!r || typeof position !== "number") return;
 
-    const old = commentRefs.current[id];
-    const height = r.offsetHeight;
-    commentRefs.current[id] = {
-      el: r,
-      top: position,
-      height,
-    };
-    if (!old || old.height !== height) {
-      setCommentDidUpdate({});
-    }
-  };
+      const height = r.offsetHeight;
+      commentRefs.current[id] = r;
+      setCommentSize([{ id, top: position, height }]);
+    },
+    [commentRefs, id, position, setCommentSize]
+  );
 
   return (
     <section
@@ -154,6 +152,9 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
     );
     const inProgressComments = useRecoilValue(inProgressCommentsSelector);
     const comments = useComments();
+    const setNearestFocusCommentId = useSetRecoilState(
+      focusNearestCommentIdSelector
+    );
 
     const onEditSubmit = React.useCallback(
       (text: string) => {
@@ -171,13 +172,10 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
       if (!success) return;
 
       if (isFocusComment) {
-        setFocusCommentId(
-          getNearestCommentId(
-            commentRefs.current,
-            comments.concat(inProgressComments).map(({ id }) => id),
-            id
-          )
-        );
+        const commentIds = comments
+          .concat(inProgressComments)
+          .map(({ id }) => id);
+        setNearestFocusCommentId({ commentIds, commentId: id });
         setFocusCommentIsActive(false);
       }
       delete commentRefs.current[id];
@@ -190,8 +188,8 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
       isFocusComment,
       roomId,
       roomPassword,
-      setFocusCommentId,
       setFocusCommentIsActive,
+      setNearestFocusCommentId,
     ]);
     const onEdit = React.useCallback(() => {
       setIsEdit(true);

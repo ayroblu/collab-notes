@@ -174,17 +174,13 @@ export const editorDidCreateState = atom<{}>({
   key: "editorDidCreateState",
   default: {},
 });
-export const commentDidUpdateState = atom<{}>({
-  key: "commentDidUpdateState",
-  default: {},
-});
 
 type CommentId = string;
-export const commentsTopState = atomFamily<number, CommentId>({
+export const commentTopState = atomFamily<number, CommentId>({
   key: "commentsTopState",
   default: 0,
 });
-export const commentsHeightState = atomFamily<number, CommentId>({
+export const commentHeightState = atomFamily<number, CommentId>({
   key: "commentsHeightState",
   default: 0,
 });

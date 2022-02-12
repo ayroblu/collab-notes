@@ -38,7 +38,7 @@ export const useCommentDecorationsHover = () => {
           const commentClass = classes.find((c) => c.startsWith("comment-"));
           if (!commentClass) return;
           const commentId = commentClass.replace("comment-", "");
-          const el = commentRefs.current[commentId]?.el;
+          const el = commentRefs.current[commentId];
           if (!el) return;
           if (isIn) {
             el.classList.add(styles.commentHover);
