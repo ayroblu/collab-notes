@@ -10,7 +10,6 @@
   position: relative;
 }
 .commentButtonContainer {
-  position: relative;
   overflow-y: auto;
   width: 35px;
   position: absolute;
