@@ -14,62 +14,67 @@ type AddCommentProps = {
   onSubmit: () => void;
   onCancel: () => void;
   id: string;
+  isFocusComment: boolean;
+  isActiveComment: boolean;
 };
-export const AddComment: React.FC<AddCommentProps> = ({
-  id,
-  offset,
-  onCancel,
-  onSubmit,
-}) => {
-  const fileName = useFileName();
-  const [comment, setComment] = useRecoilState(
-    inProgressCommentSelector({ fileName, commentId: id })
-  );
-  const settings = useRecoilValue(settingsSelector);
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit();
-  };
-  const handleCancel = () => {
-    onCancel();
-  };
-  const onBlur = () => {
-    if (!comment.text) {
-      handleCancel();
-    }
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    const isCmd = e.getModifierState("Meta");
-    const isCtrl = e.getModifierState("Ctrl");
-    switch (e.key) {
-      case "Enter":
-        if (isCmd || isCtrl) {
-          return onSubmit();
-        }
-    }
-  };
-
-  return (
-    <CommentHolder id={id} offset={offset} selection={comment.selection}>
-      <CommentHeading byName={settings.name} />
-      <form onSubmit={handleSubmit} className={styles.main}>
-        <textarea
-          className={styles.textarea}
-          value={comment.text}
-          onChange={(e) =>
-            setComment({ ...comment, text: e.currentTarget.value })
+export const AddComment: React.FC<AddCommentProps> = React.memo(
+  ({ id, isActiveComment, isFocusComment, offset, onCancel, onSubmit }) => {
+    const fileName = useFileName();
+    const [comment, setComment] = useRecoilState(
+      inProgressCommentSelector({ fileName, commentId: id })
+    );
+    const settings = useRecoilValue(settingsSelector);
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      onSubmit();
+    };
+    const handleCancel = () => {
+      onCancel();
+    };
+    const onBlur = () => {
+      if (!comment.text) {
+        handleCancel();
+      }
+    };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+      const isCmd = e.getModifierState("Meta");
+      const isCtrl = e.getModifierState("Ctrl");
+      switch (e.key) {
+        case "Enter":
+          if (isCmd || isCtrl) {
+            return onSubmit();
           }
-          onKeyDown={handleKeyDown}
-          onBlur={onBlur}
-          autoFocus
-        />
-        <div className={styles.flexEnd}>
-          <SubmitButton value="Save" disabled={!comment.text} />
-          <Button buttonType="form" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </CommentHolder>
-  );
-};
+      }
+    };
+
+    return (
+      <CommentHolder
+        id={id}
+        offset={offset}
+        selection={comment.selection}
+        isFocusComment={isFocusComment}
+        isActiveComment={isActiveComment}
+      >
+        <CommentHeading byName={settings.name} />
+        <form onSubmit={handleSubmit} className={styles.main}>
+          <textarea
+            className={styles.textarea}
+            value={comment.text}
+            onChange={(e) =>
+              setComment({ ...comment, text: e.currentTarget.value })
+            }
+            onKeyDown={handleKeyDown}
+            onBlur={onBlur}
+            autoFocus
+          />
+          <div className={styles.flexEnd}>
+            <SubmitButton value="Save" disabled={!comment.text} />
+            <Button buttonType="form" onClick={handleCancel}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CommentHolder>
+    );
+  }
+);

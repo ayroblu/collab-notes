@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import { createComment } from "@/modules/documents";
@@ -7,7 +7,6 @@ import type { CommentData, SelectionRange } from "@/modules/documents";
 
 import { CommentsContext } from "../Contexts";
 import {
-  editorDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
   settingsSelector,
@@ -15,6 +14,7 @@ import {
 import {
   useComments,
   useFileParams,
+  useFocusCommentIdState,
   useSetFocusCommentIdState,
 } from "../utils";
 
@@ -40,7 +40,8 @@ export const CommentsPane: React.FC = () => {
   const { editorDivHeight, editorHeight } = useEditorHeight();
   const commentsPaneRef = React.useRef<HTMLElement>(null);
   const commentButtonWrapperRef = React.useRef<HTMLElement>(null);
-  const setFocusCommentIsActive = useSetRecoilState(
+  const [focusCommentId] = useFocusCommentIdState();
+  const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
     focusCommentIsActiveState({ fileName, roomId })
   );
   useEditorScrollSync(
@@ -49,7 +50,6 @@ export const CommentsPane: React.FC = () => {
     extraOffset,
     scrollOffset
   );
-  useRecoilValue(editorDidCreateState);
 
   const addInProgressComment = (selection: SelectionRange) => {
     const now = new Date().toISOString();
@@ -115,6 +115,10 @@ export const CommentsPane: React.FC = () => {
             <li key={comment.id}>
               <Comment
                 offset={(offsets[comment.id] ?? 0) + extraOffset}
+                isFocusComment={focusCommentId === comment.id}
+                isActiveComment={
+                  focusCommentIsActive && focusCommentId === comment.id
+                }
                 {...comment}
               />
             </li>
@@ -126,6 +130,10 @@ export const CommentsPane: React.FC = () => {
                 id={comment.id}
                 onSubmit={createCommentFn(comment)}
                 onCancel={cancelCommentFn(comment.id)}
+                isFocusComment={focusCommentId === comment.id}
+                isActiveComment={
+                  focusCommentIsActive && focusCommentId === comment.id
+                }
               />
             </li>
           ))}

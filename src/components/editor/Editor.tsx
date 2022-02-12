@@ -25,7 +25,6 @@ import {
   cursorPositionState,
   editorDidCreateState,
   isNewUserState,
-  leftNavState,
   settingsSelector,
 } from "../data-model";
 import type { Room, Settings } from "../data-model";

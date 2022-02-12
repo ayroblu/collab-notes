@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { addThread, editComment, removeComment } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
@@ -10,6 +10,7 @@ import {
   activeFileNameState,
   activeRoomIdSelector,
   commentDidCreateState,
+  editorDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
   settingsSelector,
@@ -18,7 +19,6 @@ import {
   useComments,
   useFileName,
   useFileParams,
-  useFocusCommentIdState,
   useRoom,
   useSetFocusCommentIdState,
 } from "../utils";
@@ -31,33 +31,29 @@ import { getNearestCommentId } from "./utils";
 
 type Props = CommentData & {
   offset: number | undefined;
+  isFocusComment: boolean;
+  isActiveComment: boolean;
 };
 
-export const Comment: React.FC<Props> = ({ offset, ...comment }) => {
-  const { id } = comment;
-  const [focusCommentId] = useFocusCommentIdState();
-  const roomId = useRecoilValue(activeRoomIdSelector);
-  const fileName = useRecoilValue(activeFileNameState(roomId));
-  const [focusCommentIsActive] = useRecoilState(
-    focusCommentIsActiveState({ fileName, roomId })
-  );
-  const isFocusComment = focusCommentId === id;
-  const isActiveComment = focusCommentIsActive && isFocusComment;
+export const Comment: React.FC<Props> = React.memo(
+  ({ isActiveComment, isFocusComment, offset, ...comment }) => {
+    const { id } = comment;
 
-  return (
-    <CommentHolder
-      {...comment}
-      offset={offset}
-      isFocusComment={isFocusComment}
-      isActiveComment={isActiveComment}
-    >
-      <CommentMain {...comment} isFocusComment={isFocusComment} />
-      <CommentThread commentId={id} />
-      {isActiveComment && <div className={styles.ruledLine} />}
-      {isActiveComment && <CommentAddThread commentId={id} />}
-    </CommentHolder>
-  );
-};
+    return (
+      <CommentHolder
+        {...comment}
+        offset={offset}
+        isFocusComment={isFocusComment}
+        isActiveComment={isActiveComment}
+      >
+        <CommentMain {...comment} isFocusComment={isFocusComment} />
+        <CommentThread commentId={id} />
+        {isActiveComment && <div className={styles.ruledLine} />}
+        {isActiveComment && <CommentAddThread commentId={id} />}
+      </CommentHolder>
+    );
+  }
+);
 
 type CommentHolderProps = {
   id: string;
@@ -224,6 +220,7 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
 
 const usePosition = (selection: SelectionRange) => {
   const { editorDivRef, editorRef } = React.useContext(EditorContext);
+  useRecoilValue(editorDidCreateState);
 
   const editor = editorRef.current;
   if (!editor) return;
