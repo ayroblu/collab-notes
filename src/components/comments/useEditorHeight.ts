@@ -14,7 +14,7 @@ export const useEditorHeight = () => {
   React.useEffect(() => {
     if (!editor || !editorDiv) return;
     const ro = new ResizeObserver(() => {
-      const editorDivHeight = editorDiv.getBoundingClientRect().height;
+      const editorDivHeight = editorDiv.offsetHeight;
       const editorHeight = editor.getContentHeight();
       setEditorDivHeight(editorDivHeight);
 

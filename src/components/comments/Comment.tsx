@@ -94,7 +94,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
     if (!r || typeof position !== "number") return;
 
     const old = commentRefs.current[id];
-    const height = r.getBoundingClientRect().height;
+    const height = r.offsetHeight;
     commentRefs.current[id] = {
       el: r,
       top: position,
@@ -230,7 +230,7 @@ const usePosition = (selection: SelectionRange) => {
   const editorDiv = editorDivRef.current;
   if (!editorDiv) return;
   // TODO: Why does -1 make this work? Removing it causes the scroll sync to fail
-  const editorTop = editorDiv.getBoundingClientRect().top - 1;
+  const editorTop = editorDiv.offsetTop - 1;
   const top = editor.getTopForPosition(
     selection.startLineNumber,
     selection.startColumn
