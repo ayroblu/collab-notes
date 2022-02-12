@@ -6,7 +6,6 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- loading page has double flash
 - race condition for undo decorations
   - if commented text no longer exists on page - hide them
 - comments v2
