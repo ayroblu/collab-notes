@@ -199,14 +199,17 @@ const CommentMain: React.FC<CommentData> = React.memo(
 );
 
 const usePosition = (selection: SelectionRange) => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editorDivRef, editorRef } = React.useContext(EditorContext);
 
   const editor = editorRef.current;
   if (!editor) return;
+  const editorDiv = editorDivRef.current;
+  if (!editorDiv) return;
+  const editorTop = editorDiv.getBoundingClientRect().top;
   const top = editor.getTopForPosition(
     selection.startLineNumber,
     selection.startColumn
   );
   const lineHeight = editor.getRawOptions().lineHeight || 24;
-  return top - lineHeight;
+  return top - lineHeight - editorTop;
 };
