@@ -7,20 +7,20 @@ import {
 } from "react-icons/vsc";
 import { useRecoilState } from "recoil";
 
-import { timeoutPromiseSuccess } from "@/modules/utils";
+import { nonNullable, timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
 import styles from "./LeftNav.module.css";
 import { LeftNavButton, LeftNavButtonLink } from "./LeftNavButton";
-import { LeftNavEnum, settingsSelector } from "./data-model";
+import { LeftNavEnum, leftNavState } from "./data-model";
 
 export const LeftNav = () => {
-  const [settings, setSettings] = useRecoilState(settingsSelector);
-  const setSettingsLeftNav = (leftNav: LeftNavEnum) => () => {
-    if (settings.leftNav === leftNav) {
-      setSettings({ ...settings, leftNav: null });
+  const [leftNav, setLeftNav] = useRecoilState(leftNavState);
+  const setNewLeftNav = (newLeftNav: LeftNavEnum) => () => {
+    if (leftNav === newLeftNav) {
+      setLeftNav(null);
     } else {
-      setSettings({ ...settings, leftNav });
+      setLeftNav(newLeftNav);
     }
   };
   return (
@@ -29,8 +29,8 @@ export const LeftNav = () => {
         <ul>
           <li>
             <LeftNavButton
-              isHighlight={settings.leftNav === LeftNavEnum.files}
-              onClick={setSettingsLeftNav(LeftNavEnum.files)}
+              isHighlight={leftNav === LeftNavEnum.files}
+              onClick={setNewLeftNav(LeftNavEnum.files)}
             >
               <VscFiles />
               Files
@@ -38,8 +38,8 @@ export const LeftNav = () => {
           </li>
           <li>
             <LeftNavButton
-              isHighlight={settings.leftNav === LeftNavEnum.rooms}
-              onClick={setSettingsLeftNav(LeftNavEnum.rooms)}
+              isHighlight={leftNav === LeftNavEnum.rooms}
+              onClick={setNewLeftNav(LeftNavEnum.rooms)}
             >
               <VscOrganization />
               Groups
@@ -52,7 +52,7 @@ export const LeftNav = () => {
           <li>
             <LeftNavButton onClick={reloadPage}>
               <VscRefresh />
-              Refresh
+              Reset
             </LeftNavButton>
           </li>
           <li>
@@ -69,5 +69,12 @@ export const LeftNav = () => {
 
 const reloadPage = async () => {
   await timeoutPromiseSuccess(unregister(), 300);
+  const dbs = await window.indexedDB.databases();
+  dbs
+    .map((db) => db.name)
+    .filter(nonNullable)
+    .forEach((name) => {
+      window.indexedDB.deleteDatabase(name);
+    });
   location.reload();
 };

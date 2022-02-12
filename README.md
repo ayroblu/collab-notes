@@ -6,12 +6,10 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- seperate button to create comment into its own scoll section
-- race condition for undo decorations
-  - if commented text no longer exists on page - hide them
-- changing left nav removes decorations
 - creating file doesn't go to new file
 - loading page has double flash
+- race condition for undo decorations
+  - if commented text no longer exists on page - hide them
 - comments v2
   - on click if scroll required, scroll page to where comment actually is
   - notifications for when you have new comments / threads

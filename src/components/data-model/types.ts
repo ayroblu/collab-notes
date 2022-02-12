@@ -15,6 +15,5 @@ export type Settings = {
   name: string;
   theme: string;
   rooms: Room[];
-  leftNav: LeftNavEnum | null;
   id: string;
 };

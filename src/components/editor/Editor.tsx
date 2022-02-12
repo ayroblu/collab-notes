@@ -25,6 +25,7 @@ import {
   cursorPositionState,
   editorDidCreateState,
   isNewUserState,
+  leftNavState,
   settingsSelector,
 } from "../data-model";
 import type { Room, Settings } from "../data-model";
@@ -65,6 +66,7 @@ function useMonacoEditor(
   const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
   const setEditorDidCreate = useSetRecoilState(editorDidCreateState);
 
+  const { createOrUpdate, handleCommentUpdates } = useCommentDecorations();
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
       return;
@@ -81,10 +83,10 @@ function useMonacoEditor(
       getIsMounted
     );
     editorRef.current = editor;
-    const { dispose: disposeLayoutChange } = editor.onDidLayoutChange(() => {
-      disposeLayoutChange();
+    // TODO: figure out a better way to determine when the editor has loaded
+    const timeoutId = window.setTimeout(() => {
       setEditorDidCreate({});
-    });
+    }, 100);
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
       if (!file) return;
@@ -97,17 +99,24 @@ function useMonacoEditor(
       });
     };
     text.observe(changeListener);
+    const decorationDispose = createOrUpdate();
+    const decorationUpdatesDispose = handleCommentUpdates();
     return () => {
       editor.dispose();
       model.dispose();
       text.unobserve(changeListener);
       editorRef.current = undefined;
+      decorationDispose?.();
+      decorationUpdatesDispose?.();
+      clearTimeout(timeoutId);
     };
   }, [
+    createOrUpdate,
     editorDivRef,
     editorRef,
     fileName,
     getIsMounted,
+    handleCommentUpdates,
     room,
     setCursorStyles,
     setEditorDidCreate,
@@ -123,7 +132,6 @@ function useMonacoEditor(
       setIsNewUser(false);
     }
   }, [fileName, isNewUser, room, setIsNewUser]);
-  useCommentDecorations();
   useCommentDecorationsHover();
   useSelectionHandler();
   useCommentHighlightActive();
@@ -132,7 +140,6 @@ function useMonacoEditor(
   React.useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
-    editor.layout({ width: 300, height: 300 });
     editor.layout();
   }, [editorRef]);
 }
@@ -273,16 +280,19 @@ function useLineRestoration() {
     const editor = editorRef.current;
     if (!editor) return;
     editor.setPosition(cursorPosition);
-    const { dispose: disposeLayoutChange } = editor.onDidLayoutChange(() => {
-      disposeLayoutChange();
+    // TODO: figure out a better way to determine when the editor has loaded
+    const timeoutId = window.setTimeout(() => {
       editor.revealLineInCenter(cursorPosition.lineNumber);
-    });
+    }, 100);
     editor.onDidChangeCursorPosition((e) => {
       clearTimeout(lineRestorationTimeoutId);
       lineRestorationTimeoutId = window.setTimeout(() => {
         setCursorPosition(e.position);
       }, 1000);
     });
+    return () => {
+      clearTimeout(timeoutId);
+    };
   });
 }
 let lineRestorationTimeoutId = 0;

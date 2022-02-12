@@ -2,4 +2,5 @@
   width: 100%;
   height: calc(100vh - var(--nav-bar-height));
   border: none;
+  overflow: hidden;
 }

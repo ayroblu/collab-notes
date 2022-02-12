@@ -40,7 +40,7 @@ export const Settings: React.FC = () => {
       setSettings({ ...settings, ...tempSettings });
     }
   };
-  // This is just magic, try deleting your name, you should get invalid state
+  // TODO: This is just magic, try deleting your name, you should get invalid state
   const persistStable = useStable(persist, [tempSettings]);
   React.useEffect(() => {
     persist();

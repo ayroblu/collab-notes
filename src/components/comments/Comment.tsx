@@ -205,6 +205,7 @@ const usePosition = (selection: SelectionRange) => {
   if (!editor) return;
   const editorDiv = editorDivRef.current;
   if (!editorDiv) return;
+  // TODO: Why does -1 make this work? Removing it causes the scroll sync to fail
   const editorTop = editorDiv.getBoundingClientRect().top - 1;
   const top = editor.getTopForPosition(
     selection.startLineNumber,

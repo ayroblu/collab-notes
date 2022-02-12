@@ -175,7 +175,7 @@ export const useCommentDecorations = () => {
   const focusCommentId = useRecoilValue(
     focusCommentIdState({ fileName, roomId })
   );
-  React.useEffect(() => {
+  const createOrUpdate = React.useCallback(() => {
     const newDecorations = [
       ...[...comments, ...inProgressComments].map(
         ({
@@ -200,16 +200,27 @@ export const useCommentDecorations = () => {
     const editor = editorRef.current;
     if (!editor) return;
     // TODO: Why set timeout is necessary here? Decorations show double hover without it
+    // I tried editor.onDidLayoutChange but that didn't work
     clearTimeout(timeoutId);
     timeoutId = window.setTimeout(() => {
       setDecorations((decorations) =>
         editor.deltaDecorations(decorations, newDecorations)
       );
     }, 500);
-  }, [inProgressComments, comments, editorRef, focusCommentId]);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [inProgressComments, comments, editorRef]);
+
+  React.useEffect(() => {
+    const dispose = createOrUpdate();
+    return () => {
+      dispose && dispose();
+    };
+  }, [createOrUpdate, focusCommentId]);
 
   const room = useRoom();
-  React.useEffect(() => {
+  const handleCommentUpdates = React.useCallback(() => {
     const editor = editorRef.current;
     // Adjust decorations based on typing that happens
     if (!editor || !room) return;
@@ -251,6 +262,7 @@ export const useCommentDecorations = () => {
       dispose();
     };
   }, [editorRef, fileName, room]);
+  return { createOrUpdate, handleCommentUpdates };
 };
 let timeoutId = 0;
 let commentsThrottleTimeoutId = 0;

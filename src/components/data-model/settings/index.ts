@@ -66,7 +66,6 @@ function getDefaultSettings() {
         password: roomId,
       },
     ],
-    leftNav: null,
     id: uuidv4(),
   };
 }
