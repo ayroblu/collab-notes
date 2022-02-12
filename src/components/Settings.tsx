@@ -5,7 +5,7 @@ import { useForm } from "use-form-ts";
 
 import { useStable } from "@/hooks/useStable";
 
-import { keys } from "../modules/utils";
+import { checkEqual, keys } from "../modules/utils";
 
 import styles from "./Settings.module.css";
 import { settingsSelector } from "./data-model";
@@ -37,15 +37,13 @@ export const Settings: React.FC = () => {
   };
   const persist = () => {
     if (form.validate()) {
-      setSettings({ ...settings, ...tempSettings });
+      setSettings(checkEqual(settings, { ...settings, ...tempSettings }));
     }
   };
-  // TODO: This is just magic, try deleting your name, you should get invalid state
-  const persistStable = useStable(persist, [tempSettings]);
+  const persistStable = useStable(persist);
   React.useEffect(() => {
-    persist();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [persistStable]);
+    persistStable();
+  }, [persistStable, tempSettings]);
 
   return (
     <section className={styles.settings}>

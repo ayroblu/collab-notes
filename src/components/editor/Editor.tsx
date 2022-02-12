@@ -8,6 +8,7 @@ import type * as Y from "yjs";
 
 import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
+import { useStable } from "@/hooks/useStable";
 import {
   getDocument,
   getFileFromFileName,
@@ -66,6 +67,8 @@ function useMonacoEditor(
   const setEditorDidCreate = useSetRecoilState(editorDidCreateState);
 
   const { createOrUpdate, handleCommentUpdates } = useCommentDecorations();
+  const createOrUpdateStable = useStable(createOrUpdate);
+  const handleCommentUpdatesStable = useStable(handleCommentUpdates);
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
       return;
@@ -98,8 +101,8 @@ function useMonacoEditor(
       });
     };
     text.observe(changeListener);
-    const decorationDispose = createOrUpdate();
-    const decorationUpdatesDispose = handleCommentUpdates();
+    const decorationDispose = createOrUpdateStable();
+    const decorationUpdatesDispose = handleCommentUpdatesStable();
     return () => {
       editor.dispose();
       model.dispose();
@@ -110,12 +113,12 @@ function useMonacoEditor(
       clearTimeout(timeoutId);
     };
   }, [
-    createOrUpdate,
+    createOrUpdateStable,
     editorDivRef,
     editorRef,
     fileName,
     getIsMounted,
-    handleCommentUpdates,
+    handleCommentUpdatesStable,
     room,
     setCursorStyles,
     setEditorDidCreate,

@@ -7,10 +7,9 @@ import { CommentsContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
-  commentDidCreateState,
+  commentDidUpdateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
-  showThreadSaveState,
 } from "../data-model";
 import { useComments, useFocusCommentIdState } from "../utils";
 
@@ -26,13 +25,12 @@ export const useCommentOffsets = () => {
   const [extraOffset, setExtraOffset] = React.useState<number>(0);
   const [scrollOffset, setScrollOffset] = React.useState<number>(0);
   const getIsMounted = useIsMounted();
-  const isShowThreadSave = useRecoilValue(showThreadSaveState);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const focusCommentIsActive = useRecoilValue(
     focusCommentIsActiveState({ fileName, roomId })
   );
-  const commentDidCreate = useRecoilValue(commentDidCreateState);
+  const commentDidUpdate = useRecoilValue(commentDidUpdateState);
 
   React.useEffect(() => {
     const commentDetails = getCommentDetails(
@@ -54,9 +52,9 @@ export const useCommentOffsets = () => {
     inProgressComments,
     commentRefs,
     getIsMounted,
-    isShowThreadSave,
     focusCommentIsActive,
-    commentDidCreate,
+    // Special case, always rerender when manually declared
+    commentDidUpdate,
   ]);
   return { offsets, extraOffset, scrollOffset };
 };

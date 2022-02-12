@@ -9,7 +9,7 @@ import { CommentsContext, EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
-  commentDidCreateState,
+  commentDidUpdateState,
   editorDidCreateState,
   focusCommentIsActiveState,
   inProgressCommentsSelector,
@@ -72,7 +72,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
 }) => {
   const { commentRefs } = React.useContext(CommentsContext);
   const setFocusCommentId = useSetFocusCommentIdState();
-  const setCommentDidCreate = useSetRecoilState(commentDidCreateState);
+  const setCommentDidUpdate = useSetRecoilState(commentDidUpdateState);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const setFocusCommentIsActive = useSetRecoilState(
@@ -97,7 +97,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
       height,
     };
     if (!old || old.height !== height) {
-      setCommentDidCreate({});
+      setCommentDidUpdate({});
     }
   };
 
@@ -109,10 +109,10 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
       }}
-      onClick={() => {
+      onClick={React.useCallback(() => {
         setFocusCommentId(id);
         setFocusCommentIsActive(true);
-      }}
+      }, [id, setFocusCommentId, setFocusCommentIsActive])}
     >
       {children}
     </section>

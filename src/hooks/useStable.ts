@@ -1,7 +1,12 @@
 import React from "react";
 
-export const useStable = <T extends (...args: any[]) => any>(
-  func: T,
-  dependents: any[] = []
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-) => React.useCallback(func, dependents);
+export const useStable = <T extends Function>(func: T): T => {
+  const ref = React.useRef(func);
+  ref.current = func;
+
+  return React.useCallback(
+    (...args) => ref.current(...args),
+    []
+    // Not quite handling the generic Function very well
+  ) as unknown as T;
+};

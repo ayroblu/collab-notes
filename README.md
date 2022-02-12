@@ -6,6 +6,7 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
+- adding thread doesn't relayout
 - race condition for undo decorations
   - if commented text no longer exists on page - hide them
 - comments v2

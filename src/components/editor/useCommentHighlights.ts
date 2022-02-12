@@ -62,50 +62,6 @@ function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
     e.clientY < r.bottom;
   return isIn;
 }
-// const useCommentHighlights = () => {
-//   const { commentRefs, comments } = React.useContext(CommentsContext);
-//   const { editorRef } = React.useContext(EditorContext);
-//   React.useEffect(() => {
-//     const editor = editorRef.current;
-//     if (!editor) return;
-//     let disposes: (() => void)[] = [];
-//     const { dispose } = editor.onDidChangeModelDecorations(() => {
-//       if (disposes.length === comments.length) return;
-//       disposes.forEach((d) => d());
-//       disposes = [...document.querySelectorAll(`.${styles.selection}`)].map(
-//         (v) => {
-//           const mouseEnter = () => {
-//             const classes = [...v.classList];
-//             const commentClass = classes.find((c) => c.startsWith("comment-"));
-//             if (!commentClass) return;
-//             const commentId = commentClass.replace("comment-", "");
-//             const el = commentRefs.current[commentId]?.el;
-//             if (!el) return;
-//             el.classList.add(styles.commentHover);
-//           };
-//           const mouseLeave = () => {
-//             const classes = [...v.classList];
-//             const commentClass = classes.find((c) => c.startsWith("comment-"));
-//             if (!commentClass) return;
-//             const commentId = commentClass.replace("comment-", "");
-//             const el = commentRefs.current[commentId]?.el;
-//             if (!el) return;
-//             el.classList.remove(styles.commentHover);
-//           };
-//           v.addEventListener("mouseenter", mouseEnter);
-//           v.addEventListener("mouseleave", mouseLeave);
-//           return () => {
-//             v.removeEventListener("mouseenter", mouseEnter);
-//             v.removeEventListener("mouseenter", mouseLeave);
-//           };
-//         }
-//       );
-//     });
-//     return () => {
-//       dispose();
-//     };
-//   }, [comments]);
-// };
 export const useSelectionHandler = () => {
   const { editorRef } = React.useContext(EditorContext);
   const comments = useComments();
@@ -172,9 +128,6 @@ export const useCommentDecorations = () => {
   const [, setDecorations] = React.useState<string[]>([]);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
-  const focusCommentId = useRecoilValue(
-    focusCommentIdState({ fileName, roomId })
-  );
   const createOrUpdate = React.useCallback(() => {
     const newDecorations = [
       ...[...comments, ...inProgressComments].map(
@@ -217,7 +170,7 @@ export const useCommentDecorations = () => {
     return () => {
       dispose && dispose();
     };
-  }, [createOrUpdate, focusCommentId]);
+  }, [createOrUpdate]);
 
   const room = useRoom();
   const handleCommentUpdates = React.useCallback(() => {
