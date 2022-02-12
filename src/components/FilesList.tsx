@@ -13,7 +13,7 @@ import {
   SiTypescript,
 } from "react-icons/si";
 import { VscNewFile } from "react-icons/vsc";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
 import { cn, dateTimeFormatter } from "@/modules/utils";
@@ -96,6 +96,7 @@ const FileTypeIcon: React.FC<{ name: string }> = ({ name }) => {
 const NewFile: React.FC = () => {
   const [isNewFileInput, setIsNewFileInput] = React.useState(false);
   const room = useRoom();
+  const [, setSearchParams] = useSearchParams();
   const [, setFileName] = useFileNameState();
   const handleNewFileFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     handleNewFile(e.currentTarget.value.trim());
@@ -105,6 +106,7 @@ const NewFile: React.FC = () => {
     if (name) {
       createNewFile(room.id, room.password, name);
       setFileName(name);
+      setSearchParams({ name });
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
