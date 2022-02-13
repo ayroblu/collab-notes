@@ -6,10 +6,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const webpack = require("webpack");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const isProduction = process.env.NODE_ENV === "production";
+const isDebug = !!process.env.DEBUG;
 const swSrc = "./src/service-worker.ts";
 
 module.exports = {
@@ -29,21 +31,43 @@ module.exports = {
   },
   output: {
     globalObject: "self",
-    filename: "[name].bundle.js", // necessary for hardcoded worker names
+    filename: "[name].[contenthash:8].bundle.js", // necessary for hardcoded worker names
     path: path.resolve(__dirname, "dist"),
-    // chunkFilename: isProduction
-    //   ? "static/js/[name].[contenthash:8].chunk.js"
-    //   : isDevelopment && "static/js/[name].chunk.js",
+    chunkFilename: isProduction
+      ? "static/js/[name].[contenthash:8].chunk.js"
+      : isDevelopment && "static/js/[name].chunk.js",
     clean: true,
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx|tsx|ts)$/,
+        test: /\.(?:js|jsx|tsx|ts)$/,
         exclude: /node_modules/,
         use: [
+          // {
+          //   loader: "swc-loader",
+          //   options: {
+          //     jsc: {
+          //       parser: {
+          //         syntax: "typescript",
+          //         jsx: true,
+          //       },
+          //       transform: {
+          //         react: {
+          //           runtime: "automatic",
+          //           pragma: "React.createElement",
+          //           pragmaFrag: "React.Fragment",
+          //           throwIfNamespace: true,
+          //           development: false,
+          //           useBuiltins: false,
+          //         },
+          //       },
+          //     },
+          //   },
+          // },
           {
-            loader: require.resolve("babel-loader"),
+            // loader: require.resolve("babel-loader"),
+            loader: "babel-loader",
             options: {
               presets: [
                 ["@babel/preset-env", { targets: { chrome: "58" } }],
@@ -86,6 +110,8 @@ module.exports = {
         // See https://github.com/cra-template/pwa/issues/13#issuecomment-722667270
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       }),
+    isDebug && new BundleAnalyzerPlugin(),
+    // new webpack.debug.ProfilingPlugin(),
   ].filter(Boolean),
 
   //https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa

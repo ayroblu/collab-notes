@@ -1,0 +1,31 @@
+import type { CodeProps } from "react-markdown/lib/ast-to-react";
+import { Prism } from "react-syntax-highlighter";
+import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+import styles from "./SyntaxHighlighter.module.css";
+
+type Props = Omit<CodeProps, "className" | "inline" | "node"> & {
+  language: string;
+};
+export const SyntaxHighlighter: React.FC<Props> = ({
+  children,
+  language,
+  ...props
+}) => (
+  <Prism
+    children={String(children).replace(/\n$/, "")}
+    style={materialDark}
+    customStyle={{
+      padding: "4px 8px",
+      margin: "4px 0",
+      lineHeight: "inherit",
+      fontSize: "0.9em",
+    }}
+    wrapLongLines
+    codeTagProps={{ className: styles.code }}
+    language={language}
+    PreTag="div"
+    {...props}
+  />
+);
+export default SyntaxHighlighter;

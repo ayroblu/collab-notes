@@ -53,6 +53,7 @@ export const Editor: React.FC = React.memo(() => {
     </>
   );
 });
+export default Editor;
 
 function useMonacoEditor(
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>

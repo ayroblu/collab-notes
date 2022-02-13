@@ -5,6 +5,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier src -w",
     "build": "NODE_ENV='production' webpack --progress",
+    "build:debug": "DEBUG=t yarn build",
     "esbuild": "node build.js"
   },
   "dependencies": {
@@ -66,6 +67,7 @@
     "typescript": "^4.5.4",
     "typescript-plugin-css-modules": "^3.4.0",
     "webpack": "^5.65.0",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.7.2",
     "workbox-webpack-plugin": "^6.4.2"
