@@ -47,6 +47,7 @@ module.exports = {
         test: /\.(?:js|jsx|tsx|ts)$/,
         exclude: /node_modules/,
         use: [
+          // No noticable performance benefit + larger bundle
           // {
           //   loader: "swc-loader",
           //   options: {
