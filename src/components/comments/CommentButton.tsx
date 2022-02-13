@@ -11,7 +11,6 @@ import { EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
-  editorDidCreateState,
   focusCommentIsActiveState,
 } from "../data-model";
 
@@ -59,14 +58,12 @@ const useShowCommentButton = () => {
   return null;
 };
 const useSelectionPosition = () => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editor } = React.useContext(EditorContext);
   const [position, setPosition] = React.useState<number | null>(null);
   const [selection, setSelection] = React.useState<SelectionRange | null>(null);
   const getIsMounted = useIsMounted();
-  const editorDidRender = useRecoilValue(editorDidCreateState);
 
   React.useEffect(() => {
-    const editor = editorRef.current;
     if (!editor) return;
     const { dispose } = editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection;
@@ -96,6 +93,6 @@ const useSelectionPosition = () => {
     return () => {
       dispose();
     };
-  }, [editorRef, getIsMounted, editorDidRender]);
+  }, [editor, getIsMounted]);
   return { position, selection };
 };

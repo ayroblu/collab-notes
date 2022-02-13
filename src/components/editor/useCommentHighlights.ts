@@ -63,7 +63,7 @@ function isMouseInDOMRect(e: MouseEvent, r: DOMRect) {
   return isIn;
 }
 export const useSelectionHandler = () => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editor } = React.useContext(EditorContext);
   const comments = useComments();
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
@@ -75,7 +75,6 @@ export const useSelectionHandler = () => {
   );
   React.useEffect(() => {
     let rafId = 0;
-    const editor = editorRef.current;
     if (!editor) return;
     const { dispose } = editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection;
@@ -105,7 +104,7 @@ export const useSelectionHandler = () => {
     return () => {
       dispose();
     };
-  }, [comments, editorRef, setFocusCommentId, setFocusCommentIsActive]);
+  }, [comments, editor, setFocusCommentId, setFocusCommentIsActive]);
 };
 
 function cursorInSelection(
@@ -122,7 +121,7 @@ function cursorInSelection(
 }
 
 export const useCommentDecorations = () => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editor } = React.useContext(EditorContext);
   const comments = useComments();
   const inProgressComments = useRecoilValue(inProgressCommentsSelector);
   const [, setDecorations] = React.useState<string[]>([]);
@@ -150,7 +149,6 @@ export const useCommentDecorations = () => {
         })
       ),
     ];
-    const editor = editorRef.current;
     if (!editor) return;
     // TODO: Why set timeout is necessary here? Decorations show double hover without it
     // I tried editor.onDidLayoutChange but that didn't work
@@ -163,7 +161,7 @@ export const useCommentDecorations = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [inProgressComments, comments, editorRef]);
+  }, [inProgressComments, comments, editor]);
 
   React.useEffect(() => {
     const dispose = createOrUpdate();
@@ -174,7 +172,6 @@ export const useCommentDecorations = () => {
 
   const room = useRoom();
   const handleCommentUpdates = React.useCallback(() => {
-    const editor = editorRef.current;
     // Adjust decorations based on typing that happens
     if (!editor || !room) return;
     const comments = getComments(room.id, room.password, fileName);
@@ -214,7 +211,7 @@ export const useCommentDecorations = () => {
     return () => {
       dispose();
     };
-  }, [editorRef, fileName, room]);
+  }, [editor, fileName, room]);
   return { createOrUpdate, handleCommentUpdates };
 };
 let timeoutId = 0;

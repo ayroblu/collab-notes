@@ -170,11 +170,6 @@ export const showThreadSaveState = atom<boolean>({
   default: false,
 });
 
-export const editorDidCreateState = atom<{}>({
-  key: "editorDidCreateState",
-  default: {},
-});
-
 type CommentId = string;
 export const commentTopState = atomFamily<number, CommentId>({
   key: "commentsTopState",

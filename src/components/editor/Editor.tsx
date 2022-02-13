@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor";
 import { initVimMode, VimMode } from "monaco-vim";
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
@@ -24,7 +24,6 @@ import {
   activeFileNameState,
   activeRoomIdSelector,
   cursorPositionState,
-  editorDidCreateState,
   isNewUserState,
   settingsSelector,
 } from "../data-model";
@@ -60,12 +59,11 @@ function useMonacoEditor(
 ) {
   const { editorDivRef } = React.useContext(EditorContext);
   const settings = useRecoilValue(settingsSelector);
-  const { editorRef } = React.useContext(EditorContext);
+  const { setEditor } = React.useContext(EditorContext);
   const getIsMounted = useIsMounted();
   const room = useRoom();
   const fileName = useFileName();
   const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
-  const setEditorDidCreate = useSetRecoilState(editorDidCreateState);
 
   const { createOrUpdate, handleCommentUpdates } = useCommentDecorations();
   const createOrUpdateStable = useStable(createOrUpdate);
@@ -85,11 +83,7 @@ function useMonacoEditor(
       text,
       getIsMounted
     );
-    editorRef.current = editor;
-    // TODO: figure out a better way to determine when the editor has loaded
-    const timeoutId = window.setTimeout(() => {
-      setEditorDidCreate({});
-    }, 100);
+    setEditor(editor);
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
       if (!file) return;
@@ -108,21 +102,19 @@ function useMonacoEditor(
       editor.dispose();
       model.dispose();
       text.unobserve(changeListener);
-      editorRef.current = undefined;
+      setEditor(null);
       decorationDispose?.();
       decorationUpdatesDispose?.();
-      clearTimeout(timeoutId);
     };
   }, [
     createOrUpdateStable,
     editorDivRef,
-    editorRef,
+    setEditor,
     fileName,
     getIsMounted,
     handleCommentUpdatesStable,
     room,
     setCursorStyles,
-    setEditorDidCreate,
     settings,
   ]);
   React.useEffect(() => {
@@ -266,7 +258,7 @@ function setupYjsMonacoCursorData(
 }
 
 function useLineRestoration() {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editor } = React.useContext(EditorContext);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
 
@@ -274,7 +266,6 @@ function useLineRestoration() {
     cursorPositionState({ fileName, roomId })
   );
   useEffectOnce(() => {
-    const editor = editorRef.current;
     if (!editor) return;
     editor.setPosition(cursorPosition);
     // TODO: figure out a better way to determine when the editor has loaded

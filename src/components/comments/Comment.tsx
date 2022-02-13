@@ -10,7 +10,6 @@ import {
   activeFileNameState,
   activeRoomIdSelector,
   commentSizeSelector,
-  editorDidCreateState,
   focusCommentIsActiveState,
   focusNearestCommentIdSelector,
   inProgressCommentsSelector,
@@ -220,10 +219,8 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
   });
 
 const usePosition = (selection: SelectionRange) => {
-  const { editorDivRef, editorRef } = React.useContext(EditorContext);
-  useRecoilValue(editorDidCreateState);
+  const { editor, editorDivRef } = React.useContext(EditorContext);
 
-  const editor = editorRef.current;
   if (!editor) return;
   const editorDiv = editorDivRef.current;
   if (!editorDiv) return;

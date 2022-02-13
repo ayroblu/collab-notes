@@ -10,7 +10,7 @@ export const useEditorScrollSync = (
   extraOffset: number,
   scrollOffset: number
 ) => {
-  const { editorRef } = React.useContext(EditorContext);
+  const { editor } = React.useContext(EditorContext);
   const lastEditorScrollRef = React.useRef<string | null>(null);
   const lastCommentsPaneScrollRef = React.useRef<string | null>(null);
   const lastCommentButtonWrapperScrollRef = React.useRef<string | null>(null);
@@ -18,7 +18,6 @@ export const useEditorScrollSync = (
 
   React.useEffect(() => {
     // When the editor scrolls
-    const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
@@ -47,14 +46,13 @@ export const useEditorScrollSync = (
   }, [
     commentButtonWrapperRef,
     commentsPaneRef,
-    editorRef,
+    editor,
     extraOffset,
     scrollOffset,
   ]);
 
   React.useEffect(() => {
     // For when CommentsPane scrolls
-    const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
@@ -89,14 +87,13 @@ export const useEditorScrollSync = (
   }, [
     commentButtonWrapperRef,
     commentsPaneRef,
-    editorRef,
+    editor,
     extraOffset,
     scrollOffset,
   ]);
 
   React.useEffect(() => {
     // For when CommentButtonWrapper scrolls
-    const editor = editorRef.current;
     if (!editor) return;
     const commentsPane = commentsPaneRef.current;
     if (!commentsPane) return;
@@ -130,14 +127,13 @@ export const useEditorScrollSync = (
   }, [
     commentButtonWrapperRef,
     commentsPaneRef,
-    editorRef,
+    editor,
     extraOffset,
     scrollOffset,
   ]);
 
   // For when focus comment changes usually
   React.useEffect(() => {
-    const editor = editorRef.current;
     const commentsPane = commentsPaneRef.current;
     if (!editor) return;
     if (!commentsPane) return;
@@ -146,7 +142,7 @@ export const useEditorScrollSync = (
       behavior: "smooth",
     });
     lastSmoothScrollRef.current = new Date().toISOString();
-  }, [commentsPaneRef, editorRef, extraOffset, scrollOffset]);
+  }, [commentsPaneRef, editor, extraOffset, scrollOffset]);
 };
 
 function getIsRecent(date: string | null, diff: number): boolean {

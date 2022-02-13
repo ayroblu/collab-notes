@@ -1,18 +1,14 @@
 import React from "react";
-import { useRecoilValue } from "recoil";
 
 import { EditorContext } from "../Contexts";
-import { editorDidCreateState } from "../data-model";
 
 export const useEditorHeight = () => {
-  const { editorDivRef, editorRef } = React.useContext(EditorContext);
+  const { editor, editorDivRef } = React.useContext(EditorContext);
   const [editorHeight, setEditorHeight] = React.useState(window.innerHeight);
   const [editorDivHeight, setEditorDivHeight] = React.useState(
     window.innerHeight
   );
-  const editorDidCreate = useRecoilValue(editorDidCreateState);
   React.useEffect(() => {
-    const editor = editorRef.current;
     const editorDiv = editorDivRef.current;
     if (!editor || !editorDiv) return;
     const ro = new ResizeObserver(() => {
@@ -30,6 +26,6 @@ export const useEditorHeight = () => {
     return () => {
       ro.unobserve(editorDiv);
     };
-  }, [editorDivRef, editorRef, editorDidCreate]);
+  }, [editorDivRef, editor]);
   return { editorHeight, editorDivHeight };
 };
