@@ -1,6 +1,6 @@
 import type { CodeProps } from "react-markdown/lib/ast-to-react";
 import { Prism } from "react-syntax-highlighter";
-import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { xonokai } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import styles from "./SyntaxHighlighter.module.css";
 
@@ -14,7 +14,7 @@ export const SyntaxHighlighter: React.FC<Props> = ({
 }) => (
   <Prism
     children={String(children).replace(/\n$/, "")}
-    style={materialDark}
+    style={xonokai}
     customStyle={{
       padding: "4px 8px",
       margin: "4px 0",
