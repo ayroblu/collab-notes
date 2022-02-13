@@ -2,6 +2,7 @@ import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
+import { useStable } from "@/hooks/useStable";
 import type { SelectionRange } from "@/modules/documents";
 import { getComments, updateCommentSelection } from "@/modules/documents";
 import { cn } from "@/modules/utils";
@@ -127,7 +128,11 @@ export const useCommentDecorations = () => {
   const [, setDecorations] = React.useState<string[]>([]);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
-  const createOrUpdate = React.useCallback(() => {
+  const inProgressCommentsStable = useStable(() => inProgressComments);
+  const commentsStable = useStable(() => comments);
+  React.useEffect(() => {
+    const comments = commentsStable();
+    const inProgressComments = inProgressCommentsStable();
     const newDecorations = [
       ...[...comments, ...inProgressComments].map(
         ({
@@ -152,8 +157,7 @@ export const useCommentDecorations = () => {
     if (!editor) return;
     // TODO: Why set timeout is necessary here? Decorations show double hover without it
     // I tried editor.onDidLayoutChange but that didn't work
-    clearTimeout(timeoutId);
-    timeoutId = window.setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       setDecorations((decorations) =>
         editor.deltaDecorations(decorations, newDecorations)
       );
@@ -161,21 +165,15 @@ export const useCommentDecorations = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [inProgressComments, comments, editor]);
-
-  React.useEffect(() => {
-    const dispose = createOrUpdate();
-    return () => {
-      dispose && dispose();
-    };
-  }, [createOrUpdate]);
+  }, [inProgressCommentsStable, commentsStable, editor]);
 
   const room = useRoom();
-  const handleCommentUpdates = React.useCallback(() => {
+  React.useEffect(() => {
     // Adjust decorations based on typing that happens
     if (!editor || !room) return;
     const comments = getComments(room.id, room.password, fileName);
     if (!comments) return;
+    let commentsThrottleTimeoutId = 0;
     const { dispose } = editor.onDidChangeModelDecorations(() => {
       clearTimeout(commentsThrottleTimeoutId);
       commentsThrottleTimeoutId = window.setTimeout(() => {
@@ -209,13 +207,11 @@ export const useCommentDecorations = () => {
       }, 1000);
     });
     return () => {
+      clearTimeout(commentsThrottleTimeoutId);
       dispose();
     };
   }, [editor, fileName, room]);
-  return { createOrUpdate, handleCommentUpdates };
 };
-let timeoutId = 0;
-let commentsThrottleTimeoutId = 0;
 
 export const useCommentHighlightActive = () => {
   const roomId = useRecoilValue(activeRoomIdSelector);

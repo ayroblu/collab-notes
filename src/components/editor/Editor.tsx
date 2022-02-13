@@ -65,9 +65,7 @@ function useMonacoEditor(
   const fileName = useFileName();
   const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
 
-  const { createOrUpdate, handleCommentUpdates } = useCommentDecorations();
-  const createOrUpdateStable = useStable(createOrUpdate);
-  const handleCommentUpdatesStable = useStable(handleCommentUpdates);
+  useCommentDecorations();
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
       return;
@@ -96,23 +94,17 @@ function useMonacoEditor(
       });
     };
     text.observe(changeListener);
-    const decorationDispose = createOrUpdateStable();
-    const decorationUpdatesDispose = handleCommentUpdatesStable();
     return () => {
       editor.dispose();
       model.dispose();
       text.unobserve(changeListener);
       setEditor(null);
-      decorationDispose?.();
-      decorationUpdatesDispose?.();
     };
   }, [
-    createOrUpdateStable,
     editorDivRef,
     setEditor,
     fileName,
     getIsMounted,
-    handleCommentUpdatesStable,
     room,
     setCursorStyles,
     settings,
