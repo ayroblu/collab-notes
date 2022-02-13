@@ -4,11 +4,13 @@ import path from "path";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
-// import TerserWebpackPlugin from "terser-webpack-plugin";
+import SpeedMeasurePlugin from "speed-measure-webpack-plugin";
 import webpack from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import WorkboxWebpackPlugin from "workbox-webpack-plugin";
 import "webpack-dev-server";
+
+const smp = new SpeedMeasurePlugin();
 
 const isDevelopment = process.env["NODE_ENV"] !== "production";
 const isProduction = process.env["NODE_ENV"] === "production";
@@ -141,7 +143,7 @@ const config: webpack.Configuration = {
   //   ],
   // },
 };
-export default config;
+export default isDebug ? smp.wrap(config as any) : config;
 
 export function isTruthy<T>(a: T | "" | 0 | false | null | undefined): a is T {
   return !!a;
