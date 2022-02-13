@@ -20,6 +20,7 @@ export const SyntaxHighlighter: React.FC<Props> = ({
       margin: "4px 0",
       lineHeight: "inherit",
       fontSize: "0.9em",
+      border: "none",
     }}
     wrapLongLines
     codeTagProps={{ className: styles.code }}
