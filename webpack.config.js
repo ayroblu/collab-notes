@@ -25,8 +25,11 @@ module.exports = {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
       "@": path.resolve(__dirname, "src"),
-      // vs: "monaco-editor/min/vs",
-      // "monaco-editor": "monaco-editor/min/vs/editor/editor.main.js",
+      // Uncaught TypeError: Cannot set properties of null (setting '__h')
+      // react: "preact/compat",
+      // "react-dom/test-utils": "preact/test-utils",
+      // "react-dom": "preact/compat",
+      // "react/jsx-runtime": "preact/jsx-runtime",
     },
   },
   output: {
@@ -66,7 +69,6 @@ module.exports = {
           //   },
           // },
           {
-            // loader: require.resolve("babel-loader"),
             loader: "babel-loader",
             options: {
               presets: [
