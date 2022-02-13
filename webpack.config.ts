@@ -1,26 +1,27 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
-const TerserWebpackPlugin = require("terser-webpack-plugin");
-const webpack = require("webpack");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
+import CopyWebpackPlugin from "copy-webpack-plugin";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
+// import TerserWebpackPlugin from "terser-webpack-plugin";
+import webpack from "webpack";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import WorkboxWebpackPlugin from "workbox-webpack-plugin";
+import "webpack-dev-server";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-const isProduction = process.env.NODE_ENV === "production";
-const isDebug = !!process.env.DEBUG;
+const isDevelopment = process.env["NODE_ENV"] !== "production";
+const isProduction = process.env["NODE_ENV"] === "production";
+const isDebug = !!process.env["DEBUG"];
 const swSrc = "./src/service-worker.ts";
 
-module.exports = {
+const config: webpack.Configuration = {
   mode: isDevelopment ? "development" : "production",
   entry: "./src/index.tsx",
   devServer: {
     compress: true,
   },
-  devtool: isDevelopment ? "eval-source-map" : undefined,
+  devtool: isDevelopment && "eval-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
@@ -38,7 +39,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     chunkFilename: isProduction
       ? "static/js/[name].[contenthash:8].chunk.js"
-      : isDevelopment && "static/js/[name].chunk.js",
+      : "static/js/[name].chunk.js",
     clean: true,
   },
   module: {
@@ -122,9 +123,10 @@ module.exports = {
       }),
     isDebug && new BundleAnalyzerPlugin(),
     // new webpack.debug.ProfilingPlugin(),
-  ].filter(Boolean),
+  ].filter(isTruthy),
 
   // Significant perf gain (66s -> 24s) but not minified (0.7MB -> 4.0MB main)
+  //   Unminified => 5.2MB (main.bundle.js)
   // optimization: {
   //   minimizer: [
   //     new TerserWebpackPlugin({
@@ -133,3 +135,8 @@ module.exports = {
   //   ],
   // },
 };
+export default config;
+
+export function isTruthy<T>(a: T | "" | 0 | false | null | undefined): a is T {
+  return !!a;
+}
