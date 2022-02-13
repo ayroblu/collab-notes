@@ -125,6 +125,12 @@ const config: webpack.Configuration = {
     // new webpack.debug.ProfilingPlugin(),
   ].filter(isTruthy),
 
+  cache: isProduction
+    ? false
+    : {
+        type: "filesystem",
+      },
+
   // Significant perf gain (66s -> 24s) but not minified (0.7MB -> 4.0MB main)
   //   Unminified => 5.2MB (main.bundle.js)
   // optimization: {
