@@ -143,10 +143,10 @@ export const builtInThemes = [
 const adaptor: <T = string>(
   e: React.ChangeEvent<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  >
+  >,
 ) => T = (e) => e.target.value as any;
 const checkedAdaptor: (e: React.ChangeEvent<HTMLInputElement>) => boolean = (
-  e
+  e,
 ) => e.target.checked;
 
 const themes = keys(themeList).map((key) => ({

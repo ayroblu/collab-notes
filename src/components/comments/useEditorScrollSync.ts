@@ -8,7 +8,7 @@ export const useEditorScrollSync = (
   commentsPaneRef: React.RefObject<HTMLElement>,
   commentButtonWrapperRef: React.RefObject<HTMLElement>,
   extraOffset: number,
-  scrollOffset: number
+  scrollOffset: number,
 ) => {
   const { editor } = React.useContext(EditorContext);
   const lastEditorScrollRef = React.useRef<string | null>(null);

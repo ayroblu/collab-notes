@@ -38,7 +38,7 @@ export const CommentButton: React.FC<CommentButtonProps> = React.memo(
         <VscComment />
       </button>
     );
-  }
+  },
 );
 
 const useShowCommentButton = () => {
@@ -46,7 +46,7 @@ const useShowCommentButton = () => {
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const focusCommentIsActive = useRecoilValue(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
   if (
     nonNullable(selection) &&
@@ -84,7 +84,7 @@ const useSelectionPosition = () => {
       };
       const top = editor.getTopForPosition(
         sel.startLineNumber,
-        sel.startColumn
+        sel.startColumn,
       );
       const lineHeight = editor.getRawOptions().lineHeight || 24;
       setPosition(top + lineHeight / 2);

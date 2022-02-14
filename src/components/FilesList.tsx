@@ -37,7 +37,7 @@ export const FilesList = () => {
           <Link
             className={cn(
               styles.filesListItem,
-              fileName === name && styles.highlight
+              fileName === name && styles.highlight,
             )}
             to={routesHelper.room(room.id).files(name)}
           >

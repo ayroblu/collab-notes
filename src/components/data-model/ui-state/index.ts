@@ -9,7 +9,7 @@ import type { LeftNavEnum } from "../types";
 const syncCursorStorageEffect: AtomEffect<IPosition> = ({ onSet, setSelf }) => {
   const dbKey = "cursorPosition";
   setSelf(
-    get(dbKey).then((savedVal) => (savedVal ? savedVal : new DefaultValue()))
+    get(dbKey).then((savedVal) => (savedVal ? savedVal : new DefaultValue())),
   );
   onSet((newVal, oldVal) => {
     if (isEqual(newVal, oldVal)) return;
@@ -35,7 +35,7 @@ const syncLeftNavEffect: AtomEffect<LeftNavEnum | null> = ({
 }) => {
   const dbKey = "leftNav";
   setSelf(
-    get(dbKey).then((savedVal) => (savedVal ? savedVal : new DefaultValue()))
+    get(dbKey).then((savedVal) => (savedVal ? savedVal : new DefaultValue())),
   );
   onSet((newVal, oldVal) => {
     if (isEqual(newVal, oldVal)) return;

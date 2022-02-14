@@ -25,7 +25,7 @@ export const useFileParams = () => {
   const settings = useRecoilValue(settingsSelector);
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
   const room = getNonNullable(
-    settings.rooms.find(({ id }) => id === activeRoomId)
+    settings.rooms.find(({ id }) => id === activeRoomId),
   );
   const fileName = useRecoilValue(activeFileNameState(room.id));
   return {

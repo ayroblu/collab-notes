@@ -72,7 +72,7 @@ const useProviderListener = (setFaces: (faces: Face[]) => void) => {
     const { provider, ydoc } = getRoom(room.id, room.password);
     const changeFunc = () => {
       const faces = Array.from(
-        provider.awareness.getStates() as AwarenessStates
+        provider.awareness.getStates() as AwarenessStates,
       )
         .slice(1)
         .filter(([, { user }]) => user)
@@ -82,10 +82,11 @@ const useProviderListener = (setFaces: (faces: Face[]) => void) => {
             {
               user: { colour, id, name },
             },
-          ]) => ({ clientId, name, color: colour, id })
+          ]) => ({ clientId, name, color: colour, id }),
         )
         .filter(
-          ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
+          ({ clientId, id }) =>
+            clientId !== ydoc.clientID && id !== settings.id,
         );
       setFaces(uniqBy(faces, ({ id }) => id));
     };
@@ -94,7 +95,7 @@ const useProviderListener = (setFaces: (faces: Face[]) => void) => {
       awarenessProtocol.removeAwarenessStates(
         provider.awareness,
         [ydoc.clientID],
-        "left room"
+        "left room",
       );
     };
   }, [room, settings.id, setFaces]);

@@ -38,7 +38,7 @@ export const CommentTextareaWithSave: React.FC<{
   const onFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.currentTarget.setSelectionRange(
       e.currentTarget.value.length,
-      e.currentTarget.value.length
+      e.currentTarget.value.length,
     );
   };
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {

@@ -11,7 +11,7 @@ const initialLoadRef: any = {};
 export const useSuspensePromise = <T>(
   key: string,
   func: () => Promise<T>,
-  dependents: any[]
+  dependents: any[],
 ): T => {
   if (!initialLoadRef[key]) {
     initialLoadRef[key] = {

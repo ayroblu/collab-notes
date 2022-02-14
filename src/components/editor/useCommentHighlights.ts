@@ -68,10 +68,10 @@ export const useSelectionHandler = () => {
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const setFocusCommentId = useSetRecoilState(
-    focusCommentIdState({ fileName, roomId })
+    focusCommentIdState({ fileName, roomId }),
   );
   const setFocusCommentIsActive = useSetRecoilState(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
   React.useEffect(() => {
     let rafId = 0;
@@ -81,14 +81,14 @@ export const useSelectionHandler = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         const foundComment = comments.find(({ selection }) =>
-          cursorInSelection(selection, sel.startLineNumber, sel.startColumn)
+          cursorInSelection(selection, sel.startLineNumber, sel.startColumn),
         );
         if (foundComment) {
           if (
             cursorInSelection(
               foundComment.selection,
               sel.startLineNumber,
-              sel.endColumn
+              sel.endColumn,
             )
           ) {
             setFocusCommentId(foundComment.id);
@@ -110,7 +110,7 @@ export const useSelectionHandler = () => {
 function cursorInSelection(
   selection: SelectionRange,
   lineNumber: number,
-  columnNumber: number
+  columnNumber: number,
 ) {
   return (
     selection.startLineNumber <= lineNumber &&
@@ -139,14 +139,14 @@ export const useCommentDecorations = () => {
             startLineNumber,
             startColumn,
             endLineNumber,
-            endColumn
+            endColumn,
           ),
           options: {
             // inlineClassName: cn(styles.selection, `comment-${id}`),
             className: cn(styles.selection, `comment-${id}`),
             hoverMessage: { value: text },
           },
-        })
+        }),
       ),
     ];
     if (!editor) return;
@@ -154,7 +154,7 @@ export const useCommentDecorations = () => {
     // I tried editor.onDidLayoutChange but that didn't work
     const timeoutId = window.setTimeout(() => {
       setDecorations((decorations) =>
-        editor.deltaDecorations(decorations, newDecorations)
+        editor.deltaDecorations(decorations, newDecorations),
       );
     }, 500);
     return () => {
@@ -196,7 +196,7 @@ export const useCommentDecorations = () => {
               room.password,
               fileName,
               commentId,
-              range
+              range,
             );
           });
       }, 1000);
@@ -212,16 +212,16 @@ export const useCommentHighlightActive = () => {
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const focusCommentId = useRecoilValue(
-    focusCommentIdState({ fileName, roomId })
+    focusCommentIdState({ fileName, roomId }),
   );
   const oldFocusCommentIdRef = React.useRef<string | null>(null);
   const focusCommentIsActive = useRecoilValue(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
 
   React.useEffect(() => {
     const highlight = document.querySelector(
-      `.${styles.selection}.comment-${focusCommentId}`
+      `.${styles.selection}.comment-${focusCommentId}`,
     );
     if (highlight) {
       if (focusCommentIsActive) {
@@ -234,7 +234,7 @@ export const useCommentHighlightActive = () => {
     if (oldCommentId !== focusCommentId) {
       if (oldCommentId) {
         const highlight = document.querySelector(
-          `.${styles.selection}.comment-${oldCommentId}`
+          `.${styles.selection}.comment-${oldCommentId}`,
         );
         if (highlight) {
           highlight.classList.remove(styles.selectionFocus);

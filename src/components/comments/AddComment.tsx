@@ -21,7 +21,7 @@ export const AddComment: React.FC<AddCommentProps> = React.memo(
   ({ id, isActiveComment, isFocusComment, offset, onCancel, onSubmit }) => {
     const fileName = useFileName();
     const [comment, setComment] = useRecoilState(
-      inProgressCommentSelector({ fileName, commentId: id })
+      inProgressCommentSelector({ fileName, commentId: id }),
     );
     const settings = useRecoilValue(settingsSelector);
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,5 +76,5 @@ export const AddComment: React.FC<AddCommentProps> = React.memo(
         </form>
       </CommentHolder>
     );
-  }
+  },
 );

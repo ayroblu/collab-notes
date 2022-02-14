@@ -5,10 +5,10 @@ import { EditorContext } from "../Contexts";
 export const useEditorHeight = () => {
   const { editor, editorDivRef } = React.useContext(EditorContext);
   const [editorHeight, setEditorHeight] = React.useState(
-    window.innerHeight - 40
+    window.innerHeight - 40,
   );
   const [editorDivHeight, setEditorDivHeight] = React.useState(
-    window.innerHeight
+    window.innerHeight,
   );
   React.useEffect(() => {
     const editorDiv = editorDivRef.current;

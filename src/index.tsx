@@ -14,7 +14,7 @@ ReactDOM.render(
       <App />
     </HashRouter>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById("root"),
 );
 
 register({
@@ -34,7 +34,7 @@ register({
           if (event.target && event.target.state === "activated") {
             window.location.reload();
           }
-        }
+        },
       );
       waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
     }

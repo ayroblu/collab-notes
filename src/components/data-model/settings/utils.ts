@@ -13,8 +13,8 @@ export const syncStorageEffect: AtomEffect<Settings> = ({ onSet, setSelf }) => {
   setSelf(
     idbGetWithMigrations().then((savedSettings) =>
       // Active room id should be set by the app elsewhere, so this should be okay
-      savedSettings ? savedSettings : new DefaultValue()
-    )
+      savedSettings ? savedSettings : new DefaultValue(),
+    ),
   );
   onSet((newSettings, oldSettings) => {
     if (isEqual(newSettings, oldSettings)) return;
@@ -48,7 +48,7 @@ function broadcastUpdate() {
 function listenToUpdates(func: (message: SettingsBroadcast) => void) {
   if (bc) {
     bc.onmessage = (ev) => {
-      const {data} = ev;
+      const { data } = ev;
       func(data);
     };
   }

@@ -38,7 +38,7 @@ export const inProgressCommentSelector = selectorFamily<
     ({ get }) => {
       const activeRoomId = get(activeRoomIdSelector);
       const comments = get(
-        inProgressCommentsState({ roomId: activeRoomId, fileName })
+        inProgressCommentsState({ roomId: activeRoomId, fileName }),
       );
       return getNonNullable(comments.find(({ id }) => id === commentId));
     },
@@ -47,17 +47,17 @@ export const inProgressCommentSelector = selectorFamily<
     ({ get, set }, newValue) => {
       const activeRoomId = get(activeRoomIdSelector);
       const comments = get(
-        inProgressCommentsState({ roomId: activeRoomId, fileName })
+        inProgressCommentsState({ roomId: activeRoomId, fileName }),
       );
       const result =
         newValue instanceof DefaultValue
           ? newValue
           : comments.map((comment) =>
-              comment.id === commentId ? newValue : comment
+              comment.id === commentId ? newValue : comment,
             );
       return set(
         inProgressCommentsState({ roomId: activeRoomId, fileName }),
-        result
+        result,
       );
     },
 });

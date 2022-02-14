@@ -127,7 +127,7 @@ function getSubtitle(room: Room) {
   const lastUpdated = Math.max(
     ...files
       .map((file) => getYFileMetaData(file).lastUpdated)
-      .map((lastUpdated) => new Date(lastUpdated!).getTime())
+      .map((lastUpdated) => new Date(lastUpdated!).getTime()),
   );
   const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
   return `${formattedDateTime} - ${numFiles} files`;

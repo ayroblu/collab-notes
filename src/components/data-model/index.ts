@@ -148,7 +148,7 @@ export const threadsSelector = selectorFamily<
       const comments = get(commentsState({ fileName, roomId }));
       return comments.reduce((result, comment) => {
         result[comment.id] = get(
-          threadState({ roomId, fileName, commentId: comment.id })
+          threadState({ roomId, fileName, commentId: comment.id }),
         );
         return result;
       }, {} as { [commentId: string]: ThreadData[] });

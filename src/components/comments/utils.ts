@@ -1,14 +1,14 @@
 import { sortBy } from "@/modules/utils";
 
 export function getCommentDetails(
-  commentSizes: { id: string; top: number; height: number }[]
+  commentSizes: { id: string; top: number; height: number }[],
 ) {
   return commentSizes.concat().sort(sortBy([({ top }) => top], ["asc"]));
 }
 
 export function getNearestCommentId(
   commentSizes: { id: string; top: number; height: number }[],
-  commentId: string
+  commentId: string,
 ) {
   const commentDetails = getCommentDetails(commentSizes);
   const index = commentDetails.findIndex(({ id }) => id === commentId);

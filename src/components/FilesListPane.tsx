@@ -38,7 +38,7 @@ const useDeleteFile = () => {
   return () => {
     if (!fileName) return;
     const confirmation = confirm(
-      `Are you sure you want to delete ${fileName}?`
+      `Are you sure you want to delete ${fileName}?`,
     );
     if (confirmation) {
       const name = deleteFileAndGetNextName(room.id, room.password, fileName);

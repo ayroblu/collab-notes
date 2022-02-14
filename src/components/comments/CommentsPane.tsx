@@ -32,7 +32,7 @@ export const CommentsPane: React.FC = () => {
   const setFocusCommentId = useSetFocusCommentIdState();
   const { commentRefs } = React.useContext(CommentsContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
-    inProgressCommentsSelector
+    inProgressCommentsSelector,
   );
   const comments = useComments();
   const { fileName, roomId, roomPassword } = useFileParams();
@@ -42,16 +42,16 @@ export const CommentsPane: React.FC = () => {
   const commentButtonWrapperRef = React.useRef<HTMLElement>(null);
   const [focusCommentId] = useFocusCommentIdState();
   const [focusCommentIsActive, setFocusCommentIsActive] = useRecoilState(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
   const setNearestFocusCommentId = useSetRecoilState(
-    focusNearestCommentIdSelector
+    focusNearestCommentIdSelector,
   );
   useEditorScrollSync(
     commentsPaneRef,
     commentButtonWrapperRef,
     extraOffset,
-    scrollOffset
+    scrollOffset,
   );
 
   const addInProgressComment = (selection: SelectionRange) => {
@@ -71,13 +71,13 @@ export const CommentsPane: React.FC = () => {
   };
   const createCommentFn = (comment: CommentData) => () => {
     setInProgressComments(
-      inProgressComments.filter(({ id }) => comment.id !== id)
+      inProgressComments.filter(({ id }) => comment.id !== id),
     );
     createComment(roomId, roomPassword, fileName, comment);
   };
   const cancelCommentFn = (commentId: string) => () => {
     setInProgressComments(
-      inProgressComments.filter(({ id }) => id !== commentId)
+      inProgressComments.filter(({ id }) => id !== commentId),
     );
     const commentIds = comments.concat(inProgressComments).map(({ id }) => id);
     setNearestFocusCommentId({ commentIds, commentId });

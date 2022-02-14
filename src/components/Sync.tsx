@@ -93,7 +93,7 @@ const useCommentNamesSync = () => {
     syncCommentNamesFn(
       room.id,
       room.password,
-      fileName
+      fileName,
     )(settings.id, settings.name);
   }, [settings.name, fileName, room, settings.id]);
 };
@@ -149,7 +149,7 @@ const useFileNameInitSync = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const filesData = useRecoilValue(filesDataState);
   const [activeFileName, setActiveFileName] = useRecoilState(
-    activeFileNameState(roomId)
+    activeFileNameState(roomId),
   );
   const fileName = searchParams.get("name");
 
@@ -226,11 +226,11 @@ const useYRoomLoad = () => {
       if (!room) return;
       const { initialConnectionPromise, initialDbPromise } = getRoom(
         room.id,
-        room.password
+        room.password,
       );
       await initialDbPromise;
       await timeoutPromiseSuccess(initialConnectionPromise, 1000);
     },
-    [activeRoomId]
+    [activeRoomId],
   );
 };

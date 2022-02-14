@@ -52,7 +52,7 @@ export const Comment: React.FC<Props> = React.memo(
         {isActiveComment && <CommentAddThread commentId={id} />}
       </CommentHolder>
     );
-  }
+  },
 );
 
 type CommentHolderProps = {
@@ -75,10 +75,10 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const setFocusCommentIsActive = useSetRecoilState(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
   const setCommentSize = useSetRecoilState(
-    commentSizeSelector({ commentIds: [id] })
+    commentSizeSelector({ commentIds: [id] }),
   );
   const observer = useCommentHeight(id);
   const position = usePosition(selection);
@@ -98,7 +98,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
       setCommentSize([{ id, top: position, height }]);
       observer();
     },
-    [commentRefs, id, observer, position, setCommentSize]
+    [commentRefs, id, observer, position, setCommentSize],
   );
 
   return (
@@ -140,7 +140,7 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
         <CommentTextareaWithSave onSubmit={addThreadHandler} />
       </section>
     );
-  }
+  },
 );
 
 const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
@@ -150,12 +150,12 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
     const { fileName, roomId, roomPassword } = useFileParams();
     const setFocusCommentId = useSetFocusCommentIdState();
     const setFocusCommentIsActive = useSetRecoilState(
-      focusCommentIsActiveState({ fileName, roomId })
+      focusCommentIsActiveState({ fileName, roomId }),
     );
     const inProgressComments = useRecoilValue(inProgressCommentsSelector);
     const comments = useComments();
     const setNearestFocusCommentId = useSetRecoilState(
-      focusNearestCommentIdSelector
+      focusNearestCommentIdSelector,
     );
 
     const onEditSubmit = React.useCallback(
@@ -164,7 +164,7 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
         setIsEdit(false);
         return false;
       },
-      [fileName, id, roomId, roomPassword]
+      [fileName, id, roomId, roomPassword],
     );
     const onEditCancel = React.useCallback(() => {
       setIsEdit(false);
@@ -203,7 +203,7 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
         { label: "Edit", onClick: onEdit },
         { label: "Delete", onClick: deleteComment },
       ],
-      [deleteComment, onEdit]
+      [deleteComment, onEdit],
     );
     return (
       <CommentEntryItem
@@ -226,7 +226,7 @@ const usePosition = (selection: SelectionRange) => {
   if (!editorDiv) return;
   const top = editor.getTopForPosition(
     selection.startLineNumber,
-    selection.startColumn
+    selection.startColumn,
   );
   const lineHeight = editor.getRawOptions().lineHeight || 24;
   return top - lineHeight;

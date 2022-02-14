@@ -34,7 +34,7 @@ export const Menu: React.FC<Props> = ({ options }) => {
       case "ArrowUp":
         e.preventDefault();
         return setSelectedIndex(
-          (selectedIndex + options.length - 1) % options.length
+          (selectedIndex + options.length - 1) % options.length,
         );
       case "ArrowDown":
         e.preventDefault();
@@ -59,7 +59,7 @@ export const Menu: React.FC<Props> = ({ options }) => {
               <div
                 className={cn(
                   styles.menuItem,
-                  selectedIndex === i && styles.menuItemSelected
+                  selectedIndex === i && styles.menuItemSelected,
                 )}
                 onClick={onClick}
                 onMouseEnter={() => setSelectedIndex(i)}

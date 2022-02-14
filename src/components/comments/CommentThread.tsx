@@ -21,7 +21,7 @@ export const CommentThread: React.FC<{ commentId: string }> = React.memo(
         ))}
       </>
     );
-  }
+  },
 );
 
 const ThreadItem: React.FC<ThreadData> = ({

@@ -15,14 +15,14 @@ export const useSetActiveRoomId = () => {
       setActiveRoomId(roomId);
       navigate(`/${roomId}`);
     },
-    [navigate, setActiveRoomId]
+    [navigate, setActiveRoomId],
   );
 };
 
 export const useSetActiveFileName = () => {
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
   const setActiveFileName = useSetRecoilState(
-    activeFileNameState(activeRoomId)
+    activeFileNameState(activeRoomId),
   );
   const navigate = useNavigate();
   const navigateStable = useStable(navigate);
@@ -32,7 +32,7 @@ export const useSetActiveFileName = () => {
       setActiveFileName(fileName);
       navigateStable(routesHelper.room(activeRoomId).files(fileName));
     },
-    [activeRoomId, navigateStable, setActiveFileName]
+    [activeRoomId, navigateStable, setActiveFileName],
   );
 };
 

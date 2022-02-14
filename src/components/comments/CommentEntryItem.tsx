@@ -67,7 +67,7 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = React.memo(
         </div>
       </section>
     );
-  }
+  },
 );
 
 type CommentHeadingProps = {

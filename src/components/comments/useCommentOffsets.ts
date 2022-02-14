@@ -28,7 +28,7 @@ export const useCommentOffsets = () => {
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
   const focusCommentIsActive = useRecoilValue(
-    focusCommentIsActiveState({ fileName, roomId })
+    focusCommentIsActiveState({ fileName, roomId }),
   );
   const commentIds = comments.concat(inProgressComments).map(({ id }) => id);
   const commentSizes = useRecoilValue(commentSizeSelector({ commentIds }));

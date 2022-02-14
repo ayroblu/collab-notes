@@ -11,7 +11,7 @@ function generateHslaColor(
   randomNumber = Math.random(),
   saturation = 100,
   lightness = 40,
-  alpha = 1
+  alpha = 1,
 ) {
   const hue = (randomNumber * 360).toFixed();
 
@@ -95,7 +95,7 @@ export function generatePassword({
 
 export const uniqBy = <T>(
   arr: T[],
-  predicate: string | ((el: T) => string)
+  predicate: string | ((el: T) => string),
 ) => {
   const cb =
     typeof predicate === "function"
@@ -153,7 +153,7 @@ export function dateTimeFormatter(dateString: Date | string) {
 export const nonNullable = <T>(item: T | null | undefined): item is T =>
   item !== null && item !== undefined;
 export const nullable = <T>(
-  item: T | null | undefined
+  item: T | null | undefined,
 ): item is null | undefined => item === null || item === undefined;
 
 export const sortBy =

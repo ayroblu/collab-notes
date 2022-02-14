@@ -54,7 +54,7 @@ export const Editor: React.FC = React.memo(() => {
 export default Editor;
 
 function useMonacoEditor(
-  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>
+  setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
 ) {
   const { editorDivRef } = React.useContext(EditorContext);
   const settings = useRecoilValue(settingsSelector);
@@ -78,7 +78,7 @@ function useMonacoEditor(
       room,
       fileName,
       text,
-      getIsMounted
+      getIsMounted,
     );
     setEditor(editor);
     const changeListener = () => {
@@ -131,14 +131,14 @@ function createMonacoEditor(
   room: Room,
   fileName: string,
   text: Y.Text,
-  getIsMounted: () => boolean
+  getIsMounted: () => boolean,
 ) {
   const { provider, ydoc } = getRoom(room.id, room.password);
   // https://stackoverflow.com/questions/56681345/how-to-dynamically-set-language-according-to-file-extension-in-monaco-editor
   const model = monaco.editor.createModel(
     "",
     undefined, // language
-    monaco.Uri.file(fileName) // uri
+    monaco.Uri.file(fileName), // uri
   );
   const isBuiltInTheme = builtInThemes.includes(settings.theme);
   const editor = monaco.editor.create(divEl, {
@@ -161,7 +161,7 @@ function createMonacoEditor(
     text,
     editor.getModel(),
     new Set([editor]),
-    provider.awareness
+    provider.awareness,
   );
   setupYjsMonacoCursorData(
     editor,
@@ -169,7 +169,7 @@ function createMonacoEditor(
     provider,
     setCursorStyles,
     settings,
-    getIsMounted
+    getIsMounted,
   );
   if (settings.isVim) {
     setupVimBindings(editor, settings.vimrc);
@@ -187,7 +187,7 @@ function setupYjsMonacoCursorData(
   provider: WebrtcProvider,
   setCursorStyles: React.Dispatch<React.SetStateAction<string[]>>,
   settings: Settings,
-  getIsMounted: () => boolean
+  getIsMounted: () => boolean,
 ) {
   const getLocalState = (): LocalState => ({
     id: settings.id,
@@ -208,12 +208,12 @@ function setupYjsMonacoCursorData(
   };
   provider.awareness.on("change", ({ updated }: AwarenessEvent) => {
     const cursorData = Array.from(
-      provider.awareness.getStates() as AwarenessStates
+      provider.awareness.getStates() as AwarenessStates,
     )
       .filter(([, { user }]) => user)
       .map(([clientId, { user }]) => ({ clientId, ...user }))
       .filter(
-        ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id
+        ({ clientId, id }) => clientId !== ydoc.clientID && id !== settings.id,
       );
 
     const mainCursorStyles = cursorData.map(
@@ -223,15 +223,15 @@ function setupYjsMonacoCursorData(
             ? "transform: translate(0, 100%);inset-block-end: 0"
             : "transform: translate(0, -100%);inset-block-start: 0";
         return `.yRemoteSelectionHead-${clientId}{color: ${colour}}.yRemoteSelectionHead-${clientId}::after{content: "${name}";background: ${colour};border-color: ${colour};${translate}}`;
-      }
+      },
     );
     const tempCursorStyles = cursorData
       .filter(({ clientId }) => updated.includes(`${clientId}`))
       .map(
-        ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`
+        ({ clientId }) => `.yRemoteSelectionHead-${clientId}::after{opacity:1}`,
       );
     setCursorStyles((cursorStyles) =>
-      checkEqual(cursorStyles, [...mainCursorStyles, ...tempCursorStyles])
+      checkEqual(cursorStyles, [...mainCursorStyles, ...tempCursorStyles]),
     );
     cursorData.forEach(({ clientId }) => {
       clearTimeout(timeoutIds[clientId]);
@@ -240,8 +240,8 @@ function setupYjsMonacoCursorData(
         setCursorStyles((cursorStyles) =>
           checkEqual(
             cursorStyles,
-            cursorStyles.filter((c) => !tempCursorStyles.includes(c))
-          )
+            cursorStyles.filter((c) => !tempCursorStyles.includes(c)),
+          ),
         );
       }, 3000);
     });
@@ -254,7 +254,7 @@ function useLineRestoration() {
   const fileName = useRecoilValue(activeFileNameState(roomId));
 
   const [cursorPosition, setCursorPosition] = useRecoilState(
-    cursorPositionState({ fileName, roomId })
+    cursorPositionState({ fileName, roomId }),
   );
   const cursorPositionStable = useStable(() => cursorPosition);
   React.useEffect(() => {
@@ -277,7 +277,7 @@ function useLineRestoration() {
 
 function setupVimBindings(
   editor: monaco.editor.IStandaloneCodeEditor,
-  vimrc: string
+  vimrc: string,
 ) {
   initVimMode(editor);
   const parsedVimrc = parseVimrc(vimrc);

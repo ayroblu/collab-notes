@@ -30,10 +30,10 @@ export function getRoom(roomId: string, password: string): YRoom {
   const files = ydoc.getArray<Y.Map<any>>("files");
   const name = ydoc.getText("name");
   const initialDbPromise = new Promise<void>((resolve) =>
-    persistence.once("synced", () => resolve())
+    persistence.once("synced", () => resolve()),
   );
   const initialConnectionPromise = new Promise<void>((resolve) =>
-    provider.awareness.once("synced", () => resolve())
+    provider.awareness.once("synced", () => resolve()),
   );
 
   rooms[roomId] = {
@@ -50,7 +50,7 @@ export function getRoom(roomId: string, password: string): YRoom {
 export function getFileMetaData(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): FileMetaData | void {
   const { files } = getRoom(roomId, roomPassword);
   return files
@@ -61,7 +61,7 @@ export function getFileMetaData(
 
 export function getAllFilesMetaData(
   roomId: string,
-  roomPassword: string
+  roomPassword: string,
 ): FileMetaData[] {
   const { files } = getRoom(roomId, roomPassword);
   return files.map((file) => getYFileMetaData(file)).filter(nonNullable);
@@ -70,7 +70,7 @@ export function getAllFilesMetaData(
 export function getFileFromFileName(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): Y.Map<any> | undefined {
   const { files } = getRoom(roomId, roomPassword);
   const index = files
@@ -82,7 +82,7 @@ export function getFileFromFileName(
 export function getFileIndexFromFileName(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): number {
   const { files } = getRoom(roomId, roomPassword);
   return files
@@ -110,7 +110,7 @@ export function getYFileThreads(file: Y.Map<any>): Y.Map<Y.Array<ThreadData>> {
 export function createNewFile(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): Y.Map<any> {
   const { files } = getRoom(roomId, roomPassword);
   const now = new Date().toISOString();
@@ -131,7 +131,7 @@ export function createNewFile(
 export function deleteFile(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): number {
   const { files } = getRoom(roomId, roomPassword);
   const index = getFileIndexFromFileName(roomId, roomPassword, fileName);
@@ -142,7 +142,7 @@ export function deleteFile(
 export function deleteFileAndGetNextName(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): string | void {
   const index = deleteFile(roomId, roomPassword, fileName);
   const { files } = getRoom(roomId, roomPassword);
@@ -156,7 +156,7 @@ export function deleteFileAndGetNextName(
 export function getDocument(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): Y.Text | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
@@ -166,7 +166,7 @@ export function getDocument(
 export function getComments(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): Y.Array<CommentData> | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
@@ -176,7 +176,7 @@ export function createComment(
   roomId: string,
   roomPassword: string,
   fileName: string,
-  comment: CommentData
+  comment: CommentData,
 ) {
   const yComments = getComments(roomId, roomPassword, fileName);
   if (!yComments) return;
@@ -194,7 +194,7 @@ export function editComment(
   roomPassword: string,
   fileName: string,
   commentId: string,
-  text: string
+  text: string,
 ) {
   const { ydoc } = getRoom(roomId, roomPassword);
   const yComments = getComments(roomId, roomPassword, fileName);
@@ -215,7 +215,7 @@ export function updateCommentSelection(
   roomPassword: string,
   fileName: string,
   commentId: string,
-  selection: SelectionRange
+  selection: SelectionRange,
 ) {
   const { ydoc } = getRoom(roomId, roomPassword);
   const yComments = getComments(roomId, roomPassword, fileName);
@@ -237,7 +237,7 @@ export function removeComment(
   roomId: string,
   roomPassword: string,
   fileName: string,
-  commentId: string
+  commentId: string,
 ): boolean {
   const yComments = getComments(roomId, roomPassword, fileName);
   if (!yComments) return false;
@@ -253,7 +253,7 @@ export function removeComment(
 export function getAllThreads(
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ): Y.Map<Y.Array<ThreadData>> | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
@@ -264,7 +264,7 @@ export function getThreads(
   roomId: string,
   roomPassword: string,
   fileName: string,
-  commentId: string
+  commentId: string,
 ): Y.Array<ThreadData> | void {
   const threads = getAllThreads(roomId, roomPassword, fileName);
   if (!threads) return;
@@ -361,7 +361,7 @@ export function removeThread({
 export const syncCommentNamesFn = (
   roomId: string,
   roomPassword: string,
-  fileName: string
+  fileName: string,
 ) => {
   const { ydoc } = getRoom(roomId, roomPassword);
   const comments = getComments(roomId, roomPassword, fileName);
@@ -401,7 +401,7 @@ export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   Object.entries(seenMap).forEach(([, entries]) => {
     if (entries.length > 1) {
       const sortedEntries = entries.sort(
-        sortBy([({ length }) => length], ["desc"])
+        sortBy([({ length }) => length], ["desc"]),
       );
       indexesToDelete.push(...sortedEntries.slice(1).map(({ index }) => index));
     }
