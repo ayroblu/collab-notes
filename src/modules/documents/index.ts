@@ -170,13 +170,7 @@ export function getComments(
 ): Y.Array<CommentData> | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
-  const comments = getYFileComments(file);
-  const comment = comments.get(6);
-  if (comment) {
-    console.warn("deleting comment 6");
-    comments.delete(6);
-  }
-  return comments;
+  return getYFileComments(file);
 }
 export function createComment(
   roomId: string,
@@ -230,6 +224,7 @@ export function updateCommentSelection(
     .map(({ id }) => id)
     .findIndex((id) => id === commentId);
 
+  if (index === -1) return;
   const comment = yComments.get(index);
   if (!isEqual(selection, comment.selection)) {
     ydoc.transact(() => {

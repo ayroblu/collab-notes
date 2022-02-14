@@ -6,8 +6,8 @@ import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
 
-import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
+import { useStable } from "@/hooks/useStable";
 import {
   getDocument,
   getFileFromFileName,
@@ -256,25 +256,24 @@ function useLineRestoration() {
   const [cursorPosition, setCursorPosition] = useRecoilState(
     cursorPositionState({ fileName, roomId })
   );
-  useEffectOnce(() => {
+  const cursorPositionStable = useStable(() => cursorPosition);
+  React.useEffect(() => {
     if (!editor) return;
+    const cursorPosition = cursorPositionStable();
     editor.setPosition(cursorPosition);
-    // TODO: figure out a better way to determine when the editor has loaded
-    const timeoutId = window.setTimeout(() => {
-      editor.revealLineInCenter(cursorPosition.lineNumber);
-    }, 100);
+    editor.revealLineInCenter(cursorPosition.lineNumber);
+    let lineRestorationTimeoutId = 0;
     editor.onDidChangeCursorPosition((e) => {
       clearTimeout(lineRestorationTimeoutId);
       lineRestorationTimeoutId = window.setTimeout(() => {
         setCursorPosition(e.position);
-      }, 1000);
+      }, 200);
     });
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(lineRestorationTimeoutId);
     };
-  });
+  }, [cursorPositionStable, editor, setCursorPosition]);
 }
-let lineRestorationTimeoutId = 0;
 
 function setupVimBindings(
   editor: monaco.editor.IStandaloneCodeEditor,

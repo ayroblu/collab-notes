@@ -93,7 +93,10 @@ function updateOffsets({
     setExtraOffset(topOffset < 0 ? -topOffset : 0);
     setScrollOffset(topOffset);
   } else {
-    setScrollOffset(0);
+    const comment = commentDetails[focusCommentIndex];
+    const offset = comment ? comment.top - commentGap : 0;
+    const topOffset = offset <= 0 ? offset : 0;
+    setScrollOffset(topOffset);
   }
 
   if (commentDetails.length < 2) return;

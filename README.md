@@ -6,8 +6,6 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
-- race condition for undo decorations
-  - if commented text no longer exists on page - hide them
 - comments v2
   - on click if scroll required, scroll page to where comment actually is
   - notifications for when you have new comments / threads

@@ -2,7 +2,6 @@ import * as monaco from "monaco-editor";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import { useStable } from "@/hooks/useStable";
 import type { SelectionRange } from "@/modules/documents";
 import { getComments, updateCommentSelection } from "@/modules/documents";
 import { cn } from "@/modules/utils";
@@ -128,11 +127,7 @@ export const useCommentDecorations = () => {
   const [, setDecorations] = React.useState<string[]>([]);
   const roomId = useRecoilValue(activeRoomIdSelector);
   const fileName = useRecoilValue(activeFileNameState(roomId));
-  const inProgressCommentsStable = useStable(() => inProgressComments);
-  const commentsStable = useStable(() => comments);
   React.useEffect(() => {
-    const comments = commentsStable();
-    const inProgressComments = inProgressCommentsStable();
     const newDecorations = [
       ...[...comments, ...inProgressComments].map(
         ({
@@ -165,7 +160,7 @@ export const useCommentDecorations = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [inProgressCommentsStable, commentsStable, editor]);
+  }, [inProgressComments, comments, editor]);
 
   const room = useRoom();
   React.useEffect(() => {

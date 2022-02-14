@@ -224,12 +224,10 @@ const usePosition = (selection: SelectionRange) => {
   if (!editor) return;
   const editorDiv = editorDivRef.current;
   if (!editorDiv) return;
-  // TODO: Why does -1 make this work? Removing it causes the scroll sync to fail
-  const editorTop = editorDiv.offsetTop - 1;
   const top = editor.getTopForPosition(
     selection.startLineNumber,
     selection.startColumn
   );
   const lineHeight = editor.getRawOptions().lineHeight || 24;
-  return top - lineHeight - editorTop;
+  return top - lineHeight;
 };

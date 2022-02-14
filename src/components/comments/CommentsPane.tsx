@@ -109,7 +109,7 @@ export const CommentsPane: React.FC = () => {
             height: editorHeight && editorHeight + extraOffset + scrollOffset,
           }}
         >
-          {comments.map((comment) => (
+          {comments.filter(commentHasVisibleSelection).map((comment) => (
             <li key={comment.id}>
               <Comment
                 offset={(offsets[comment.id] ?? 0) + extraOffset}
@@ -121,22 +121,31 @@ export const CommentsPane: React.FC = () => {
               />
             </li>
           ))}
-          {inProgressComments.map((comment) => (
-            <li key={comment.id}>
-              <AddComment
-                offset={(offsets[comment.id] ?? 0) + extraOffset}
-                id={comment.id}
-                onSubmit={createCommentFn(comment)}
-                onCancel={cancelCommentFn(comment.id)}
-                isFocusComment={focusCommentId === comment.id}
-                isActiveComment={
-                  focusCommentIsActive && focusCommentId === comment.id
-                }
-              />
-            </li>
-          ))}
+          {inProgressComments
+            .filter(commentHasVisibleSelection)
+            .map((comment) => (
+              <li key={comment.id}>
+                <AddComment
+                  offset={(offsets[comment.id] ?? 0) + extraOffset}
+                  id={comment.id}
+                  onSubmit={createCommentFn(comment)}
+                  onCancel={cancelCommentFn(comment.id)}
+                  isFocusComment={focusCommentId === comment.id}
+                  isActiveComment={
+                    focusCommentIsActive && focusCommentId === comment.id
+                  }
+                />
+              </li>
+            ))}
         </ul>
       </section>
     </div>
   );
 };
+
+function commentHasVisibleSelection({ selection }: CommentData) {
+  return !(
+    selection.startLineNumber === selection.endLineNumber &&
+    selection.startColumn === selection.endColumn
+  );
+}
