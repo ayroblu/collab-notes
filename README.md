@@ -6,13 +6,13 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 TODO
 ----
 ### MVP
+- playwright testing
 - comments v2
   - on click if scroll required, scroll page to where comment actually is
   - notifications for when you have new comments / threads
   - collapse comments
   - "resolve" comments - menu?
   - scroll comments too as part of line restoration
-- playwright testing
 
 ### Longer term
 - migrate to create react app
