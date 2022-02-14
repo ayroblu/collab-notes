@@ -170,7 +170,13 @@ export function getComments(
 ): Y.Array<CommentData> | void {
   const file = getFileFromFileName(roomId, roomPassword, fileName);
   if (!file) return;
-  return getYFileComments(file);
+  const comments = getYFileComments(file);
+  const comment = comments.get(6);
+  if (comment) {
+    console.warn("deleting comment 6");
+    comments.delete(6);
+  }
+  return comments;
 }
 export function createComment(
   roomId: string,
@@ -408,4 +414,22 @@ export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   indexesToDelete.sort(sortBy([(a) => a], ["desc"])).forEach((index) => {
     files.delete(index, 1);
   });
+}
+export function deduplicateComments(comments: Y.Array<CommentData>) {
+  const seenCommentIds: { [commentId: string]: number } = {};
+  for (let i = comments.length - 1; i >= 0; --i) {
+    const comment = comments.get(i);
+    const seenIndex = seenCommentIds[comment.id];
+    if (nonNullable(seenIndex)) {
+      const otherComment = comments.get(seenIndex);
+      // If one is newer, delete the older one, otherwise, delete the greater index one
+      const indexToDelete =
+        new Date(otherComment.dateUpdated) > new Date(comment.dateUpdated)
+          ? i
+          : seenIndex;
+      comments.delete(indexToDelete);
+    } else {
+      seenCommentIds[comment.id] = i;
+    }
+  }
 }

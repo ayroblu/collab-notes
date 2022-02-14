@@ -10,6 +10,7 @@ import {
   getRoom,
   getAllThreads,
   syncCommentNamesFn,
+  deduplicateComments,
 } from "@/modules/documents";
 import { timeoutPromiseSuccess } from "@/modules/utils";
 
@@ -65,10 +66,12 @@ const useCommentsSync = () => {
   React.useEffect(() => {
     const yComments = getComments(room.id, room.password, fileName);
     if (!yComments) return;
+    deduplicateComments(yComments);
 
     setComments(yComments.toArray());
 
     const changeListener = () => {
+      deduplicateComments(yComments);
       setComments(yComments.toArray());
     };
     yComments.observe(changeListener);

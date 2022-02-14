@@ -8,7 +8,6 @@ import type * as Y from "yjs";
 
 import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useIsMounted } from "@/hooks/useIsMounted";
-import { useStable } from "@/hooks/useStable";
 import {
   getDocument,
   getFileFromFileName,
