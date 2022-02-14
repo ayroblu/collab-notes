@@ -1,5 +1,7 @@
-// https://robertcooper.me/post/using-eslint-and-prettier-in-a-typescript-project
-module.exports = {
+import type { TSESLint } from "@typescript-eslint/experimental-utils";
+
+// File for demo purposes, please use the yml file for actual configuration
+const config: TSESLint.Linter.Config = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
@@ -99,3 +101,4 @@ module.exports = {
     ],
   },
 };
+export default config;

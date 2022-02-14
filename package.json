@@ -1,5 +1,6 @@
 {
   "name": "collab-notes",
+  "private": true,
   "scripts": {
     "start": "webpack-dev-server --open",
     "lint": "eslint src --ext .ts,.tsx",

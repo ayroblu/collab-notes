@@ -23,7 +23,7 @@ const config: webpack.Configuration = {
   devServer: {
     compress: true,
   },
-  devtool: isDevelopment && "eval-source-map",
+  devtool: isDevelopment && "inline-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
