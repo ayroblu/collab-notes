@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const name = "first-time-setup";
 
-describe(name, () => {
+test.describe(name, () => {
   test("should successfully create a file when prompted", async ({ page }) => {
     await page.goto("http://localhost:8080");
     const button = page.locator("text=Click me");
