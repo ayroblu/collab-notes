@@ -6,10 +6,10 @@ type Props = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
 > & {
-  buttonType: "form" | "normal";
+  buttonType?: "form" | "normal";
 };
 export const Button: React.FC<Props> = ({
-  buttonType,
+  buttonType = "normal",
   className,
   ...props
 }) => {

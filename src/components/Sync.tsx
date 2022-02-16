@@ -134,14 +134,17 @@ const useParamsSync = () => {
     }
   }, [activeRoomId, roomId, setActiveRoomId]);
 };
-export const FilesParamsSync: React.FC = ({ children }) => {
+export const FilesParamsSync: React.FC<{ fallback: React.ReactNode }> = ({
+  children,
+  fallback,
+}) => {
   useFileNameInitSync();
   const { roomId } = useParams<{ roomId: string }>();
   const [searchParams] = useSearchParams();
   const fileName = searchParams.get("name");
   const activeFileName = useRecoilValue(activeFileNameState(roomId));
 
-  if (!fileName || fileName !== activeFileName) return null;
+  if (!fileName || fileName !== activeFileName) return <>{fallback}</>;
   return <>{children}</>;
 };
 const useFileNameInitSync = () => {

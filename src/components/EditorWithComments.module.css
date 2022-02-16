@@ -7,3 +7,10 @@
   display: grid;
   grid-template-columns: 1fr 400px;
 }
+.newFile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.newFileInput {
+}

@@ -7,7 +7,8 @@
     "format": "prettier src -w",
     "build": "NODE_ENV='production' webpack --progress",
     "build:debug": "DEBUG=t yarn build",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:debug": "yarn test --headed"
   },
   "dependencies": {
     "fast-json-stable-stringify": "^2.1.0",

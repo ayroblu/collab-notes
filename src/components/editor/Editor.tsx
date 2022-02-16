@@ -150,6 +150,8 @@ function createMonacoEditor(
     fontSize: 16,
     scrollBeyondLastLine: false,
     wordWrap: settings.wordWrap ? "on" : "off",
+    autoClosingBrackets: "never",
+    tabSize: 2,
     minimap: {
       enabled: false,
     },
