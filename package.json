@@ -6,6 +6,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier src -w",
     "build": "NODE_ENV='production' webpack --progress",
+    "build:ci": "NODE_ENV='production' webpack",
     "build:debug": "DEBUG=t yarn build",
     "test": "playwright test",
     "test:debug": "yarn test --headed"

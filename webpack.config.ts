@@ -14,6 +14,7 @@ const smp = new SpeedMeasurePlugin();
 
 const isDevelopment = process.env["NODE_ENV"] !== "production";
 const isProduction = process.env["NODE_ENV"] === "production";
+const isCi = !!process.env["CI"];
 const isDebug = !!process.env["DEBUG"];
 const swSrc = "./src/service-worker.ts";
 
@@ -23,7 +24,7 @@ const config: webpack.Configuration = {
   devServer: {
     compress: true,
   },
-  devtool: isDevelopment && "inline-source-map",
+  devtool: isDevelopment && !isCi && "inline-source-map",
   resolve: {
     extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
     alias: {
@@ -127,11 +128,12 @@ const config: webpack.Configuration = {
     // new webpack.debug.ProfilingPlugin(),
   ].filter(isTruthy),
 
-  cache: isProduction
-    ? false
-    : {
-        type: "filesystem",
-      },
+  cache:
+    isProduction || isCi
+      ? false
+      : {
+          type: "filesystem",
+        },
 
   // Significant perf gain (66s -> 24s) but not minified (0.7MB -> 4.0MB main)
   //   Unminified => 5.2MB (main.bundle.js)

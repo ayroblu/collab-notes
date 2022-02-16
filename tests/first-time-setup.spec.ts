@@ -4,7 +4,7 @@ const name = "first-time-setup";
 
 test.describe(name, () => {
   test("should successfully create a file when prompted", async ({ page }) => {
-    await page.goto("http://localhost:8080");
+    await page.goto("http://localhost:8080", { timeout: 60_000 });
     await page.locator('[placeholder="filename.ts"]').waitFor();
     expect(await page.screenshot()).toMatchSnapshot([
       name,
