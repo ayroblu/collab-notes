@@ -10,7 +10,6 @@ import { NoMatchFile } from "./NoMatchFile";
 import { FilesParamsSync } from "./Sync";
 import { CommentsPane } from "./comments/CommentsPane";
 import { activeFileNameState } from "./data-model";
-import { Button } from "./shared/Button";
 import { useFileName, useRoom } from "./utils";
 
 const Editor = React.lazy(() => import("./editor/Editor"));
@@ -43,14 +42,11 @@ const NewFileDialog: React.FC = () => {
   const room = useRoom();
   const [, setSearchParams] = useSearchParams();
   const setFileName = useSetRecoilState(activeFileNameState(room.id));
-  const [isEdit, setIsEdit] = React.useState(true);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
       case "Enter":
         return handleNewFile(e.currentTarget.value.trim());
-      case "Escape":
-        setIsEdit(false);
     }
   };
 
@@ -70,28 +66,16 @@ const NewFileDialog: React.FC = () => {
     },
     [handleNewFile],
   );
-  const onNewFileClick = React.useCallback(() => {
-    setIsEdit(true);
-  }, []);
 
   return (
     <section className={styles.newFile}>
-      {isEdit ? (
-        <>
-          <h2>Add new file</h2>
-          <input
-            className={styles.newFileInput}
-            onKeyDown={handleKeyDown}
-            onBlur={handleNewFileFocus}
-            placeholder="filename.ts"
-            autoFocus
-          />
-        </>
-      ) : (
-        <Button buttonType="normal" onClick={onNewFileClick}>
-          New File
-        </Button>
-      )}
+      <h2>Add new file</h2>
+      <input
+        onKeyDown={handleKeyDown}
+        onBlur={handleNewFileFocus}
+        placeholder="filename.ts"
+        autoFocus
+      />
     </section>
   );
 };
