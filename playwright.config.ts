@@ -1,7 +1,10 @@
-import { toMatchImageSnapshot } from "@ayroblu/playwright-image-snapshot";
+import { configureToMatchImageSnapshot } from "@ayroblu/playwright-image-snapshot";
 import type { PlaywrightTestConfig } from "@playwright/test";
 import { devices, expect } from "@playwright/test";
 
+const toMatchImageSnapshot = configureToMatchImageSnapshot({
+  failureThreshold: process.env["CI"] ? 0.2 : 0.05,
+});
 expect.extend({ toMatchImageSnapshot });
 
 /**

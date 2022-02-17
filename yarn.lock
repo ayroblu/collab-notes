@@ -11,10 +11,10 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@ayroblu/playwright-image-snapshot@^0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@ayroblu/playwright-image-snapshot/-/playwright-image-snapshot-0.3.4.tgz#d2878f78b21c098204901f3dc91bf10a4eb804ad"
-  integrity sha512-/m60YG1PX+64lrYkRQUyAO4HWZsMCku/4jrfjGPMLmz3zRZThdenrkZ62X67CJeENF8hoq4gXUIYx/nxXlNAGg==
+"@ayroblu/playwright-image-snapshot@^0.3.5":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@ayroblu/playwright-image-snapshot/-/playwright-image-snapshot-0.3.5.tgz#9c9d34307b54378692ec7f2a4e3a1b141bb59308"
+  integrity sha512-kfmO0qQmH+HlQtqsQVKcEXh0pbdXk1MR02OBCUEOuI9woh0rXDJADc4EuaG5ZSSfwZL3UukAwQ6hbZG8WJk7nQ==
   dependencies:
     glur "1.1.2"
     mkdirp "1.0.4"

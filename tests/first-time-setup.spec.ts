@@ -9,6 +9,7 @@ test.describe(name, () => {
     await page.addStyleTag({
       content: disableAnimationsCss,
     });
+    console.log("start trying to load page");
 
     await page.goto("http://localhost:8080", { timeout: 60_000 });
     await page.locator('[placeholder="filename.ts"]').waitFor();
