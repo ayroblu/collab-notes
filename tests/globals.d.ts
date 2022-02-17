@@ -8,7 +8,7 @@ declare global {
     interface Matchers<R> {
       toMatchImageSnapshot(
         testInfo: TestInfo,
-        name: string,
+        name: string[] | string,
         options?: ImageSnapshotOptions,
       ): R;
     }
