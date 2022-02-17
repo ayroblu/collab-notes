@@ -1,11 +1,8 @@
+import { toMatchImageSnapshot } from "@ayroblu/playwright-image-snapshot";
 import type { PlaywrightTestConfig } from "@playwright/test";
-import { devices } from "@playwright/test";
+import { devices, expect } from "@playwright/test";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
+expect.extend({ toMatchImageSnapshot });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -97,10 +94,12 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "webpack-dev-server",
-    port: 8080,
-  },
+  ...(process.env["CI"] && {
+    webServer: {
+      command: "webpack-dev-server",
+      port: 8080,
+    },
+  }),
 };
 
 export default config;

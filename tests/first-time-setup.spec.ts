@@ -13,26 +13,34 @@ test.describe(name, () => {
     await page.goto("http://localhost:8080", { timeout: 60_000 });
     await page.locator('[placeholder="filename.ts"]').waitFor();
     await wait(100);
-    expect(await page.screenshot()).toMatchSnapshot([
-      name,
-      "1-initial-load.png",
-    ]);
+    expect(await page.screenshot()).toMatchImageSnapshot(
+      test.info(),
+      "1-initial-load",
+    );
     await page.locator('[placeholder="filename.ts"]').type("tweet.ts");
     await page.keyboard.press("Enter");
     await page.locator('[data-mode-id="typescript"]').waitFor();
     await wait(100);
-    expect(await page.screenshot()).toMatchSnapshot([
-      name,
+    // expect(await page.screenshot()).toMatchSnapshot([
+    //   name,
+    //   "2-typescript-loaded.png",
+    // ]);
+    expect(await page.screenshot()).toMatchImageSnapshot(
+      test.info(),
       "2-typescript-loaded.png",
-    ]);
+    );
     await page.fill(".monaco-editor textarea", content);
     // await page.type("input", content);
     // await page.fill("input", content);
     await wait(100);
-    expect(await page.screenshot()).toMatchSnapshot([
-      name,
+    // expect(await page.screenshot()).toMatchSnapshot([
+    //   name,
+    //   "3-content-added.png",
+    // ]);
+    expect(await page.screenshot()).toMatchImageSnapshot(
+      test.info(),
       "3-content-added.png",
-    ]);
+    );
   });
 });
 
