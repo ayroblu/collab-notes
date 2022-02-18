@@ -7,6 +7,7 @@ TODO
 ----
 ### MVP
 - playwright testing
+  - rewrite playright-image-snapshot to leverage playwright attachments etc apis
 - comments v2
   - on click if scroll required, scroll page to where comment actually is
   - notifications for when you have new comments / threads

@@ -13,7 +13,7 @@ expect.extend({ toMatchImageSnapshot });
 const config: PlaywrightTestConfig = {
   testDir: "./tests",
   /* Maximum time one test can run for. */
-  timeout: process.env["CI"] ? 60_000 : 60_000_000,
+  timeout: process.env["CI"] ? 30_000 : 60_000_000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -97,12 +97,11 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  ...(process.env["CI"] && {
-    webServer: {
-      command: "webpack-dev-server",
-      port: 8080,
-    },
-  }),
+  webServer: {
+    command: "serve -p 8080",
+    port: 8080,
+    reuseExistingServer: !process.env["CI"],
+  },
 };
 
 export default config;

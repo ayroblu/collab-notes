@@ -11,7 +11,7 @@ test.describe(name, () => {
     });
     console.log("start trying to load page");
 
-    await page.goto("http://localhost:8080", { timeout: 60_000 });
+    await page.goto("http://localhost:8080");
     await page.locator('[placeholder="filename.ts"]').waitFor();
     await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
