@@ -98,7 +98,7 @@ const config: PlaywrightTestConfig = {
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "serve -p 8080",
+    command: "serve -p 8080 dist",
     port: 8080,
     reuseExistingServer: !process.env["CI"],
   },
