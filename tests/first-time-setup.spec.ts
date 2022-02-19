@@ -9,7 +9,6 @@ test.describe(name, () => {
     await page.addStyleTag({
       content: disableAnimationsCss,
     });
-    console.log("start trying to load page");
 
     await page.goto("http://localhost:8080");
     await page.locator('[placeholder="filename.ts"]').waitFor();
@@ -18,6 +17,10 @@ test.describe(name, () => {
       name,
       "1-initial-load.png",
     ]);
+    // expect(await page.screenshot()).toMatchSnapshot([
+    //   name,
+    //   "1-initial-load.png",
+    // ]);
     await page.locator('[placeholder="filename.ts"]').type("tweet.ts");
     await page.keyboard.press("Enter");
     await page.locator('[data-mode-id="typescript"]').waitFor();
