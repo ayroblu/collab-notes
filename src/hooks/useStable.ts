@@ -7,6 +7,6 @@ export const useStable = <T extends Function>(func: T): T => {
   return React.useCallback(
     (...args) => ref.current(...args),
     [],
-    // Not quite handling the generic Function very well
+    // TypeScript not quite handling the generic Function very well
   ) as unknown as T;
 };
