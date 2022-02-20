@@ -2,6 +2,7 @@ import type {
   ImageSnapshotOptions,
   TestInfo,
 } from "@ayroblu/playwright-image-snapshot";
+import type { SinonFakeTimers } from "sinon";
 
 declare global {
   namespace PlaywrightTest {
@@ -12,5 +13,8 @@ declare global {
         options?: ImageSnapshotOptions,
       ): R;
     }
+  }
+  interface Window {
+    __clock: SinonFakeTimers;
   }
 }

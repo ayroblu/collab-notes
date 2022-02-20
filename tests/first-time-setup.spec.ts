@@ -1,3 +1,6 @@
+import path from "path";
+
+import type { Page } from "@playwright/test";
 import { test, expect } from "@playwright/test";
 
 import { wait } from "./utils";
@@ -5,6 +8,22 @@ import { wait } from "./utils";
 const name = "first-time-setup";
 
 test.describe(name, () => {
+  /**
+   * https://github.com/microsoft/playwright/issues/6347#issuecomment-965887758
+   */
+  test.beforeEach(async ({ context }) => {
+    await context.addInitScript({
+      path: path.join(__dirname, "..", "./node_modules/sinon/pkg/sinon.js"),
+    });
+    await context.addInitScript(() => {
+      // @ts-expect-error import from sinon
+      window.__clock = sinon.useFakeTimers({
+        now: new Date(2022, 0, 1).getTime(),
+        shouldAdvanceTime: true,
+      });
+    });
+  });
+
   test("should successfully create a file when prompted", async ({ page }) => {
     await page.goto("http://localhost:8080");
     await page.locator('[placeholder="filename.ts"]').waitFor();
@@ -60,7 +79,15 @@ test.describe(name, () => {
     await page.keyboard.press("Meta+Enter");
 
     await page.keyboard.press("ArrowUp");
+    await wait(50);
+    await page.keyboard.press("Alt+ArrowRight");
+    await wait(50);
+    await page.keyboard.press("Alt+ArrowRight");
+    await wait(50);
     await page.keyboard.press("Alt+ArrowLeft");
+    await wait(50);
+    await page.keyboard.press("Shift+Alt+ArrowRight");
+    await wait(50);
     await page.keyboard.press("Shift+Alt+ArrowRight");
     await page.click("[data-testid='CommentButton']");
     await page.fill(
