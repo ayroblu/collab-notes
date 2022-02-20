@@ -30,6 +30,7 @@ export const CommentButton: React.FC<CommentButtonProps> = React.memo(
     return (
       <button
         className={styles.commentButton}
+        data-testid="CommentButton"
         style={{
           top: offsetTop,
         }}

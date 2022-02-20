@@ -6,12 +6,11 @@ const name = "first-time-setup";
 
 test.describe(name, () => {
   test("should successfully create a file when prompted", async ({ page }) => {
+    await page.goto("http://localhost:8080");
+    await page.locator('[placeholder="filename.ts"]').waitFor();
     await page.addStyleTag({
       content: disableAnimationsCss,
     });
-
-    await page.goto("http://localhost:8080");
-    await page.locator('[placeholder="filename.ts"]').waitFor();
     await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
@@ -33,9 +32,14 @@ test.describe(name, () => {
       name,
       "2-typescript-loaded.png",
     ]);
+
+    // Set username for consistency
+    await page.click("text=Settings");
+    await page.fill('input[name="name"]', "test-user");
+    await page.locator('select[name="theme"]').selectOption("vs-dark");
+    await page.goBack();
+
     await page.fill(".monaco-editor textarea", content);
-    // await page.type("input", content);
-    // await page.fill("input", content);
     await wait(100);
     // expect(await page.screenshot()).toMatchSnapshot([
     //   name,
@@ -44,6 +48,32 @@ test.describe(name, () => {
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "3-content-added.png",
+    ]);
+
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("Shift+Alt+ArrowRight");
+    await page.click("[data-testid='CommentButton']");
+    await page.fill(
+      "[placeholder='Add comment...']",
+      "Are you sure you want to console.log?",
+    );
+    await page.keyboard.press("Meta+Enter");
+
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("Alt+ArrowLeft");
+    await page.keyboard.press("Shift+Alt+ArrowRight");
+    await page.click("[data-testid='CommentButton']");
+    await page.fill(
+      "[placeholder='Add comment...']",
+      "This function doesn't create any Tweets!",
+    );
+    await page.keyboard.press("Meta+Enter");
+
+    await page.locator('[data-testid="Comment"]').nth(1).waitFor();
+    await wait(100);
+    expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
+      name,
+      "4-comments-added.png",
     ]);
   });
 });

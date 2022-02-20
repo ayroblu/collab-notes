@@ -58,6 +58,7 @@ export const AddComment: React.FC<AddCommentProps> = React.memo(
         <CommentHeading byName={settings.name} />
         <form onSubmit={handleSubmit} className={styles.main}>
           <textarea
+            placeholder="Add comment..."
             className={styles.textarea}
             value={comment.text}
             onChange={(e) =>

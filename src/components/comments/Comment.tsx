@@ -104,6 +104,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   return (
     <section
       ref={handleRef}
+      data-testid="Comment"
       className={cn(styles.comment, isFocusComment && styles.focus)}
       style={{
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,

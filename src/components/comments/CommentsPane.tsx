@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { createComment } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents";
 
-import { CommentsContext } from "../Contexts";
+import { CommentsContext, EditorContext } from "../Contexts";
 import {
   focusCommentIsActiveState,
   focusNearestCommentIdSelector,
@@ -31,6 +31,7 @@ export const CommentsPane: React.FC = () => {
   const settings = useRecoilValue(settingsSelector);
   const setFocusCommentId = useSetFocusCommentIdState();
   const { commentRefs } = React.useContext(CommentsContext);
+  const { editor } = React.useContext(EditorContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
     inProgressCommentsSelector,
   );
@@ -74,6 +75,7 @@ export const CommentsPane: React.FC = () => {
       inProgressComments.filter(({ id }) => comment.id !== id),
     );
     createComment(roomId, roomPassword, fileName, comment);
+    editor?.focus();
   };
   const cancelCommentFn = (commentId: string) => () => {
     setInProgressComments(
