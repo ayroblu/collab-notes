@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     strategy:
       matrix:
@@ -38,6 +38,9 @@ jobs:
     - name: Grab dependencies
       run: yarn --frozen-lockfile
 
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+
     - name: Lint
       run: yarn lint
 
@@ -49,3 +52,13 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
+
+    - name: Run Playwright tests
+      run: yarn test
+
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: test-results
+        path: test-results/
+        retention-days: 2
