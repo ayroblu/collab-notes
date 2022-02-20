@@ -1,6 +1,5 @@
 import path from "path";
 
-import type { Page } from "@playwright/test";
 import { test, expect } from "@playwright/test";
 
 import { wait } from "./utils";
@@ -127,5 +126,12 @@ const disableAnimationsCss = `
 }
 .monaco-editor .cursors-layer .cursor {
   visibility: inherit !important;
+}
+*::-webkit-scrollbar {
+  display: none !important;
+}
+* {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
 }
 `.trim();

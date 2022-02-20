@@ -3,7 +3,7 @@ import type { PlaywrightTestConfig } from "@playwright/test";
 import { devices, expect } from "@playwright/test";
 
 const toMatchImageSnapshot = configureToMatchImageSnapshot({
-  failureThreshold: process.env["CI"] ? 0.008 : 0.001,
+  failureThreshold: process.env["CI"] ? 0.01 : 0.002,
 });
 expect.extend({ toMatchImageSnapshot });
 
