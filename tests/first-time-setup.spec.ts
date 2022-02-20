@@ -116,8 +116,40 @@ test.describe(name, () => {
 
 const content = `
 type Tweet = {
-  text: string,
-  dateCreated: string,
+  id: string;
+  text: string;
+  author_user_id: User['id'];
+  media: Media[];
+  likes: number;
+  replies: number;
+  quotes: number;
+  replyTo?: Tweet['id'];
+  topics: string[];
+  dateCreated: string;
+  dateUpdated: string;
+}
+
+type User = {
+  id: string;
+  name: string;
+  numFollowers: number;
+  numFollowing: number;
+  dateCreated: string;
+  dateUpdated: string;
+}
+
+type Media = Image | Tweet | Video;
+type Image = {
+  width: number;
+  height: number;
+  link_640: string;
+  link_1280: string;
+}
+type Video = {
+  width: number;
+  height: number;
+  link: string;
+  type: string;
 }
 function createTweet(tweet: Tweet) {
   console.log(tweet);
