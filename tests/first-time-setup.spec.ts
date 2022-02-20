@@ -51,6 +51,16 @@ test.describe(name, () => {
       "2-typescript-loaded.png",
     ]);
 
+    // Check page can't scroll
+    await page.click("text=Files");
+    await page.mouse.wheel(50, 50);
+    await wait(100);
+    expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
+      name,
+      "3-files-list-opened.png",
+    ]);
+    await page.click("text=Files");
+
     // Set username for consistency
     await page.click("text=Settings");
     await page.fill('input[name="name"]', "test-user");
@@ -65,7 +75,7 @@ test.describe(name, () => {
     // ]);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
-      "3-content-added.png",
+      "4-content-added.png",
     ]);
 
     await page.keyboard.press("ArrowUp");
@@ -99,7 +109,7 @@ test.describe(name, () => {
     await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
-      "4-comments-added.png",
+      "5-comments-added.png",
     ]);
   });
 });
