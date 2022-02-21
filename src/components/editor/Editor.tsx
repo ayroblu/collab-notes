@@ -1,14 +1,18 @@
 import * as monaco from "monaco-editor";
 import { initVimMode, VimMode } from "monaco-vim";
+import { format } from "prettier/standalone";
 import React from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import type { SetterOrUpdater } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { MonacoBinding } from "y-monaco";
 import type { WebrtcProvider } from "y-webrtc";
 import type * as Y from "yjs";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { useStable } from "@/hooks/useStable";
+import { useSuspensePromise } from "@/hooks/useSuspensePromise";
 import {
+  applyDiff,
   getDocument,
   getFileFromFileName,
   getRoom,
@@ -25,9 +29,10 @@ import {
   cursorPositionState,
   isNewUserState,
   settingsSelector,
+  undoFormatState,
 } from "../data-model";
 import type { Room, Settings } from "../data-model";
-import { useFileName, useRoom } from "../utils";
+import { useFileName, useFileParams, useRoom } from "../utils";
 
 import "./Editor.css";
 import styles from "./Editor.module.css";
@@ -63,7 +68,12 @@ function useMonacoEditor(
   const room = useRoom();
   const fileName = useFileName();
   const [isNewUser, setIsNewUser] = useRecoilState(isNewUserState);
+  const prettierPlugins = usePrettierPlugins(fileName);
 
+  const setUndoFormat = useSetRecoilState(
+    undoFormatState({ fileName, roomId: room.id }),
+  );
+  useUndoFormat();
   useCommentDecorations();
   React.useEffect(() => {
     if (!editorDivRef.current || !fileName) {
@@ -81,6 +91,13 @@ function useMonacoEditor(
       getIsMounted,
     );
     setEditor(editor);
+    setupPrettierIntegration(
+      room,
+      fileName,
+      editor,
+      prettierPlugins,
+      setUndoFormat,
+    );
     const changeListener = () => {
       const file = getFileFromFileName(room.id, room.password, fileName);
       if (!file) return;
@@ -107,6 +124,8 @@ function useMonacoEditor(
     room,
     setCursorStyles,
     settings,
+    prettierPlugins,
+    setUndoFormat,
   ]);
   React.useEffect(() => {
     const text = getDocument(room.id, room.password, fileName);
@@ -122,6 +141,157 @@ function useMonacoEditor(
   useSelectionHandler();
   useCommentHighlightActive();
   useLineRestoration();
+}
+
+const usePrettierPlugins = (fileName: string) => {
+  const ext = /\.(?<ext>\w+)$/g.exec(fileName)?.groups?.["ext"];
+  const pluginImports = getPrettierPlugins(ext);
+  const plugins = useSuspensePromise(
+    `prettier-${ext}`,
+    () => Promise.all(pluginImports()),
+    [ext],
+  );
+  return plugins;
+};
+function setupPrettierIntegration(
+  room: Room,
+  fileName: string,
+  editor: monaco.editor.IStandaloneCodeEditor,
+  plugins: any[],
+  setUndoFormat: SetterOrUpdater<{ result: string; former: string }[]>,
+) {
+  const ext = /\.(?<ext>\w+)$/g.exec(fileName)?.groups?.["ext"];
+  const parser = getPrettierParser(ext);
+  if (parser) {
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      const former = editor.getValue();
+      applyDiff(room.id, room.password, fileName, (text) =>
+        format(text, {
+          parser,
+          plugins,
+          endOfLine: "crlf", // vscode
+        }),
+      );
+      const result = editor.getValue();
+      setUndoFormat((items) => [{ result, former }].concat(items));
+    });
+  }
+}
+
+function getPrettierPlugins(ext: string | undefined): () => Promise<any>[] {
+  switch (ext) {
+    case "graphql":
+      return () => [import("prettier/parser-graphql")];
+    case "html":
+      return () => [
+        import("prettier/parser-html"),
+        import("prettier/parser-postcss"),
+        import("prettier/parser-babel"),
+      ];
+    case "js":
+    case "jsx":
+    case "mjs":
+    case "json":
+    case "json5":
+    case "mdx":
+      return () => [import("prettier/parser-babel")];
+    case "ts":
+    case "tsx":
+      return () => [import("prettier/parser-typescript")];
+    // case 'md':
+    //   return ['markdown']
+    case "css":
+      return () => [import("prettier/parser-postcss")];
+    case "yml":
+    case "yaml":
+      return () => [import("prettier/parser-yaml")];
+    default:
+      return () => [];
+  }
+}
+function getPrettierParser(ext: string | undefined): string | null {
+  switch (ext) {
+    case "graphql":
+      return "graphql";
+    case "html":
+      return "html";
+    case "js":
+    case "jsx":
+    case "mjs":
+      return "babel";
+    case "ts":
+    case "tsx":
+      return "typescript";
+    // case 'md':
+    //   return ['markdown']
+    case "css":
+      return "css";
+    case "json":
+      return "json";
+    case "json5":
+      return "json5";
+    case "mdx":
+      return "mdx";
+    case "yml":
+    case "yaml":
+      return "yaml";
+    default:
+      return null;
+  }
+}
+function useUndoFormat() {
+  const { fileName, roomId, roomPassword } = useFileParams();
+  const [undoFormat, setUndoFormat] = useRecoilState(
+    undoFormatState({ fileName, roomId }),
+  );
+  const { editor } = React.useContext(EditorContext);
+  const undoFormatStable = useStable(() => undoFormat);
+  const ref = React.useRef<monaco.editor.IContextKey<boolean> | null>(null);
+  React.useEffect(() => {
+    if (!editor) return;
+    const isUndoEnabled = editor.createContextKey("isUndoEnabled", false);
+    ref.current = isUndoEnabled;
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyZ,
+      () => {
+        const undoFormat = undoFormatStable();
+        const undoFormatFirst = undoFormat[0];
+        if (!undoFormatFirst) return;
+        if (editor.getValue() === undoFormatFirst.result) {
+          applyDiff(
+            roomId,
+            roomPassword,
+            fileName,
+            () => undoFormatFirst.former,
+          );
+          setUndoFormat((items) => items.slice(1));
+        }
+      },
+      "isUndoEnabled",
+    );
+  }, [editor, fileName, roomId, roomPassword, setUndoFormat, undoFormatStable]);
+  React.useEffect(() => {
+    if (!editor) return;
+    const onChange = () => {
+      const undoFormatFirst = undoFormat[0];
+      if (!undoFormatFirst) return;
+      if (ref.current) {
+        if (editor.getValue() === undoFormatFirst.result) {
+          ref.current.set(true);
+        } else {
+          ref.current.set(false);
+        }
+      }
+    };
+    onChange();
+    const { dispose } = editor.onDidChangeModelContent(() => {
+      onChange();
+    });
+    return () => {
+      dispose();
+    };
+  }, [editor, undoFormat]);
+  return [];
 }
 
 function createMonacoEditor(

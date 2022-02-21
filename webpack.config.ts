@@ -7,6 +7,7 @@ import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import SpeedMeasurePlugin from "speed-measure-webpack-plugin";
 import webpack from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import FilterWarningsWebpackPlugin from "webpack-filter-warnings-plugin";
 import WorkboxWebpackPlugin from "workbox-webpack-plugin";
 import "webpack-dev-server";
 
@@ -125,6 +126,12 @@ const config: webpack.Configuration = {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       }),
     isDebug && new BundleAnalyzerPlugin(),
+    // from: https://github.com/prettier/prettier/issues/4959#issuecomment-416834237
+    // Because of: https://github.com/prettier/prettier/issues/12338
+    new FilterWarningsWebpackPlugin({
+      exclude:
+        /Critical dependency: the request of a dependency is an expression/,
+    }),
     // new webpack.debug.ProfilingPlugin(),
   ].filter(isTruthy),
 

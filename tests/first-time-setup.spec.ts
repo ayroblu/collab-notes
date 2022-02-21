@@ -73,12 +73,18 @@ test.describe(name, () => {
     //   name,
     //   "3-content-added.png",
     // ]);
+    await page.keyboard.press("Control+S");
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "4-content-added.png",
     ]);
 
     await page.keyboard.press("ArrowUp");
+    await wait(50);
+    await page.keyboard.press("ArrowUp");
+    await wait(50);
+    await page.keyboard.press("Alt+ArrowRight");
+    await wait(50);
     await page.keyboard.press("Shift+Alt+ArrowRight");
     await page.click("[data-testid='CommentButton']");
     await page.fill(
@@ -86,6 +92,7 @@ test.describe(name, () => {
       "Are you sure you want to console.log?",
     );
     await page.keyboard.press("Meta+Enter");
+    await wait(50);
 
     await page.keyboard.press("ArrowUp");
     await wait(50);
@@ -107,6 +114,7 @@ test.describe(name, () => {
 
     await page.locator('[data-testid="Comment"]').nth(1).waitFor();
     await wait(100);
+    await page.pause();
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "5-comments-added.png",

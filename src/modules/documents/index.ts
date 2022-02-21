@@ -1,3 +1,4 @@
+import { diffChars } from "diff";
 import isEqual from "lodash/isEqual";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
@@ -105,6 +106,34 @@ export function getYFileThreads(file: Y.Map<any>): Y.Map<Y.Array<ThreadData>> {
     file.set("threads", new Y.Map<Y.Array<ThreadData>>());
   }
   return file.get("threads");
+}
+export function applyDiff(
+  roomId: string,
+  roomPassword: string,
+  fileName: string,
+  getNewString: (text: string) => string,
+) {
+  const doc = getDocument(roomId, roomPassword, fileName);
+  if (!doc) return;
+  const text = doc.toString();
+  const formatted = getNewString(text);
+  const diff = diffChars(text, formatted);
+  console.log("apply diff", text, formatted, diff);
+  let index = 0;
+  diff.forEach(({ added, count, removed, value }) => {
+    if (added) {
+      doc.insert(index, value);
+    } else if (removed) {
+      // const docValue = doc.toString().slice(index, index + count!);
+      // if (docValue !== value) {
+      //   console.log({ value, docValue, index });
+      // }
+      // TODO: This breaks on if using lf and not crlf with prettier
+      doc.delete(index, count!);
+      return;
+    }
+    if (count) index += count;
+  });
 }
 
 export function createNewFile(

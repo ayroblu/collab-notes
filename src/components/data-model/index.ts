@@ -179,3 +179,18 @@ export const commentHeightState = atomFamily<number, CommentId>({
   key: "commentsHeightState",
   default: 0,
 });
+
+export const undoFormatState = atomFamily<
+  { result: string; former: string }[],
+  { fileName: string; roomId: string }
+>({
+  key: "undoFormatState",
+  default: () => [],
+});
+// export const redoFormatState = atomFamily<
+//   { result: string; former: string }[],
+//   { fileName: string; roomId: string }
+// >({
+//   key: "redoFormatState",
+//   default: () => [],
+// });
