@@ -7,15 +7,17 @@ import { Spinner } from "./Spinner";
 
 const SyntaxHighlighter = React.lazy(() => import("./SyntaxHighlighter"));
 
-export const Markdown: React.FC<{ text: string }> = React.memo(({ text }) => (
-  <ReactMarkdown
-    children={text}
-    remarkPlugins={[remarkGfm]}
-    components={{
-      code: Code,
-    }}
-  />
-));
+export const Markdown: React.FC<{ text: string; className?: string }> =
+  React.memo(({ className, text }) => (
+    <ReactMarkdown
+      className={className}
+      children={text}
+      remarkPlugins={[remarkGfm]}
+      components={{
+        code: Code,
+      }}
+    />
+  ));
 
 const Code: React.FC<CodeProps> = ({
   children,

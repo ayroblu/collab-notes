@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { addThread, editComment, removeComment } from "@/modules/documents";
 import type { CommentData, SelectionRange } from "@/modules/documents/types";
@@ -9,6 +9,7 @@ import { CommentsContext, EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  commentCollapsedState,
   commentSizeSelector,
   focusCommentIsActiveState,
   focusNearestCommentIdSelector,
@@ -24,7 +25,7 @@ import {
 } from "../utils";
 
 import styles from "./Comment.module.css";
-import { CommentEntryItem } from "./CommentEntryItem";
+import { CollapsedCommentItem, CommentEntryItem } from "./CommentEntryItem";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 import { CommentThread } from "./CommentThread";
 import { useCommentHeight } from "./useCommentHeight";
@@ -38,6 +39,7 @@ type Props = CommentData & {
 export const Comment: React.FC<Props> = React.memo(
   ({ isActiveComment, isFocusComment, offset, ...comment }) => {
     const { id } = comment;
+    const isCollapsed = useRecoilValue(commentCollapsedState(id));
 
     return (
       <CommentHolder
@@ -46,8 +48,12 @@ export const Comment: React.FC<Props> = React.memo(
         isFocusComment={isFocusComment}
         isActiveComment={isActiveComment}
       >
-        <CommentMain {...comment} isFocusComment={isFocusComment} />
-        <CommentThread commentId={id} />
+        <CommentMain
+          {...comment}
+          isFocusComment={isFocusComment}
+          isActiveComment={isActiveComment}
+        />
+        {(!isCollapsed || isActiveComment) && <CommentThread commentId={id} />}
         {isActiveComment && <div className={styles.ruledLine} />}
         {isActiveComment && <CommentAddThread commentId={id} />}
       </CommentHolder>
@@ -144,8 +150,10 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
   },
 );
 
-const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
-  React.memo(({ byName, dateUpdated, id, isFocusComment, text }) => {
+const CommentMain: React.FC<
+  CommentData & { isFocusComment: boolean; isActiveComment: boolean }
+> = React.memo(
+  ({ byName, dateUpdated, id, isActiveComment, isFocusComment, text }) => {
     const [isEdit, setIsEdit] = React.useState(false);
     const { commentRefs } = React.useContext(CommentsContext);
     const { fileName, roomId, roomPassword } = useFileParams();
@@ -199,25 +207,40 @@ const CommentMain: React.FC<CommentData & { isFocusComment: boolean }> =
       setFocusCommentId(id);
       setFocusCommentIsActive(true);
     }, [id, setFocusCommentId, setFocusCommentIsActive]);
+    const [isCollapsed, setIsCollapsed] = useRecoilState(
+      commentCollapsedState(id),
+    );
+    const onCollapse = React.useCallback(() => {
+      setIsCollapsed(!isCollapsed);
+      if (!isCollapsed) {
+        setFocusCommentIsActive(false);
+      }
+    }, [isCollapsed, setFocusCommentIsActive, setIsCollapsed]);
     const options = React.useMemo(
       () => [
+        { label: isCollapsed ? "Uncollapse" : "Collapse", onClick: onCollapse },
         { label: "Edit", onClick: onEdit },
         { label: "Delete", onClick: deleteComment },
       ],
-      [deleteComment, onEdit],
+      [deleteComment, isCollapsed, onCollapse, onEdit],
     );
-    return (
-      <CommentEntryItem
-        byName={byName}
-        options={options}
-        text={text}
-        dateUpdated={dateUpdated}
-        isEdit={isEdit}
-        onEditSubmit={onEditSubmit}
-        onEditCancel={onEditCancel}
-      />
-    );
-  });
+    if (!isCollapsed || isActiveComment) {
+      return (
+        <CommentEntryItem
+          byName={byName}
+          options={options}
+          text={text}
+          dateUpdated={dateUpdated}
+          isEdit={isEdit}
+          onEditSubmit={onEditSubmit}
+          onEditCancel={onEditCancel}
+        />
+      );
+    } else {
+      return <CollapsedCommentItem byName={byName} text={text} />;
+    }
+  },
+);
 
 const usePosition = (selection: SelectionRange) => {
   const { editor, editorDivRef } = React.useContext(EditorContext);

@@ -179,6 +179,10 @@ export const commentHeightState = atomFamily<number, CommentId>({
   key: "commentsHeightState",
   default: 0,
 });
+export const commentCollapsedState = atomFamily<boolean, CommentId>({
+  key: "commentsCollapsedState",
+  default: false,
+});
 
 export const undoFormatState = atomFamily<
   { result: string; former: string }[],

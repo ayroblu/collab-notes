@@ -16,7 +16,7 @@ export const SyntaxHighlighter: React.FC<Props> = ({
     children={String(children).replace(/\n$/, "")}
     style={xonokai}
     customStyle={{
-      padding: "4px 8px",
+      padding: "3px 6px",
       margin: "4px 0",
       lineHeight: "inherit",
       fontSize: "0.9em",

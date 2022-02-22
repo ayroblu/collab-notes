@@ -103,3 +103,11 @@ export const CommentHeading: React.FC<CommentHeadingProps> = ({
     </div>
   );
 };
+
+export const CollapsedCommentItem: React.FC<{ byName: string; text: string }> =
+  React.memo(({ byName, text }) => (
+    <section className={styles.collapsedContainer}>
+      <span className={styles.collapsedName}>{byName}</span>
+      <Markdown text={text} className={styles.collapsedText} />
+    </section>
+  ));
