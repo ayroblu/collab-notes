@@ -12,7 +12,7 @@ export type MenuOption = {
 type Props = {
   options: MenuOption[];
 };
-export const Menu: React.FC<Props> = ({ options }) => {
+export const Menu: React.FC<Props> = ({ children, options }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
@@ -51,7 +51,7 @@ export const Menu: React.FC<Props> = ({ options }) => {
       onClick={onClickHandler}
       onBlur={reset}
     >
-      <VscChevronDown />
+      {children ?? <VscChevronDown />}
       {isOpen && (
         <ul className={styles.dropdown}>
           {options.map(({ label, onClick }, i) => (

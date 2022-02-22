@@ -1,0 +1,13 @@
+.popoverContainer {
+  position: relative;
+}
+.popover {
+  position: absolute;
+  width: 300px;
+  right: 0;
+  background: var(--main-background-color);
+  z-index: 1;
+  border-radius: var(--button-border-radius);
+  border: 1px solid var(--fade-color);
+  box-shadow: var(--box-shadow);
+}

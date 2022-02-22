@@ -8,3 +8,6 @@
 .pageTitle {
   font-size: var(--font-size-20);
 }
+.rightSection {
+  display: flex;
+}
