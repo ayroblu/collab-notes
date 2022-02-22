@@ -169,7 +169,6 @@ function setupPrettierIntegration(
         format(text, {
           parser,
           plugins,
-          endOfLine: "crlf", // vscode
         }),
       );
       const result = editor.getValue();

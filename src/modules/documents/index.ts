@@ -118,18 +118,17 @@ export function applyDiff(
   const text = doc.toString();
   const formatted = getNewString(text);
   const diff = diffChars(text, formatted);
+  // console.log("apply diff", text, formatted, diff);
   let index = 0;
   diff.forEach(({ added, count, removed, value }) => {
     if (added) {
       doc.insert(index, value);
     } else if (removed) {
-      // const docValue = doc.toString().slice(index, index + count!);
-      // if (docValue !== value) {
-      //   console.log({ value, docValue, index });
-      // }
-      // TODO: This breaks on if using lf and not crlf with prettier
-      doc.delete(index, count!);
-      return;
+      // Something uses crlf, which breaks if you only try to delete one half as if deletes the whold character
+      if (value !== "\r") {
+        doc.delete(index, count!);
+        return;
+      }
     }
     if (count) index += count;
   });
