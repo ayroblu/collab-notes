@@ -1,8 +1,10 @@
 import type { WebrtcProvider } from "y-webrtc";
+import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
 
 export type YRoom = {
   provider: WebrtcProvider;
+  socketProvider: WebsocketProvider;
   ydoc: Y.Doc;
   files: Y.Array<Y.Map<any>>;
   name: Y.Text;

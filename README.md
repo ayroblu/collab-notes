@@ -7,14 +7,17 @@ TODO
 ----
 ### MVP
 - comments v2
-  - on click if scroll required, scroll page to where comment actually is
-  - notifications for when you have new comments / threads
   - collapse comments
-  - "resolve" comments - menu?
+  - Dropdown menu top next to facepile - checkboxes for resolved, open
+    - Stats for num resolved, open
+    - Buttons to collapse all and expand all
+    - jump to next comment (maybe next new comment in the future)
+  - on click if scroll required, scroll page to where comment actually is
   - scroll comments too as part of line restoration
+- comments v3
+  - what is "new" - has "focused" ever - only matters if you've ever commented before
 
 ### Longer term
-- migrate to create react app
 - rollback history
 - gdoc / gdrive sync
 - dropbox sync
@@ -24,4 +27,3 @@ TODO
 - image uploads?
 - design language (hover v active / focused etc)
 - try have a really big editor, with normal scrolling?
-- performance

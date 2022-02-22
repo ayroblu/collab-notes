@@ -2,6 +2,7 @@ import { diffChars } from "diff";
 import isEqual from "lodash/isEqual";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
+import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
 import { nonNullable, sortBy, uuidv4 } from "../utils";
@@ -27,6 +28,13 @@ export function getRoom(roomId: string, password: string): YRoom {
   const ydoc = new Y.Doc();
   // @ts-expect-error - types are wrong
   const provider = new WebrtcProvider(roomId, ydoc, { password });
+  // Use yjs demos for now, but should switch to our own host solution
+  const socketProvider = new WebsocketProvider(
+    "wss://demos.yjs.dev",
+    roomId,
+    ydoc,
+  );
+
   const persistence = new IndexeddbPersistence(roomId, ydoc);
   const files = ydoc.getArray<Y.Map<any>>("files");
   const name = ydoc.getText("name");
@@ -39,6 +47,7 @@ export function getRoom(roomId: string, password: string): YRoom {
 
   rooms[roomId] = {
     provider,
+    socketProvider,
     ydoc,
     files,
     name,
