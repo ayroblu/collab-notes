@@ -68,12 +68,12 @@ test.describe(name, () => {
     await page.goBack();
 
     await page.fill(".monaco-editor textarea", content);
-    await wait(100);
     // expect(await page.screenshot()).toMatchSnapshot([
     //   name,
     //   "3-content-added.png",
     // ]);
     await page.keyboard.press("Control+S");
+    await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "4-content-added.png",
@@ -114,7 +114,6 @@ test.describe(name, () => {
 
     await page.locator('[data-testid="Comment"]').nth(1).waitFor();
     await wait(100);
-    await page.pause();
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "5-comments-added.png",

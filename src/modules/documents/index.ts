@@ -118,7 +118,6 @@ export function applyDiff(
   const text = doc.toString();
   const formatted = getNewString(text);
   const diff = diffChars(text, formatted);
-  console.log("apply diff", text, formatted, diff);
   let index = 0;
   diff.forEach(({ added, count, removed, value }) => {
     if (added) {
