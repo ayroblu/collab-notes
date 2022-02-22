@@ -1,6 +1,7 @@
 import React from "react";
-import { VscTrash } from "react-icons/vsc";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { VscNewFolder, VscTrash } from "react-icons/vsc";
+import { useNavigate } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
 import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
@@ -12,7 +13,7 @@ import {
   roomNamesState,
   settingsSelector,
 } from "./data-model";
-import { useSetActiveRoomId } from "./navigation-utils";
+import { routesHelper, useSetActiveRoomId } from "./navigation-utils";
 
 export const RoomsList = () => {
   const settings = useRecoilValue(settingsSelector);
@@ -34,6 +35,9 @@ export const RoomsList = () => {
             <ListButton room={room} isEdit={isEdit} />
           </li>
         ))}
+        <li>
+          <NewRoomButton />
+        </li>
       </ul>
     </section>
   );
@@ -124,6 +128,9 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
 function getSubtitle(room: Room) {
   const { files } = getRoom(room.id, room.password);
   const numFiles = files.length;
+  if (!numFiles) {
+    return `${numFiles} files`;
+  }
   const lastUpdated = Math.max(
     ...files
       .map((file) => getYFileMetaData(file).lastUpdated)
@@ -132,3 +139,32 @@ function getSubtitle(room: Room) {
   const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
   return `${formattedDateTime} - ${numFiles} files`;
 }
+
+const NewRoomButton: React.FC = () => {
+  const setSettings = useSetRecoilState(settingsSelector);
+  const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
+  const navigate = useNavigate();
+
+  const handleNewRoom = () => {
+    const roomId = generatePassword();
+    setSettings((settings) => ({
+      ...settings,
+      rooms: [
+        ...settings.rooms,
+        {
+          id: roomId,
+          password: roomId,
+        },
+      ],
+    }));
+    setActiveRoomId(roomId);
+    navigate(routesHelper.room(roomId).index);
+  };
+
+  return (
+    <button className={styles.newRoomButton} onClick={() => handleNewRoom()}>
+      <VscNewFolder />
+      New Group
+    </button>
+  );
+};

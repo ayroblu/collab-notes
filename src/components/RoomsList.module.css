@@ -46,3 +46,19 @@
 .input {
   width: 100%;
 }
+.newRoomButton {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-block-start: var(--spacing-8);
+  border: 1px solid currentColor;
+  border-radius: var(--button-border-radius);
+  padding: var(--spacing-4) var(--spacing-8);
+}
+.newRoomButton svg {
+  margin-inline-end: var(--spacing-4);
+}
+.newRoomButton:hover {
+  background: var(--fade-color);
+}

@@ -88,7 +88,7 @@ export const activeFileNameState = atomFamily<
   default: () => "Untitled",
 });
 
-export const filesDataState = atom<FileMetaData[]>({
+export const filesDataState = atomFamily<FileMetaData[], RoomId>({
   key: "filesDataState",
   default: [],
 });

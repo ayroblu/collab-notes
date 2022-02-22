@@ -12,7 +12,7 @@ import {
   syncCommentNamesFn,
   deduplicateComments,
 } from "@/modules/documents";
-import { timeoutPromiseSuccess } from "@/modules/utils";
+import { getNonNullable, timeoutPromiseSuccess } from "@/modules/utils";
 
 import { useSetThreads } from "./comments/useThread";
 import {
@@ -36,8 +36,8 @@ export const Sync: React.FC = () => {
 };
 
 const useFilesListSync = () => {
-  const setFilesData = useSetRecoilState(filesDataState);
   const room = useRoom();
+  const setFilesData = useSetRecoilState(filesDataState(room.id));
   const [settings, setSettings] = useRecoilState(settingsSelector);
 
   React.useEffect(() => {
@@ -150,7 +150,7 @@ export const FilesParamsSync: React.FC<{ fallback: React.ReactNode }> = ({
 const useFileNameInitSync = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const filesData = useRecoilValue(filesDataState);
+  const filesData = useRecoilValue(filesDataState(getNonNullable(roomId)));
   const [activeFileName, setActiveFileName] = useRecoilState(
     activeFileNameState(roomId),
   );
@@ -161,6 +161,7 @@ const useFileNameInitSync = () => {
       const name = filesData[0]?.name;
       if (name) {
         setSearchParams({ name });
+        console.log("setting to name", name, filesData);
       }
     } else if (activeFileName !== fileName) {
       setActiveFileName(fileName);

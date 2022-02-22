@@ -1,10 +1,10 @@
 import React from "react";
 import { createSearchParams, useNavigate } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
 import { useStable } from "@/hooks/useStable";
 
-import { activeFileNameState, activeRoomIdSelector } from "./data-model";
+import { activeRoomIdSelector } from "./data-model";
 
 export const useSetActiveRoomId = () => {
   const setActiveRoomId = useSetRecoilState(activeRoomIdSelector);
@@ -13,26 +13,9 @@ export const useSetActiveRoomId = () => {
   return React.useCallback(
     (roomId: string) => {
       setActiveRoomId(roomId);
-      navigate(`/${roomId}`);
+      navigate(routesHelper.room(roomId).index);
     },
     [navigate, setActiveRoomId],
-  );
-};
-
-export const useSetActiveFileName = () => {
-  const activeRoomId = useRecoilValue(activeRoomIdSelector);
-  const setActiveFileName = useSetRecoilState(
-    activeFileNameState(activeRoomId),
-  );
-  const navigate = useNavigate();
-  const navigateStable = useStable(navigate);
-
-  return React.useCallback(
-    (fileName: string) => {
-      setActiveFileName(fileName);
-      navigateStable(routesHelper.room(activeRoomId).files(fileName));
-    },
-    [activeRoomId, navigateStable, setActiveFileName],
   );
 };
 
