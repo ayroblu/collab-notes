@@ -81,8 +81,6 @@ test.describe(name, () => {
 
     await page.keyboard.press("ArrowUp");
     await wait(50);
-    await page.keyboard.press("ArrowUp");
-    await wait(50);
     await page.keyboard.press("Alt+ArrowRight");
     await wait(50);
     await page.keyboard.press("Shift+Alt+ArrowRight");
