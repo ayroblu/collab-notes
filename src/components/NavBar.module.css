@@ -8,6 +8,9 @@
 .pageTitle {
   font-size: var(--font-size-20);
 }
-.rightSection {
+.endSection {
   display: flex;
+}
+.resolved {
+  color: var(--primary-color);
 }

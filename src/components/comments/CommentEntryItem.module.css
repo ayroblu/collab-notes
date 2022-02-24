@@ -39,3 +39,15 @@
 .collapsedText * {
   display: inline;
 }
+.flex {
+  display: flex;
+}
+.resolveButton {
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resolveButton svg {
+  stroke-width: 1;
+}

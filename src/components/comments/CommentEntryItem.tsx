@@ -1,17 +1,23 @@
 import React from "react";
+import { VscCheck } from "react-icons/vsc";
 
+import { resolveComment } from "@/modules/documents";
 import { getHashColor } from "@/modules/utils";
 
+import { Button } from "../shared/Button";
 import { FacePileFace } from "../shared/FacePile";
 import { Markdown } from "../shared/Markdown";
 import type { MenuOption } from "../shared/Menu";
 import { Menu } from "../shared/Menu";
+import { useFileParams } from "../utils";
 
 import styles from "./CommentEntryItem.module.css";
 import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 
 type CommentEntryItemProps = {
   options?: MenuOption[];
+  isResolved?: boolean;
+  resolveCommentId?: string;
   byName: string;
   dateUpdated?: string;
   text: string;
@@ -24,9 +30,11 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = React.memo(
     byName,
     dateUpdated,
     isEdit,
+    isResolved,
     onEditCancel,
     onEditSubmit,
     options,
+    resolveCommentId,
     text,
   }) => {
     const formatedDate =
@@ -35,6 +43,13 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = React.memo(
         dateStyle: "short",
         timeStyle: "short",
       }).format(new Date(dateUpdated));
+    const { fileName, roomId, roomPassword } = useFileParams();
+    const setResolved =
+      !isResolved && resolveCommentId
+        ? () => {
+            resolveComment(roomId, roomPassword, fileName, resolveCommentId);
+          }
+        : null;
     return (
       <section>
         <div className={styles.heading}>
@@ -48,7 +63,16 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = React.memo(
             </div>
           </div>
           {options && (
-            <div>
+            <div className={styles.flex}>
+              {setResolved && (
+                <Button
+                  buttonType="inline"
+                  className={styles.resolveButton}
+                  onClick={setResolved}
+                >
+                  <VscCheck />
+                </Button>
+              )}
               <Menu options={options} />
             </div>
           )}

@@ -29,3 +29,6 @@
 .ruledLine {
   border-block-end: 1px solid var(--fade-color);
 }
+.resolved {
+  filter: var(--darker-filter);
+}

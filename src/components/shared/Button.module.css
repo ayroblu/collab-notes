@@ -10,3 +10,6 @@
 .button:disabled {
   opacity: 0.4;
 }
+.inlineButton {
+  background-color: transparent;
+}

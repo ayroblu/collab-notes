@@ -38,7 +38,7 @@ type Props = CommentData & {
 
 export const Comment: React.FC<Props> = React.memo(
   ({ isActiveComment, isFocusComment, offset, ...comment }) => {
-    const { id } = comment;
+    const { id, isResolved } = comment;
     const isCollapsed = useRecoilValue(commentCollapsedState(id));
 
     return (
@@ -53,9 +53,11 @@ export const Comment: React.FC<Props> = React.memo(
           isFocusComment={isFocusComment}
           isActiveComment={isActiveComment}
         />
-        {(!isCollapsed || isActiveComment) && <CommentThread commentId={id} />}
-        {isActiveComment && <div className={styles.ruledLine} />}
-        {isActiveComment && <CommentAddThread commentId={id} />}
+        {(!isCollapsed || isActiveComment) && !isResolved && (
+          <CommentThread commentId={id} />
+        )}
+        {isActiveComment && !isResolved && <div className={styles.ruledLine} />}
+        {isActiveComment && !isResolved && <CommentAddThread commentId={id} />}
       </CommentHolder>
     );
   },
@@ -65,6 +67,7 @@ type CommentHolderProps = {
   id: string;
   offset: number | undefined;
   selection: SelectionRange;
+  isResolved?: boolean;
   isFocusComment: boolean;
   isActiveComment: boolean;
 };
@@ -73,6 +76,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
   id,
   isActiveComment,
   isFocusComment,
+  isResolved,
   offset,
   selection,
 }) => {
@@ -111,7 +115,11 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
     <section
       ref={handleRef}
       data-testid="Comment"
-      className={cn(styles.comment, isFocusComment && styles.focus)}
+      className={cn(
+        styles.comment,
+        isFocusComment && styles.focus,
+        isResolved && styles.resolved,
+      )}
       style={{
         transform: `translate(${offsetLeft}, ${offsetTop}px)`,
         display: !nonNullable(position) ? "none" : undefined,
@@ -153,7 +161,15 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
 const CommentMain: React.FC<
   CommentData & { isFocusComment: boolean; isActiveComment: boolean }
 > = React.memo(
-  ({ byName, dateUpdated, id, isActiveComment, isFocusComment, text }) => {
+  ({
+    byName,
+    dateUpdated,
+    id,
+    isActiveComment,
+    isFocusComment,
+    isResolved,
+    text,
+  }) => {
     const [isEdit, setIsEdit] = React.useState(false);
     const { commentRefs } = React.useContext(CommentsContext);
     const { fileName, roomId, roomPassword } = useFileParams();
@@ -227,6 +243,8 @@ const CommentMain: React.FC<
     if (!isCollapsed || isActiveComment) {
       return (
         <CommentEntryItem
+          isResolved={isResolved}
+          resolveCommentId={id}
           byName={byName}
           options={options}
           text={text}

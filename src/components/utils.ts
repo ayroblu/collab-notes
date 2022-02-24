@@ -9,8 +9,7 @@ import {
   commentsState,
   focusCommentIdState,
   settingsSelector,
-  showOpenCommentsState,
-  showResolvedCommentsState,
+  showCommentsState,
 } from "./data-model";
 
 export const useRoom = () => {
@@ -44,22 +43,18 @@ export const useFileNameState = () => {
 };
 
 export const useComments = () => {
-  const fileName = useFileName();
-  const roomId = useRecoilValue(activeRoomIdSelector);
-  const showResolvedComments = useRecoilValue(
-    showResolvedCommentsState({ fileName, roomId }),
-  );
-  const showOpenComments = useRecoilValue(
-    showOpenCommentsState({ fileName, roomId }),
-  );
+  const { fileName, roomId } = useFileParams();
+  const showComments = useRecoilValue(showCommentsState({ fileName, roomId }));
   const comments = useRecoilValue(commentsState({ fileName, roomId }));
-  return React.useMemo(
-    () =>
-      comments.filter(({ isResolved }) =>
-        isResolved ? showResolvedComments : showOpenComments,
-      ),
-    [comments, showOpenComments, showResolvedComments],
-  );
+  return React.useMemo(() => {
+    // return comments.filter(({ isResolved }) => isResolved ? showResolvedComments : showOpenComments)
+    switch (showComments) {
+      case "open":
+        return comments.filter(({ isResolved }) => !isResolved);
+      case "resolved":
+        return comments.filter(({ isResolved }) => isResolved);
+    }
+  }, [comments, showComments]);
 };
 
 export const useAllComments = () => {

@@ -6,7 +6,7 @@ type Props = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
 > & {
-  buttonType?: "form" | "normal";
+  buttonType?: "form" | "inline" | "normal";
 };
 export const Button: React.FC<Props> = ({
   buttonType = "normal",
@@ -15,6 +15,13 @@ export const Button: React.FC<Props> = ({
 }) => {
   if (buttonType === "normal") {
     return <button className={cn(styles.button, className)} {...props} />;
+  } else if (buttonType === "inline") {
+    return (
+      <button
+        className={cn(styles.button, styles.inlineButton, className)}
+        {...props}
+      />
+    );
   } else if (buttonType === "form") {
     return (
       <button

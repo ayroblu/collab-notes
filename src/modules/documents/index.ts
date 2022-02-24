@@ -1,21 +1,16 @@
 import { diffChars } from "diff";
-import isEqual from "lodash/isEqual";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
-import { nonNullable, sortBy, uuidv4 } from "../utils";
+import { nonNullable, sortBy } from "../utils";
 
-import type {
-  CommentData,
-  FileMetaData,
-  SelectionRange,
-  ThreadData,
-  YRoom,
-} from "./types";
+import type { CommentData, FileMetaData, ThreadData, YRoom } from "./types";
 
 export * from "./types";
+export * from "./comments";
+export * from "./threads";
 
 // Singleton caching
 const rooms: { [roomId: string]: YRoom } = {};
@@ -199,227 +194,6 @@ export function getDocument(
   return getYFileText(file);
 }
 
-export function getComments(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-): Y.Array<CommentData> | void {
-  const file = getFileFromFileName(roomId, roomPassword, fileName);
-  if (!file) return;
-  return getYFileComments(file);
-}
-export function createComment(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-  comment: CommentData,
-) {
-  const yComments = getComments(roomId, roomPassword, fileName);
-  if (!yComments) return;
-  const now = new Date().toISOString();
-  yComments.push([
-    {
-      ...comment,
-      dateCreated: now,
-      dateUpdated: now,
-    },
-  ]);
-}
-export function editComment(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-  commentId: string,
-  text: string,
-) {
-  const { ydoc } = getRoom(roomId, roomPassword);
-  const yComments = getComments(roomId, roomPassword, fileName);
-  if (!yComments) return;
-  const index = yComments
-    .map(({ id }) => id)
-    .findIndex((id) => id === commentId);
-
-  const now = new Date().toISOString();
-  const comment = yComments.get(index);
-  ydoc.transact(() => {
-    yComments.delete(index);
-    yComments.insert(index, [{ ...comment, text, dateUpdated: now }]);
-  });
-}
-export function updateCommentSelection(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-  commentId: string,
-  selection: SelectionRange,
-) {
-  const { ydoc } = getRoom(roomId, roomPassword);
-  const yComments = getComments(roomId, roomPassword, fileName);
-  if (!yComments) return;
-  const index = yComments
-    .map(({ id }) => id)
-    .findIndex((id) => id === commentId);
-
-  if (index === -1) return;
-  const comment = yComments.get(index);
-  if (!isEqual(selection, comment.selection)) {
-    ydoc.transact(() => {
-      yComments.delete(index);
-      yComments.insert(index, [{ ...comment, selection }]);
-    });
-  }
-}
-export function removeComment(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-  commentId: string,
-): boolean {
-  const yComments = getComments(roomId, roomPassword, fileName);
-  if (!yComments) return false;
-  const index = yComments
-    .map(({ id }) => id)
-    .findIndex((id) => id === commentId);
-  if (index === -1) return false;
-
-  yComments.delete(index);
-  return true;
-}
-
-export function getAllThreads(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-): Y.Map<Y.Array<ThreadData>> | void {
-  const file = getFileFromFileName(roomId, roomPassword, fileName);
-  if (!file) return;
-  return getYFileThreads(file);
-}
-
-export function getThreads(
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-  commentId: string,
-): Y.Array<ThreadData> | void {
-  const threads = getAllThreads(roomId, roomPassword, fileName);
-  if (!threads) return;
-  if (!threads.has(commentId)) {
-    threads.set(commentId, new Y.Array<ThreadData>());
-  }
-  return threads.get(commentId)!;
-}
-
-type CommentParams = {
-  roomId: string;
-  roomPassword: string;
-  fileName: string;
-  commentId: string;
-};
-type AddThreadParams = CommentParams & {
-  text: string;
-  byId: string;
-  byName: string;
-};
-export function addThread({
-  byId,
-  byName,
-  commentId,
-  fileName,
-  roomId,
-  roomPassword,
-  text,
-}: AddThreadParams): boolean {
-  const thread = getThreads(roomId, roomPassword, fileName, commentId);
-  if (text && thread) {
-    const now = new Date().toISOString();
-    thread.push([
-      {
-        id: uuidv4(),
-        commentId,
-        text,
-        byId,
-        byName,
-        dateCreated: now,
-        dateUpdated: now,
-      },
-    ]);
-    return true;
-  }
-  return false;
-}
-
-type ThreadParams = CommentParams & {
-  threadId: string;
-};
-type EditThreadParams = ThreadParams & {
-  text: string;
-};
-export function editThread({
-  commentId,
-  fileName,
-  roomId,
-  roomPassword,
-  text,
-  threadId,
-}: EditThreadParams) {
-  const { ydoc } = getRoom(roomId, roomPassword);
-  const threads = getThreads(roomId, roomPassword, fileName, commentId);
-  if (!threads) return;
-  const index = threads.map(({ id }) => id).findIndex((id) => id === threadId);
-
-  const now = new Date().toISOString();
-  const thread = threads.get(index);
-  ydoc.transact(() => {
-    threads.delete(index);
-    threads.insert(index, [{ ...thread, text, dateUpdated: now }]);
-  });
-}
-
-export function removeThread({
-  commentId,
-  fileName,
-  roomId,
-  roomPassword,
-  threadId,
-}: ThreadParams): boolean {
-  const thread = getThreads(roomId, roomPassword, fileName, commentId);
-  if (thread) {
-    const index = thread.map(({ id }) => id).findIndex((id) => id === threadId);
-    if (index !== -1) {
-      thread.delete(index, 1);
-    }
-    return true;
-  }
-  return false;
-}
-
-export const syncCommentNamesFn = (
-  roomId: string,
-  roomPassword: string,
-  fileName: string,
-) => {
-  const { ydoc } = getRoom(roomId, roomPassword);
-  const comments = getComments(roomId, roomPassword, fileName);
-
-  return (id: string, name: string) => {
-    if (!comments) return;
-    const toChange: number[] = [];
-    comments.forEach(({ byId, byName }, i) => {
-      if (id === byId && byName !== name) {
-        toChange.push(i);
-      }
-    });
-    ydoc.transact(() => {
-      toChange.forEach((i) => {
-        const comment = comments.get(i);
-        comments.delete(i);
-        comments.insert(i, [{ ...comment, byName: name }]);
-      });
-    });
-  };
-};
-
 export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   const seenMap: { [fileName: string]: { index: number; length: number }[] } =
     {};
@@ -445,22 +219,4 @@ export function deduplicateFiles(files: Y.Array<Y.Map<any>>) {
   indexesToDelete.sort(sortBy([(a) => a], ["desc"])).forEach((index) => {
     files.delete(index, 1);
   });
-}
-export function deduplicateComments(comments: Y.Array<CommentData>) {
-  const seenCommentIds: { [commentId: string]: number } = {};
-  for (let i = comments.length - 1; i >= 0; --i) {
-    const comment = comments.get(i);
-    const seenIndex = seenCommentIds[comment.id];
-    if (nonNullable(seenIndex)) {
-      const otherComment = comments.get(seenIndex);
-      // If one is newer, delete the older one, otherwise, delete the greater index one
-      const indexToDelete =
-        new Date(otherComment.dateUpdated) > new Date(comment.dateUpdated)
-          ? i
-          : seenIndex;
-      comments.delete(indexToDelete);
-    } else {
-      seenCommentIds[comment.id] = i;
-    }
-  }
 }

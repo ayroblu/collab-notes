@@ -1,13 +1,6 @@
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 
-import { unreachable } from "@/modules/utils";
-
-import {
-  commentCollapsedSelector,
-  showCommentsState,
-  showOpenCommentsState,
-  showResolvedCommentsState,
-} from "../data-model";
+import { commentCollapsedSelector, showCommentsState } from "../data-model";
 import { Button } from "../shared/Button";
 import { Radio } from "../shared/Radio";
 import { useAllComments, useFileParams } from "../utils";
