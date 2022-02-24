@@ -109,13 +109,37 @@ test.describe(name, () => {
       "This function doesn't create any Tweets!",
     );
     await page.keyboard.press("Meta+Enter");
+    await wait(50);
+    await page.keyboard.press("PageUp");
+    await wait(50);
+    await page.keyboard.press("PageUp");
 
-    await page.locator('[data-testid="Comment"]').nth(1).waitFor();
+    const commentItems = [
+      ["text=numFollowers", "The people who follow you - how popular you are"],
+      [
+        "text=numFollowing",
+        "The people you follow - how connected you want to be",
+      ],
+      ["text=User >> nth=0", "User type - should we call them customers"],
+      ["text=Tweet >> nth=3", "Tweet type, should probably have more options"],
+      [
+        "text=author_user_id >> nth=0",
+        "I could type this with a string, but using the reference type is more explicit!",
+      ],
+    ] as const;
+    for (const [selector, commentText] of commentItems) {
+      await page.dblclick(selector);
+      await page.click("[data-testid='CommentButton']");
+      await page.fill("[placeholder='Add comment...']", commentText);
+      await page.keyboard.press("Meta+Enter");
+    }
+
     await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "5-comments-added.png",
     ]);
+    // TODO: add comment settings changes
   });
 });
 
