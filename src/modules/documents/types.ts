@@ -25,6 +25,7 @@ export type CommentData = {
   dateCreated: string;
   dateUpdated: string;
   selection: SelectionRange;
+  isResolved?: boolean;
 };
 export type SelectionRange = {
   startLineNumber: number;

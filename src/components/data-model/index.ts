@@ -198,3 +198,25 @@ export const undoFormatState = atomFamily<
 //   key: "redoFormatState",
 //   default: () => [],
 // });
+
+export const showCommentsState = atomFamily<
+  "open" | "resolved",
+  { fileName: string; roomId: string }
+>({
+  key: "showCommentsState",
+  default: "open",
+});
+export const showResolvedCommentsState = atomFamily<
+  boolean,
+  { fileName: string; roomId: string }
+>({
+  key: "showResolvedCommentsState",
+  default: false,
+});
+export const showOpenCommentsState = atomFamily<
+  boolean,
+  { fileName: string; roomId: string }
+>({
+  key: "showOpenCommentsState",
+  default: true,
+});

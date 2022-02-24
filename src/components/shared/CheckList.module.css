@@ -1,0 +1,8 @@
+.checklist {
+}
+.label {
+  display: block;
+}
+.labelText {
+  margin-inline-start: var(--spacing-4);
+}

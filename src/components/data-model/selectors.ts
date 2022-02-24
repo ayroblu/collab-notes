@@ -8,6 +8,7 @@ import { getNearestCommentId } from "../comments/utils";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  commentCollapsedState,
   commentHeightState,
   commentTopState,
   focusCommentIdState,
@@ -110,4 +111,26 @@ export const focusNearestCommentIdSelector = selector<{
     const nearestCommentId = getNearestCommentId(commentSizes, commentId);
     set(focusCommentIdState({ fileName, roomId }), nearestCommentId);
   },
+});
+
+export const commentCollapsedSelector = selectorFamily<
+  boolean,
+  { commentIds: string[] }
+>({
+  key: "commentCollapsedSelector",
+  // dummy for the types
+  get:
+    ({ commentIds }) =>
+    ({ get }) =>
+      commentIds.every((id) => get(commentCollapsedState(id))),
+  set:
+    ({ commentIds }) =>
+    ({ set }, newValue) => {
+      if (newValue instanceof DefaultValue)
+        throw new Error("not a resetable selector");
+      const isCollapsed = newValue;
+      for (const commentId of commentIds) {
+        set(commentCollapsedState(commentId), isCollapsed);
+      }
+    },
 });

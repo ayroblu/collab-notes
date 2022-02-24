@@ -1,3 +1,4 @@
+import React from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { getNonNullable } from "@/modules/utils";
@@ -8,6 +9,8 @@ import {
   commentsState,
   focusCommentIdState,
   settingsSelector,
+  showOpenCommentsState,
+  showResolvedCommentsState,
 } from "./data-model";
 
 export const useRoom = () => {
@@ -41,6 +44,25 @@ export const useFileNameState = () => {
 };
 
 export const useComments = () => {
+  const fileName = useFileName();
+  const roomId = useRecoilValue(activeRoomIdSelector);
+  const showResolvedComments = useRecoilValue(
+    showResolvedCommentsState({ fileName, roomId }),
+  );
+  const showOpenComments = useRecoilValue(
+    showOpenCommentsState({ fileName, roomId }),
+  );
+  const comments = useRecoilValue(commentsState({ fileName, roomId }));
+  return React.useMemo(
+    () =>
+      comments.filter(({ isResolved }) =>
+        isResolved ? showResolvedComments : showOpenComments,
+      ),
+    [comments, showOpenComments, showResolvedComments],
+  );
+};
+
+export const useAllComments = () => {
   const fileName = useFileName();
   const roomId = useRecoilValue(activeRoomIdSelector);
   return useRecoilValue(commentsState({ fileName, roomId }));

@@ -1,11 +1,85 @@
+import { useRecoilState, useSetRecoilState } from "recoil";
+
+import { unreachable } from "@/modules/utils";
+
+import {
+  commentCollapsedSelector,
+  showCommentsState,
+  showOpenCommentsState,
+  showResolvedCommentsState,
+} from "../data-model";
+import { Button } from "../shared/Button";
+import { Radio } from "../shared/Radio";
+import { useAllComments, useFileParams } from "../utils";
+
 import styles from "./CommentSettings.module.css";
 
-export const CommentSettings: React.FC = () => (
-  <section className={styles.commentSettings}>
-    Comment Settings
-    <p>Select resolved comments</p>
-    <p>Select open comments</p>
-    <p>collapse all</p>
-    <p>show all</p>
-  </section>
-);
+export const CommentSettings: React.FC = () => {
+  const { fileName, roomId } = useFileParams();
+  const [showComments, setShowComments] = useRecoilState(
+    showCommentsState({ fileName, roomId }),
+  );
+  const comments = useAllComments();
+  const [isCollapsed, setAllCommentsCollapsed] = useRecoilState(
+    commentCollapsedSelector({ commentIds: comments.map(({ id }) => id) }),
+  );
+  // const [showResolvedComments, setShowResolvedComments] = useRecoilState(
+  //   showResolvedCommentsState({ fileName, roomId }),
+  // );
+  // const [showOpenComments, setShowOpenComments] = useRecoilState(
+  //   showOpenCommentsState({ fileName, roomId }),
+  // );
+  // const values = {
+  //   resolved: showResolvedComments,
+  //   open: showOpenComments,
+  // };
+  const settingsItems = [
+    {
+      label: "Resolved",
+      value: "resolved",
+    },
+    {
+      label: "Open",
+      value: "open",
+    },
+  ] as const;
+  const onChange = (key: "open" | "resolved") => {
+    setShowComments(key);
+  };
+  if (!comments.length) {
+    return null;
+  }
+  // <CheckList
+  //   name="comment-settings"
+  //   items={settingsItems}
+  //   values={values}
+  //   onChange={onChange}
+  // />
+  return (
+    <section className={styles.commentSettings}>
+      Comment Settings
+      <Radio
+        name="comment-settings"
+        items={settingsItems}
+        value={showComments}
+        onChange={onChange}
+      />
+      <hr className={styles.divider} />
+      {isCollapsed ? (
+        <Button
+          className={styles.button}
+          onClick={() => setAllCommentsCollapsed(false)}
+        >
+          Expand All
+        </Button>
+      ) : (
+        <Button
+          className={styles.button}
+          onClick={() => setAllCommentsCollapsed(true)}
+        >
+          Collapse All
+        </Button>
+      )}
+    </section>
+  );
+};
