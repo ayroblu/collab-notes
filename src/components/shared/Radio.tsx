@@ -28,6 +28,7 @@ export const Radio = <T extends string>({
             onChange={() => onChange(itemValue)}
           />
           <div className={styles.radioIcon} />
+          <div className={styles.hoverShadow} />
         </div>
         <span className={styles.labelText}>{label}</span>
       </label>

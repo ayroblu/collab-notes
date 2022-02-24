@@ -23,6 +23,8 @@ export const CommentSettings: React.FC = () => {
   const [isCollapsed, setAllCommentsCollapsed] = useRecoilState(
     commentCollapsedSelector({ commentIds: comments.map(({ id }) => id) }),
   );
+  const numResolved = comments.filter(({ isResolved }) => isResolved).length;
+  const numOpen = comments.filter(({ isResolved }) => !isResolved).length;
   // const [showResolvedComments, setShowResolvedComments] = useRecoilState(
   //   showResolvedCommentsState({ fileName, roomId }),
   // );
@@ -35,11 +37,11 @@ export const CommentSettings: React.FC = () => {
   // };
   const settingsItems = [
     {
-      label: "Resolved",
+      label: `Resolved (${numResolved})`,
       value: "resolved",
     },
     {
-      label: "Open",
+      label: `Open (${numOpen})`,
       value: "open",
     },
   ] as const;
@@ -58,12 +60,14 @@ export const CommentSettings: React.FC = () => {
   return (
     <section className={styles.commentSettings}>
       Comment Settings
-      <Radio
-        name="comment-settings"
-        items={settingsItems}
-        value={showComments}
-        onChange={onChange}
-      />
+      {numResolved > 0 && (
+        <Radio
+          name="comment-settings"
+          items={settingsItems}
+          value={showComments}
+          onChange={onChange}
+        />
+      )}
       <hr className={styles.divider} />
       {isCollapsed ? (
         <Button
