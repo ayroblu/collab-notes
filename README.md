@@ -5,27 +5,34 @@ Uses Monaco (the editor from VS Code), WebRTC so that all communication happens 
 
 TODO
 ----
-### MVP
-- comments v2
-  - Enlarge to modal
-  - "show more" button for long comments
-- comments v3
-  - what is "new" - has "focused" ever - only matters if you've ever commented before
-  - scroll comments too as part of line restoration
+### v2
 - keyboard shortcuts
   - ⌘B toggle left menu
+- alternative storage adaptors server side for enterprise use
+  - websocket choice
+  - leveldb
+    - https://github.com/Level/awesome
+    - https://github.com/yjs/y-leveldb
+- identity provider - e.g. okta
 
 ### Longer term
-- rollback history
-- gdoc / gdrive sync
-- dropbox sync
-- output files
 - mobile friendly
   - remove left lav
   - bottom nav
   - on top comments + menus
-- local file sync
-- whiteboard?
-- image uploads?
-- design language (hover v active / focused etc)
+- better markdown support / rendering
+  - image uploads?
+- features
+  - whiteboard?
+  - spreadsheet / airtable?
 - try have a really big editor, with normal scrolling?
+- comments v3
+  - what is "new" - has "focused" ever - only matters if you've ever commented before
+  - scroll comments too as part of line restoration
+  - Enlarge to modal
+  - "show more" button for long comments
+- gdoc / gdrive sync
+- dropbox sync
+- output files
+- local file sync
+- design language (hover v active / focused etc)
