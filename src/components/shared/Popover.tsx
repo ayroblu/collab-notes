@@ -5,9 +5,14 @@ import styles from "./Popover.module.css";
 
 type Props = {
   anchor: React.ReactNode;
+  buttonTestId?: string;
 };
 
-export const Popover: React.FC<Props> = ({ anchor, children }) => {
+export const Popover: React.FC<Props> = ({
+  anchor,
+  buttonTestId,
+  children,
+}) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -24,34 +29,19 @@ export const Popover: React.FC<Props> = ({ anchor, children }) => {
       clearTimeout(timeoutId);
     };
   }, [isVisible]);
-  // const containerRef = React.useRef<HTMLDivElement | null>(null);
-  // React.useEffect(() => {
-  //   if (!isVisible) return;
-  //   const el = containerRef.current;
-  //   if (!el) return;
-  //   // https://gomakethings.com/detecting-when-focus-leaves-a-group-of-elements-with-vanilla-js/
-  //   let timeoutId = 0;
-  //   const focusHandler = (e: FocusEvent) => {
-  //     if (el.contains(e.relatedTarget as any)) return;
 
-  //     timeoutId = window.setTimeout(() => {
-  //       setIsVisible(false);
-  //     }, 100);
-  //   };
-  //   el.addEventListener("focusout", focusHandler);
-  //   return () => {
-  //     el.removeEventListener("focusout", focusHandler);
-  //     clearTimeout(timeoutId);
-  //   };
-  // }, [isVisible]);
   const onClick = React.useCallback(
     () => setIsVisible((isVisible) => !isVisible),
     [],
   );
-  // onClick={(e) => e.stopPropagation()}
+
   return (
     <div className={styles.popoverContainer}>
-      <Button className={styles.center} onClick={onClick}>
+      <Button
+        className={styles.center}
+        onClick={onClick}
+        data-testid={buttonTestId}
+      >
         {anchor}
       </Button>
       {isVisible && <section className={styles.popover}>{children}</section>}

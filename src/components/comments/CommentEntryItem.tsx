@@ -16,7 +16,7 @@ import { CommentTextareaWithSave } from "./CommentTextareaWithSave";
 
 type CommentEntryItemProps = {
   options?: MenuOption[];
-  isResolved?: boolean;
+  isResolved?: boolean | undefined;
   resolveCommentId?: string;
   byName: string;
   dateUpdated?: string;

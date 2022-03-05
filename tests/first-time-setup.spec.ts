@@ -73,12 +73,16 @@ test.describe(name, () => {
     //   "3-content-added.png",
     // ]);
     await page.keyboard.press("Control+S");
+    await wait(50);
+    await page.keyboard.press("ArrowDown");
     await wait(100);
     expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
       name,
       "4-content-added.png",
     ]);
 
+    await page.keyboard.press("ArrowUp");
+    await wait(50);
     await page.keyboard.press("ArrowUp");
     await wait(50);
     await page.keyboard.press("Alt+ArrowRight");
@@ -139,7 +143,13 @@ test.describe(name, () => {
       name,
       "5-comments-added.png",
     ]);
-    // TODO: add comment settings changes
+    await page.click("[data-testid='CommentSettingsButton']");
+    await page.click("text=Collapse All");
+    await wait(100);
+    expect(await page.screenshot()).toMatchImageSnapshot(test.info(), [
+      name,
+      "6-comments-collapsed.png",
+    ]);
   });
 });
 

@@ -184,21 +184,6 @@ export const commentCollapsedState = atomFamily<boolean, CommentId>({
   default: false,
 });
 
-export const undoFormatState = atomFamily<
-  { result: string; former: string }[],
-  { fileName: string; roomId: string }
->({
-  key: "undoFormatState",
-  default: () => [],
-});
-// export const redoFormatState = atomFamily<
-//   { result: string; former: string }[],
-//   { fileName: string; roomId: string }
-// >({
-//   key: "redoFormatState",
-//   default: () => [],
-// });
-
 export const showCommentsState = atomFamily<
   "open" | "resolved",
   { fileName: string; roomId: string }

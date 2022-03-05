@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { getRoom, getYFileMetaData } from "@/modules/documents";
-import { cn, dateTimeFormatter, generatePassword } from "@/modules/utils";
+import {
+  cn,
+  dateTimeFormatter,
+  generatePassword,
+  sortBy,
+} from "@/modules/utils";
 
 import styles from "./RoomsList.module.css";
 import type { Room } from "./data-model";
@@ -19,6 +24,9 @@ export const RoomsList = () => {
   const settings = useRecoilValue(settingsSelector);
   const [isEdit, setIsEdit] = React.useState(false);
 
+  const orderedRooms = settings.rooms
+    .concat()
+    .sort(sortBy([(room) => getLastUpdated(room)], ["desc"]));
   return (
     <section>
       <div className={styles.headingBar}>
@@ -30,7 +38,7 @@ export const RoomsList = () => {
         )}
       </div>
       <ul>
-        {settings.rooms.map((room) => (
+        {orderedRooms.map((room) => (
           <li key={room.id}>
             <ListButton room={room} isEdit={isEdit} />
           </li>
@@ -131,13 +139,17 @@ function getSubtitle(room: Room) {
   if (!numFiles) {
     return `${numFiles} files`;
   }
-  const lastUpdated = Math.max(
+  const lastUpdated = getLastUpdated(room);
+  const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
+  return `${formattedDateTime} - ${numFiles} files`;
+}
+function getLastUpdated(room: Room): number {
+  const { files } = getRoom(room.id, room.password);
+  return Math.max(
     ...files
       .map((file) => getYFileMetaData(file).lastUpdated)
       .map((lastUpdated) => new Date(lastUpdated!).getTime()),
   );
-  const formattedDateTime = dateTimeFormatter(new Date(lastUpdated));
-  return `${formattedDateTime} - ${numFiles} files`;
 }
 
 const NewRoomButton: React.FC = () => {

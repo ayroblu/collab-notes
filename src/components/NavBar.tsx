@@ -11,7 +11,6 @@ import { FacePile } from "./shared/FacePile";
 import { Popover } from "./shared/Popover";
 import { useComments, useFileName, useFileParams } from "./utils";
 
-
 export const NavBar: React.FC = () => {
   const fileName = useFileName();
   return (
@@ -32,6 +31,7 @@ const CommentSettingsMenuItem = () => {
   if (comments.length) {
     return (
       <Popover
+        buttonTestId="CommentSettingsButton"
         anchor={
           <VscCommentDiscussion
             className={cn(showComments === "resolved" && styles.resolved)}

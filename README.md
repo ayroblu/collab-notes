@@ -7,21 +7,23 @@ TODO
 ----
 ### MVP
 - comments v2
-  - collapse comments
-  - Dropdown menu top next to facepile - checkboxes for resolved, open
-    - Stats for num resolved, open
-    - Buttons to collapse all and expand all
-    - jump to next comment (maybe next new comment in the future)
-  - on click if scroll required, scroll page to where comment actually is
-  - scroll comments too as part of line restoration
+  - Enlarge to modal
+  - "show more" button for long comments
 - comments v3
   - what is "new" - has "focused" ever - only matters if you've ever commented before
+  - scroll comments too as part of line restoration
+- keyboard shortcuts
+  - ⌘B toggle left menu
 
 ### Longer term
 - rollback history
 - gdoc / gdrive sync
 - dropbox sync
 - output files
+- mobile friendly
+  - remove left lav
+  - bottom nav
+  - on top comments + menus
 - local file sync
 - whiteboard?
 - image uploads?
