@@ -3,7 +3,11 @@ import { VscNewFolder, VscTrash } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { getRoom, getYFileMetaData } from "@/modules/documents";
+import {
+  applyDiffToYText,
+  getRoom,
+  getYFileMetaData,
+} from "@/modules/documents";
 import {
   cn,
   dateTimeFormatter,
@@ -72,8 +76,7 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
   };
   const { name: yname } = getRoom(id, password);
   const setRoomName = (text: string) => {
-    yname.delete(0, yname.length);
-    yname.insert(0, text);
+    applyDiffToYText(yname, () => text);
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {

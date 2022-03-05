@@ -5,22 +5,28 @@ import {
   VscRefresh,
   VscSettingsGear,
 } from "react-icons/vsc";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 import { nonNullable, timeoutPromiseSuccess } from "@/modules/utils";
 import { unregister } from "@/serviceWorkerRegistration";
 
 import styles from "./LeftNav.module.css";
 import { LeftNavButton, LeftNavButtonLink } from "./LeftNavButton";
-import { LeftNavEnum, leftNavState } from "./data-model";
+import {
+  leftDrawerVisibleState,
+  LeftNavEnum,
+  leftNavState,
+} from "./data-model";
 
 export const LeftNav = () => {
   const [leftNav, setLeftNav] = useRecoilState(leftNavState);
+  const setLeftDrawerVisible = useSetRecoilState(leftDrawerVisibleState);
   const setNewLeftNav = (newLeftNav: LeftNavEnum) => () => {
     if (leftNav === newLeftNav) {
-      setLeftNav(null);
+      setLeftDrawerVisible((isVisible) => !isVisible);
     } else {
       setLeftNav(newLeftNav);
+      setLeftDrawerVisible(true);
     }
   };
   return (

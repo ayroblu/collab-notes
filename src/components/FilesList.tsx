@@ -24,9 +24,8 @@ import { VscNewFile } from "react-icons/vsc";
 import { Link, useSearchParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
+import { createNewFile } from "@/modules/documents";
 import { cn, dateTimeFormatter } from "@/modules/utils";
-
-import { createNewFile } from "../modules/documents";
 
 import styles from "./FilesList.module.css";
 import { filesDataState } from "./data-model";

@@ -111,6 +111,7 @@ export function getYFileThreads(file: Y.Map<any>): Y.Map<Y.Array<ThreadData>> {
   }
   return file.get("threads");
 }
+
 export function applyDiff(
   roomId: string,
   roomPassword: string,
@@ -119,6 +120,13 @@ export function applyDiff(
 ) {
   const doc = getDocument(roomId, roomPassword, fileName);
   if (!doc) return;
+  applyDiffToYText(doc, getNewString);
+}
+
+export function applyDiffToYText(
+  doc: Y.Text,
+  getNewString: (text: string) => string,
+) {
   const text = doc.toString();
   const formatted = getNewString(text);
   const diff = diffChars(text, formatted);

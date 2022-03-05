@@ -6,11 +6,16 @@ import { unreachable } from "@/modules/utils";
 import { FilesListPane } from "./FilesListPane";
 import styles from "./LeftNavPane.module.css";
 import { RoomsList } from "./RoomsList";
-import { LeftNavEnum, leftNavState } from "./data-model";
+import {
+  leftDrawerVisibleState,
+  LeftNavEnum,
+  leftNavState,
+} from "./data-model";
 
 export const LeftNavPane: React.FC = () => {
   const leftNav = useRecoilValue(leftNavState);
-  const part = getLeftNavPanePart(leftNav);
+  const leftDrawerVisible = useRecoilValue(leftDrawerVisibleState);
+  const part = getLeftNavPanePart(leftNav, leftDrawerVisible);
   return (
     <section className={styles.leftNavPane}>
       {part && <div className={styles.fixedWidth}>{part}</div>}
@@ -18,8 +23,8 @@ export const LeftNavPane: React.FC = () => {
   );
 };
 
-function getLeftNavPanePart(type: LeftNavEnum | null) {
-  if (!type) {
+function getLeftNavPanePart(type: LeftNavEnum, isVisible: boolean) {
+  if (!isVisible) {
     return null;
   }
   switch (type) {
