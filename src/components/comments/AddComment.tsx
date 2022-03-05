@@ -50,26 +50,26 @@ export const AddComment: React.FC<AddCommentProps> = React.memo(
     return (
       <CommentHolder
         id={id}
+        isActiveComment={isActiveComment}
+        isFocusComment={isFocusComment}
         offset={offset}
         selection={comment.selection}
-        isFocusComment={isFocusComment}
-        isActiveComment={isActiveComment}
       >
         <CommentHeading byName={settings.name} />
-        <form onSubmit={handleSubmit} className={styles.main}>
+        <form className={styles.main} onSubmit={handleSubmit}>
           <textarea
-            placeholder="Add comment..."
+            autoFocus
             className={styles.textarea}
-            value={comment.text}
+            onBlur={onBlur}
             onChange={(e) =>
               setComment({ ...comment, text: e.currentTarget.value })
             }
             onKeyDown={handleKeyDown}
-            onBlur={onBlur}
-            autoFocus
+            placeholder="Add comment..."
+            value={comment.text}
           />
           <div className={styles.flexEnd}>
-            <SubmitButton value="Save" disabled={!comment.text} />
+            <SubmitButton disabled={!comment.text} value="Save" />
             <Button buttonType="form" onClick={handleCancel}>
               Cancel
             </Button>

@@ -31,12 +31,12 @@ const CommentSettingsMenuItem = () => {
   if (comments.length) {
     return (
       <Popover
-        buttonTestId="CommentSettingsButton"
         anchor={
           <VscCommentDiscussion
             className={cn(showComments === "resolved" && styles.resolved)}
           />
         }
+        buttonTestId="CommentSettingsButton"
       >
         <CommentSettings />
       </Popover>

@@ -155,10 +155,10 @@ const NewFile: React.FC = () => {
   }
   return (
     <input
-      className={styles.newFileInput}
-      onKeyDown={handleKeyDown}
-      onBlur={handleNewFileFocus}
       autoFocus
+      className={styles.newFileInput}
+      onBlur={handleNewFileFocus}
+      onKeyDown={handleKeyDown}
     />
   );
 };

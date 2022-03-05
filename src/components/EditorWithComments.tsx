@@ -71,10 +71,10 @@ const NewFileDialog: React.FC = () => {
     <section className={styles.newFile}>
       <h2>Add new file</h2>
       <input
-        onKeyDown={handleKeyDown}
-        onBlur={handleNewFileFocus}
-        placeholder="filename.ts"
         autoFocus
+        onBlur={handleNewFileFocus}
+        onKeyDown={handleKeyDown}
+        placeholder="filename.ts"
       />
     </section>
   );

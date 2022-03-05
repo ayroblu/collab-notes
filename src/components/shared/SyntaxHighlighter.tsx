@@ -13,8 +13,9 @@ export const SyntaxHighlighter: React.FC<Props> = ({
   ...props
 }) => (
   <Prism
+    PreTag="div"
     children={String(children).replace(/\n$/, "")}
-    style={xonokai}
+    codeTagProps={{ className: styles.code }}
     customStyle={{
       padding: "3px 6px",
       margin: "4px 0",
@@ -22,10 +23,9 @@ export const SyntaxHighlighter: React.FC<Props> = ({
       fontSize: "0.9em",
       border: "none",
     }}
-    wrapLongLines
-    codeTagProps={{ className: styles.code }}
     language={language}
-    PreTag="div"
+    style={xonokai}
+    wrapLongLines
     {...props}
   />
 );

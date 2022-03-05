@@ -10,12 +10,12 @@ const SyntaxHighlighter = React.lazy(() => import("./SyntaxHighlighter"));
 export const Markdown: React.FC<{ text: string; className?: string }> =
   React.memo(({ className, text }) => (
     <ReactMarkdown
-      className={className}
       children={text}
-      remarkPlugins={[remarkGfm]}
+      className={className}
       components={{
         code: Code,
       }}
+      remarkPlugins={[remarkGfm]}
     />
   ));
 

@@ -6,5 +6,5 @@ import { activeRoomIdSelector } from "./data-model";
 export const RoomRedirect: React.FC = () => {
   const activeRoomId = useRecoilValue(activeRoomIdSelector);
 
-  return <Navigate to={activeRoomId} replace />;
+  return <Navigate replace to={activeRoomId} />;
 };

@@ -25,8 +25,8 @@ export const Button: React.FC<Props> = ({
   } else if (buttonType === "form") {
     return (
       <button
-        type="button"
         className={cn(styles.button, className)}
+        type="button"
         {...props}
       />
     );
@@ -43,5 +43,5 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
   className,
   ...props
 }) => (
-  <input type="submit" className={cn(styles.button, className)} {...props} />
+  <input className={cn(styles.button, className)} type="submit" {...props} />
 );

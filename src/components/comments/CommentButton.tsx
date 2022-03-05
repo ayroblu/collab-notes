@@ -31,10 +31,10 @@ export const CommentButton: React.FC<CommentButtonProps> = React.memo(
       <button
         className={styles.commentButton}
         data-testid="CommentButton"
+        onClick={() => onClick(selection)}
         style={{
           top: offsetTop,
         }}
-        onClick={() => onClick(selection)}
       >
         <VscComment />
       </button>

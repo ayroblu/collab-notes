@@ -90,8 +90,8 @@ export const CommentsPane: React.FC = () => {
     <div className={styles.commentsWrapper}>
       <section
         className={styles.commentButtonContainer}
-        style={{ height: editorDivHeight }}
         ref={commentButtonWrapperRef}
+        style={{ height: editorDivHeight }}
       >
         <div
           style={{
@@ -103,8 +103,8 @@ export const CommentsPane: React.FC = () => {
       </section>
       <section
         className={styles.commentsPane}
-        style={{ height: editorDivHeight }}
         ref={commentsPaneRef}
+        style={{ height: editorDivHeight }}
       >
         <ul
           style={{
@@ -114,11 +114,11 @@ export const CommentsPane: React.FC = () => {
           {comments.filter(commentHasVisibleSelection).map((comment) => (
             <li key={comment.id}>
               <Comment
-                offset={(offsets[comment.id] ?? 0) + extraOffset}
-                isFocusComment={focusCommentId === comment.id}
                 isActiveComment={
                   focusCommentIsActive && focusCommentId === comment.id
                 }
+                isFocusComment={focusCommentId === comment.id}
+                offset={(offsets[comment.id] ?? 0) + extraOffset}
                 {...comment}
               />
             </li>
@@ -128,14 +128,14 @@ export const CommentsPane: React.FC = () => {
             .map((comment) => (
               <li key={comment.id}>
                 <AddComment
-                  offset={(offsets[comment.id] ?? 0) + extraOffset}
                   id={comment.id}
-                  onSubmit={createCommentFn(comment)}
-                  onCancel={cancelCommentFn(comment.id)}
-                  isFocusComment={focusCommentId === comment.id}
                   isActiveComment={
                     focusCommentIsActive && focusCommentId === comment.id
                   }
+                  isFocusComment={focusCommentId === comment.id}
+                  offset={(offsets[comment.id] ?? 0) + extraOffset}
+                  onCancel={cancelCommentFn(comment.id)}
+                  onSubmit={createCommentFn(comment)}
                 />
               </li>
             ))}

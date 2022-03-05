@@ -17,13 +17,13 @@ export const CheckList = <T extends string>({
 }: Props<T>) => (
   <section className={styles.checklist}>
     {items.map(({ label, value }) => (
-      <label key={value} className={styles.label}>
+      <label className={styles.label} key={value}>
         <input
-          type="checkbox"
-          name={name}
-          value={value}
           checked={values[value]}
+          name={name}
           onChange={() => onChange(value)}
+          type="checkbox"
+          value={value}
         />
         <span className={styles.labelText}>{label}</span>
       </label>

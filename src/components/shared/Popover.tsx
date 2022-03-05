@@ -39,8 +39,8 @@ export const Popover: React.FC<Props> = ({
     <div className={styles.popoverContainer}>
       <Button
         className={styles.center}
-        onClick={onClick}
         data-testid={buttonTestId}
+        onClick={onClick}
       >
         {anchor}
       </Button>

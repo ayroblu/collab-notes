@@ -63,7 +63,7 @@ rules:
   react/jsx-key:
   - error
   - checkFragmentShorthand: true
-    #react/jsx-sort-props: error
+  react/jsx-sort-props: error
   "@typescript-eslint/consistent-type-imports":
   - error
   - prefer: type-imports

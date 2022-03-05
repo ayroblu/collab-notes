@@ -24,17 +24,17 @@ export const App: React.FC = () => (
 
 const RouteGroup: React.FC = () => (
   <Routes>
-    <Route path="/" element={<Layout />}>
-      <Route index element={<RoomRedirect />} />
+    <Route element={<Layout />} path="/">
+      <Route element={<RoomRedirect />} index />
       <Route path="/:roomId">
-        <Route index element={<Navigate to="files" replace />} />
+        <Route element={<Navigate replace to="files" />} index />
         <Route path="files">
-          <Route index element={<EditorWithComments />} />
+          <Route element={<EditorWithComments />} index />
         </Route>
-        <Route path="*" element={<Navigate to="files" replace />} />
+        <Route element={<Navigate replace to="files" />} path="*" />
       </Route>
-      <Route path="settings" element={<Settings />} />
-      <Route path="*" element={<NoMatch />} />
+      <Route element={<Settings />} path="settings" />
+      <Route element={<NoMatch />} path="*" />
     </Route>
   </Routes>
 );

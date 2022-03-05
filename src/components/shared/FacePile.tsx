@@ -19,7 +19,7 @@ export const FacePile: React.FC = () => {
     return (
       <section className={styles.facepile}>
         {faces.map(({ color, name }) => (
-          <FacePileFace key={`${name}${color}`} color={color} name={name} />
+          <FacePileFace color={color} key={`${name}${color}`} name={name} />
         ))}
       </section>
     );
@@ -55,7 +55,7 @@ const CondensedFacePile: React.FC<{ faces: Face[] }> = ({ faces }) => {
   return (
     <div className={styles.overlap}>
       {topFaces.reverse().map(({ color, name }) => (
-        <FacePileFace key={`${name}${color}`} color={color} name={name} />
+        <FacePileFace color={color} key={`${name}${color}`} name={name} />
       ))}
       <FacePileFace
         color={"#5bf"}

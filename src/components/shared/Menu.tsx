@@ -47,9 +47,9 @@ export const Menu: React.FC<Props> = ({ children, options }) => {
   return (
     <button
       className={styles.menu}
-      onKeyDown={handleKeyDown}
-      onClick={onClickHandler}
       onBlur={reset}
+      onClick={onClickHandler}
+      onKeyDown={handleKeyDown}
     >
       {children ?? <VscChevronDown />}
       {isOpen && (

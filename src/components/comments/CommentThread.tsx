@@ -15,7 +15,7 @@ export const CommentThread: React.FC<{ commentId: string }> = React.memo(
     return (
       <>
         {thread.map((thread) => (
-          <section key={thread.id} className={styles.thread}>
+          <section className={styles.thread} key={thread.id}>
             <ThreadItem {...thread} />
           </section>
         ))}
@@ -67,11 +67,11 @@ const ThreadItem: React.FC<ThreadData> = ({
     <CommentEntryItem
       byName={byName}
       dateUpdated={dateUpdated}
-      text={text}
-      options={options}
       isEdit={isEdit}
-      onEditSubmit={onEditSubmit}
       onEditCancel={onEditCancel}
+      onEditSubmit={onEditSubmit}
+      options={options}
+      text={text}
     />
   );
 };

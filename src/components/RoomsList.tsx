@@ -44,7 +44,7 @@ export const RoomsList = () => {
       <ul>
         {orderedRooms.map((room) => (
           <li key={room.id}>
-            <ListButton room={room} isEdit={isEdit} />
+            <ListButton isEdit={isEdit} room={room} />
           </li>
         ))}
         <li>
@@ -115,12 +115,12 @@ const ListButton: React.FC<{ room: Room; isEdit: boolean }> = ({
       >
         {isEdit && isNameEdit ? (
           <input
-            className={styles.input}
-            value={yname.toString()}
-            onChange={(e) => setRoomName(e.currentTarget.value)}
-            onBlur={() => setIsNameEdit(false)}
-            onKeyDown={handleKeyDown}
             autoFocus
+            className={styles.input}
+            onBlur={() => setIsNameEdit(false)}
+            onChange={(e) => setRoomName(e.currentTarget.value)}
+            onKeyDown={handleKeyDown}
+            value={yname.toString()}
           />
         ) : (
           name || id

@@ -76,10 +76,10 @@ export const Settings: React.FC = () => {
             <FormLabelWrapper>
               <FormLabel>{label}</FormLabel>
               <input
-                type="checkbox"
+                checked={value}
                 name={name}
                 onChange={onChange}
-                checked={value}
+                type="checkbox"
               />
             </FormLabelWrapper>
           ))}
@@ -92,10 +92,10 @@ export const Settings: React.FC = () => {
             <FormLabelWrapper>
               <FormLabel>{label}</FormLabel>
               <input
-                type="checkbox"
+                checked={value}
                 name={name}
                 onChange={onChange}
-                checked={value}
+                type="checkbox"
               />
             </FormLabelWrapper>
           ))}
@@ -109,12 +109,12 @@ export const Settings: React.FC = () => {
                 : "Failed to parse vimrc, syntax should match: imap jk <Esc>",
           })(({ errorText, name, onChange, value }) => (
             <TextArea
-              ref={textAreaRef}
+              errorText={errorText || ""}
               label="vimrc"
-              value={value}
               name={name}
               onChange={onChange}
-              errorText={errorText || ""}
+              ref={textAreaRef}
+              value={value}
             />
           ))}
         {form.createFormItem("theme", {

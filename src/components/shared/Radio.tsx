@@ -17,15 +17,15 @@ export const Radio = <T extends string>({
 }: Props<T>) => (
   <section className={styles.radio}>
     {items.map(({ label, value: itemValue }) => (
-      <label key={itemValue} className={styles.label}>
+      <label className={styles.label} key={itemValue}>
         <div className={styles.hoverContainer}>
           <input
-            type="radio"
+            checked={itemValue === value}
             className={styles.input}
             name={name}
-            value={itemValue}
-            checked={itemValue === value}
             onChange={() => onChange(itemValue)}
+            type="radio"
+            value={itemValue}
           />
           <div className={styles.radioIcon} />
           <div className={styles.hoverShadow} />

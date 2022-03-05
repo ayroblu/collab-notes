@@ -55,10 +55,10 @@ export const CommentSettings: React.FC = () => {
       Comment Settings
       {numResolved > 0 && (
         <Radio
-          name="comment-settings"
           items={settingsItems}
-          value={showComments}
+          name="comment-settings"
           onChange={onChange}
+          value={showComments}
         />
       )}
       <hr className={styles.divider} />

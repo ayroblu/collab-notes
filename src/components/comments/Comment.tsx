@@ -45,16 +45,16 @@ export const Comment: React.FC<Props> = React.memo(
     return (
       <CommentHolder
         {...comment}
-        offset={offset}
-        isFocusComment={isFocusComment}
         isActiveComment={isActiveComment}
+        isFocusComment={isFocusComment}
+        offset={offset}
       >
         <CommentMain
           {...comment}
-          isEdit={isEdit}
-          setIsEdit={setIsEdit}
-          isFocusComment={isFocusComment}
           isActiveComment={isActiveComment}
+          isEdit={isEdit}
+          isFocusComment={isFocusComment}
+          setIsEdit={setIsEdit}
         />
         {(!isCollapsed || isActiveComment) && !isResolved && (
           <CommentThread commentId={id} />
@@ -120,21 +120,21 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
 
   return (
     <section
-      ref={handleRef}
-      data-testid="Comment"
       className={cn(
         styles.comment,
         isFocusComment && styles.focus,
         isResolved && styles.resolved,
       )}
-      style={{
-        transform: `translate(${offsetLeft}, ${offsetTop}px)`,
-        display: !nonNullable(position) ? "none" : undefined,
-      }}
+      data-testid="Comment"
       onClick={React.useCallback(() => {
         setFocusCommentId(id);
         setFocusCommentIsActive(true);
       }, [id, setFocusCommentId, setFocusCommentIsActive])}
+      ref={handleRef}
+      style={{
+        transform: `translate(${offsetLeft}, ${offsetTop}px)`,
+        display: !nonNullable(position) ? "none" : undefined,
+      }}
     >
       {children}
     </section>
@@ -256,15 +256,15 @@ const CommentMain: React.FC<
     if (!isCollapsed || isActiveComment) {
       return (
         <CommentEntryItem
-          isResolved={isResolved}
-          resolveCommentId={id}
           byName={byName}
-          options={options}
-          text={text}
           dateUpdated={dateUpdated}
           isEdit={isEdit}
-          onEditSubmit={onEditSubmit}
+          isResolved={isResolved}
           onEditCancel={onEditCancel}
+          onEditSubmit={onEditSubmit}
+          options={options}
+          resolveCommentId={id}
+          text={text}
         />
       );
     } else {

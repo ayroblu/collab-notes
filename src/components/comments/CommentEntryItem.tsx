@@ -80,10 +80,10 @@ export const CommentEntryItem: React.FC<CommentEntryItemProps> = React.memo(
         <div className={styles.main}>
           {isEdit ? (
             <CommentTextareaWithSave
-              onSubmit={onEditSubmit}
-              defaultText={text}
               autoFocus
+              defaultText={text}
               onCancel={onEditCancel}
+              onSubmit={onEditSubmit}
             />
           ) : (
             <Markdown text={text} />
@@ -132,6 +132,6 @@ export const CollapsedCommentItem: React.FC<{ byName: string; text: string }> =
   React.memo(({ byName, text }) => (
     <section className={styles.collapsedContainer}>
       <span className={styles.collapsedName}>{byName}</span>
-      <Markdown text={text} className={styles.collapsedText} />
+      <Markdown className={styles.collapsedText} text={text} />
     </section>
   ));
