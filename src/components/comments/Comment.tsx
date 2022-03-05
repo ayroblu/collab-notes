@@ -39,6 +39,7 @@ type Props = CommentData & {
 export const Comment: React.FC<Props> = React.memo(
   ({ isActiveComment, isFocusComment, offset, ...comment }) => {
     const { id, isResolved } = comment;
+    const [isEdit, setIsEdit] = React.useState(false);
     const isCollapsed = useRecoilValue(commentCollapsedState(id));
 
     return (
@@ -50,14 +51,20 @@ export const Comment: React.FC<Props> = React.memo(
       >
         <CommentMain
           {...comment}
+          isEdit={isEdit}
+          setIsEdit={setIsEdit}
           isFocusComment={isFocusComment}
           isActiveComment={isActiveComment}
         />
         {(!isCollapsed || isActiveComment) && !isResolved && (
           <CommentThread commentId={id} />
         )}
-        {isActiveComment && !isResolved && <div className={styles.ruledLine} />}
-        {isActiveComment && !isResolved && <CommentAddThread commentId={id} />}
+        {isActiveComment && !isResolved && !isEdit && (
+          <>
+            <div className={styles.ruledLine} />
+            <CommentAddThread commentId={id} />
+          </>
+        )}
       </CommentHolder>
     );
   },
@@ -159,18 +166,24 @@ const CommentAddThread: React.FC<{ commentId: string }> = React.memo(
 );
 
 const CommentMain: React.FC<
-  CommentData & { isFocusComment: boolean; isActiveComment: boolean }
+  CommentData & {
+    isEdit: boolean;
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    isFocusComment: boolean;
+    isActiveComment: boolean;
+  }
 > = React.memo(
   ({
     byName,
     dateUpdated,
     id,
     isActiveComment,
+    isEdit,
     isFocusComment,
     isResolved,
+    setIsEdit,
     text,
   }) => {
-    const [isEdit, setIsEdit] = React.useState(false);
     const { commentRefs } = React.useContext(CommentsContext);
     const { fileName, roomId, roomPassword } = useFileParams();
     const setFocusCommentId = useSetFocusCommentIdState();
@@ -189,11 +202,11 @@ const CommentMain: React.FC<
         setIsEdit(false);
         return false;
       },
-      [fileName, id, roomId, roomPassword],
+      [fileName, id, roomId, roomPassword, setIsEdit],
     );
     const onEditCancel = React.useCallback(() => {
       setIsEdit(false);
-    }, []);
+    }, [setIsEdit]);
     const deleteComment = React.useCallback(() => {
       const success = removeComment(roomId, roomPassword, fileName, id);
       if (!success) return;
@@ -222,7 +235,7 @@ const CommentMain: React.FC<
       setIsEdit(true);
       setFocusCommentId(id);
       setFocusCommentIsActive(true);
-    }, [id, setFocusCommentId, setFocusCommentIsActive]);
+    }, [id, setFocusCommentId, setFocusCommentIsActive, setIsEdit]);
     const [isCollapsed, setIsCollapsed] = useRecoilState(
       commentCollapsedState(id),
     );

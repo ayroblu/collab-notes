@@ -1,3 +1,5 @@
+import React from "react";
+
 import styles from "./InputField.module.css";
 
 type InputFieldProps = {
@@ -28,16 +30,14 @@ type TextAreaProps = {
   onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
   errorText: string;
 };
-export const TextArea: React.FC<TextAreaProps> = ({
-  errorText,
-  label,
-  ...inputProps
-}) => (
-  <label className={styles.input}>
-    <FormLabel>{label}</FormLabel>
-    <textarea {...inputProps} />
-    <span className={styles.error}>{errorText}</span>
-  </label>
+export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ errorText, label, ...inputProps }, ref) => (
+    <label className={styles.input}>
+      <FormLabel>{label}</FormLabel>
+      <textarea ref={ref} {...inputProps} />
+      <span className={styles.error}>{errorText}</span>
+    </label>
+  ),
 );
 
 export const FormLabel: React.FC = ({ children }) => (

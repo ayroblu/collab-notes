@@ -1,5 +1,7 @@
 import React from "react";
 
+import { handleTextAreaHeight } from "@/modules/utils";
+
 import { Button, SubmitButton } from "../shared/Button";
 
 import styles from "./CommentTextareaWithSave.module.css";
@@ -11,11 +13,13 @@ export const CommentTextareaWithSave: React.FC<{
   onCancel?: () => void;
 }> = ({ autoFocus, defaultText = "", onCancel, onSubmit }) => {
   const [text, setText] = React.useState(defaultText);
+  const [textAreaKey, setTextAreaKey] = React.useState(0);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const handleCancel = () => {
     setText("");
     textareaRef.current?.blur();
+    setTextAreaKey((v) => ++v);
     onCancel?.();
   };
   const handleSubmit = () => {
@@ -26,11 +30,9 @@ export const CommentTextareaWithSave: React.FC<{
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    const isCmd = e.getModifierState("Meta");
-    const isCtrl = e.getModifierState("Ctrl");
     switch (e.key) {
       case "Enter":
-        if (isCmd || isCtrl) {
+        if (e.metaKey || e.ctrlKey) {
           handleSubmit();
         }
     }
@@ -49,26 +51,26 @@ export const CommentTextareaWithSave: React.FC<{
   React.useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    textarea.style.height = `${getTextareaHeight(textarea.scrollHeight)}px`;
-    textarea.addEventListener("input", () => {
-      // textarea.style.height = "auto";
-      textarea.style.height = `${getTextareaHeight(textarea.scrollHeight)}px`;
-    });
+    const dispose = handleTextAreaHeight(textarea);
+    return () => {
+      dispose();
+    };
   }, []);
   return (
     <form onSubmit={submitHandler}>
       <textarea
+        autoFocus={autoFocus}
+        className={styles.textarea}
+        key={textAreaKey}
+        onChange={(e) => setText(e.currentTarget.value)}
+        onFocus={onFocus}
+        onKeyDown={handleKeyDown}
+        placeholder="Reply to comment"
         ref={textareaRef}
         value={text}
-        onChange={(e) => setText(e.currentTarget.value)}
-        placeholder="Reply to comment"
-        className={styles.textarea}
-        onKeyDown={handleKeyDown}
-        onFocus={onFocus}
-        autoFocus={autoFocus}
       />
       <div className={styles.flexEnd}>
-        <SubmitButton value="Save" disabled={!text} />
+        <SubmitButton disabled={!text} value="Save" />
         <Button buttonType="form" disabled={!text} onClick={handleCancel}>
           Cancel
         </Button>
@@ -76,10 +78,3 @@ export const CommentTextareaWithSave: React.FC<{
     </form>
   );
 };
-
-function getTextareaHeight(scrollHeight: number) {
-  const maxHeight = window.innerHeight;
-  const lineHeight = 1.15 * 20;
-  const minTextareaHeight = lineHeight * 2 + 8;
-  return Math.max(Math.min(maxHeight, scrollHeight), minTextareaHeight);
-}

@@ -5,7 +5,7 @@ import { useForm } from "use-form-ts";
 
 import { useStable } from "@/hooks/useStable";
 
-import { checkEqual, keys } from "../modules/utils";
+import { checkEqual, handleTextAreaHeight, keys } from "../modules/utils";
 
 import styles from "./Settings.module.css";
 import { settingsSelector } from "./data-model";
@@ -44,6 +44,16 @@ export const Settings: React.FC = () => {
   React.useEffect(() => {
     persistStable();
   }, [persistStable, tempSettings]);
+
+  const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
+  React.useEffect(() => {
+    const textArea = textAreaRef.current;
+    if (!textArea) return;
+    const dispose = handleTextAreaHeight(textArea);
+    return () => {
+      dispose();
+    };
+  }, []);
 
   return (
     <section className={styles.settings}>
@@ -99,6 +109,7 @@ export const Settings: React.FC = () => {
                 : "Failed to parse vimrc, syntax should match: imap jk <Esc>",
           })(({ errorText, name, onChange, value }) => (
             <TextArea
+              ref={textAreaRef}
               label="vimrc"
               value={value}
               name={name}
