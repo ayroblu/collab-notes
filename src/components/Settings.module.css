@@ -10,3 +10,22 @@
 .settings form {
   flex: 1 1 auto;
 }
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+.checkedLine {
+  display: flex;
+}
+.checkboxContainer {
+  padding: var(--spacing-4) var(--spacing-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

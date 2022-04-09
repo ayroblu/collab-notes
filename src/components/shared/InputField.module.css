@@ -1,6 +1,6 @@
 .input {
   padding: var(--spacing-4) var(--spacing-8);
-  display: block;
+  display: flex;
 }
 .error {
   color: red;
@@ -8,7 +8,8 @@
 }
 .formLabel {
   width: 200px;
-  margin-right: var(--spacing-4);
+  margin-right: var(--spacing-8);
   display: inline-block;
   vertical-align: top;
+  text-align: end;
 }

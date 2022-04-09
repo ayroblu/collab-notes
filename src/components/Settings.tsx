@@ -9,22 +9,25 @@ import { checkEqual, handleTextAreaHeight, keys } from "../modules/utils";
 
 import styles from "./Settings.module.css";
 import { settingsSelector } from "./data-model";
+import { Button } from "./shared/Button";
 import {
   FormLabel,
   FormLabelWrapper,
+  FormWrapper,
   InputField,
   TextArea,
 } from "./shared/InputField";
 
 export const Settings: React.FC = () => {
   const [settings, setSettings] = useRecoilState(settingsSelector);
-  const { isVim, name, theme, vimrc, wordWrap } = settings;
+  const { isVim, name, theme, vimrc, websockets, wordWrap } = settings;
   const adjustedSettings = {
     isVim,
     vimrc,
     name,
     theme,
     wordWrap,
+    websockets,
   };
   const [tempSettings, setTempSettings] = React.useState(adjustedSettings);
   const form = useForm({
@@ -75,12 +78,14 @@ export const Settings: React.FC = () => {
           })(({ meta: { label }, name, onChange, value }) => (
             <FormLabelWrapper>
               <FormLabel>{label}</FormLabel>
-              <input
-                checked={value}
-                name={name}
-                onChange={onChange}
-                type="checkbox"
-              />
+              <div className={styles.centered}>
+                <input
+                  checked={value}
+                  name={name}
+                  onChange={onChange}
+                  type="checkbox"
+                />
+              </div>
             </FormLabelWrapper>
           ))}
         </div>
@@ -91,12 +96,14 @@ export const Settings: React.FC = () => {
           })(({ meta: { label }, name, onChange, value }) => (
             <FormLabelWrapper>
               <FormLabel>{label}</FormLabel>
-              <input
-                checked={value}
-                name={name}
-                onChange={onChange}
-                type="checkbox"
-              />
+              <div className={styles.centered}>
+                <input
+                  checked={value}
+                  name={name}
+                  onChange={onChange}
+                  type="checkbox"
+                />
+              </div>
             </FormLabelWrapper>
           ))}
         </div>
@@ -110,7 +117,7 @@ export const Settings: React.FC = () => {
           })(({ errorText, name, onChange, value }) => (
             <TextArea
               errorText={errorText || ""}
-              label="vimrc"
+              label="vimrc:"
               name={name}
               onChange={onChange}
               ref={textAreaRef}
@@ -140,6 +147,61 @@ export const Settings: React.FC = () => {
               </optgroup>
             </select>
           </FormLabelWrapper>
+        ))}
+        {form.createFormItem(
+          "websockets",
+          {},
+        )(({ onChange, value }) => (
+          <FormWrapper>
+            <FormLabel>Websockets:</FormLabel>
+            <div className={styles.lines}>
+              {value.map((v, i) => (
+                <div className={styles.checkedLine} key={i}>
+                  <div className={styles.checkboxContainer}>
+                    <input
+                      onChange={(e) =>
+                        onChange(
+                          value.map((newV, j) =>
+                            i === j
+                              ? { ...newV, isEnabled: e.currentTarget.checked }
+                              : newV,
+                          ),
+                        )
+                      }
+                      type="checkbox"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      onChange={(e) =>
+                        onChange(
+                          value.map((newV, j) =>
+                            i === j
+                              ? { ...newV, url: e.currentTarget.value }
+                              : newV,
+                          ),
+                        )
+                      }
+                      value={v.url}
+                    />
+                    <Button
+                      buttonType="inline"
+                      onClick={() => onChange(value.filter((_, j) => i !== j))}
+                    >
+                      ❌
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <Button
+                onClick={() =>
+                  onChange(value.concat({ isEnabled: false, url: "" }))
+                }
+              >
+                ➕ Add Connection
+              </Button>
+            </div>
+          </FormWrapper>
         ))}
       </form>
     </section>

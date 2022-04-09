@@ -4,7 +4,7 @@ import type * as Y from "yjs";
 
 export type YRoom = {
   provider: WebrtcProvider;
-  socketProvider: WebsocketProvider;
+  socketProviders: WebsocketProvider[];
   ydoc: Y.Doc;
   files: Y.Array<Y.Map<any>>;
   name: Y.Text;

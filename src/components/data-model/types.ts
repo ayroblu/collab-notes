@@ -16,4 +16,5 @@ export type Settings = {
   theme: string;
   rooms: Room[];
   id: string;
+  websockets: { isEnabled: boolean; url: string }[];
 };

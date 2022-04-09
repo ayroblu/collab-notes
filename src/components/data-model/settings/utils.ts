@@ -72,6 +72,9 @@ export async function idbGetWithMigrations(): Promise<Settings | void> {
   if (!settings.id) {
     settings.id = uuidv4();
   }
+  if (!settings.websockets) {
+    settings.websockets = [{ url: "wss://demos.yjs.dev", isEnabled: false }];
+  }
 
   return settings;
 }

@@ -11,6 +11,7 @@ import {
   getAllThreads,
   syncCommentNamesFn,
   deduplicateComments,
+  setSocketProviders,
 } from "@/modules/documents";
 import { getNonNullable, timeoutPromiseSuccess } from "@/modules/utils";
 
@@ -20,6 +21,7 @@ import {
   activeRoomIdSelector,
   filesDataState,
   settingsSelector,
+  websocketConnectionsState,
 } from "./data-model";
 import { useFileName, useRoom, useSetComments } from "./utils";
 
@@ -31,6 +33,7 @@ export const Sync: React.FC = () => {
   useCommentsSync();
   useCommentNamesSync();
   useThreadsSync();
+  useWebsocketsSync();
 
   return null;
 };
@@ -118,6 +121,18 @@ const useThreadsSync = () => {
       yThread.unobserveDeep(changeListener);
     };
   }, [fileName, room, setThreads]);
+};
+
+const useWebsocketsSync = () => {
+  const room = useRoom();
+  const { websockets } = useRecoilValue(settingsSelector);
+  React.useEffect(() => {
+    setSocketProviders(
+      room.id,
+      room.password,
+      websockets.filter(({ isEnabled }) => isEnabled).map(({ url }) => url),
+    );
+  }, [room.id, room.password, websockets]);
 };
 
 export const ParamsSync: React.FC = () => {

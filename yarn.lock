@@ -8072,10 +8072,10 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-use-form-ts@^0.0.19:
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/use-form-ts/-/use-form-ts-0.0.19.tgz#2b95897481f654928752813eb84853671a761f8e"
-  integrity sha512-pZffIr6Hz/hsvw9OwfvRK3y2QQUVwb1MBtnbi0MZtaipPnWCikimK9ZmLHeIA1/lz2vjrJ363TOW0xgrV31cSA==
+use-form-ts@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/use-form-ts/-/use-form-ts-1.0.1.tgz#3a14fed35beba055e1a5a1b3a8d861fdc95fd238"
+  integrity sha512-/WRiOwITSK3Nhai++xe3uerYfvW7aDmfoscX17AYw9NMXuzgMJlkMyvF7sQhXV5VFqYzt4KFFLqRXOQpzcNQ7A==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"

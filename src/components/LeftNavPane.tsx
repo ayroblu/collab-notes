@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { unreachable } from "@/modules/utils";
 
@@ -16,6 +16,7 @@ export const LeftNavPane: React.FC = () => {
   const leftNav = useRecoilValue(leftNavState);
   const leftDrawerVisible = useRecoilValue(leftDrawerVisibleState);
   const part = getLeftNavPanePart(leftNav, leftDrawerVisible);
+  useKeyboardShortcut();
   return (
     <section className={styles.leftNavPane}>
       {part && <div className={styles.fixedWidth}>{part}</div>}
@@ -40,3 +41,18 @@ function getLeftNavPanePart(type: LeftNavEnum, isVisible: boolean) {
 
 const LeftNavFiles: React.FC = () => <FilesListPane />;
 const LeftNavRooms: React.FC = () => <RoomsList />;
+
+const useKeyboardShortcut = () => {
+  const setLeftDrawerVisible = useSetRecoilState(leftDrawerVisibleState);
+  React.useEffect(() => {
+    const func = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "b") {
+        setLeftDrawerVisible((isVisible) => !isVisible);
+      }
+    };
+    document.addEventListener("keydown", func);
+    return () => {
+      document.removeEventListener("keydown", func);
+    };
+  }, [setLeftDrawerVisible]);
+};

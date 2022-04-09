@@ -67,5 +67,6 @@ function getDefaultSettings() {
       },
     ],
     id: uuidv4(),
+    websockets: [{ url: "wss://demos.yjs.dev", isEnabled: false }],
   };
 }

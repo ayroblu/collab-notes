@@ -47,3 +47,6 @@ export const FormLabel: React.FC = ({ children }) => (
 export const FormLabelWrapper: React.FC = ({ children }) => (
   <label className={styles.input}>{children}</label>
 );
+export const FormWrapper: React.FC = ({ children }) => (
+  <div className={styles.input}>{children}</div>
+);

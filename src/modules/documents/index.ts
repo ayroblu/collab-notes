@@ -23,12 +23,6 @@ export function getRoom(roomId: string, password: string): YRoom {
   const ydoc = new Y.Doc();
   // @ts-expect-error - types are wrong
   const provider = new WebrtcProvider(roomId, ydoc, { password });
-  // Use yjs demos for now, but should switch to our own host solution
-  const socketProvider = new WebsocketProvider(
-    "wss://demos.yjs.dev",
-    roomId,
-    ydoc,
-  );
 
   const persistence = new IndexeddbPersistence(roomId, ydoc);
   const files = ydoc.getArray<Y.Map<any>>("files");
@@ -42,7 +36,7 @@ export function getRoom(roomId: string, password: string): YRoom {
 
   rooms[roomId] = {
     provider,
-    socketProvider,
+    socketProviders: [],
     ydoc,
     files,
     name,
@@ -50,6 +44,23 @@ export function getRoom(roomId: string, password: string): YRoom {
     initialConnectionPromise,
   };
   return rooms[roomId]!;
+}
+
+export function setSocketProviders(
+  roomId: string,
+  password: string,
+  urls: string[],
+): void {
+  const room = getRoom(roomId, password);
+  const { socketProviders, ydoc } = room;
+
+  socketProviders
+    .filter((sp) => !urls.includes(sp.url))
+    .map((sp) => sp.disconnect());
+
+  room.socketProviders = urls
+    .map((url) => new WebsocketProvider(url, roomId, ydoc))
+    .concat(socketProviders.filter((sp) => urls.includes(sp.url)));
 }
 
 export function getFileMetaData(
