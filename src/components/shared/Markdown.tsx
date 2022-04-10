@@ -3,6 +3,9 @@ import ReactMarkdown from "react-markdown";
 import type { CodeProps } from "react-markdown/lib/ast-to-react";
 import remarkGfm from "remark-gfm";
 
+import { cn } from "@/modules/utils";
+
+import styles from "./Markdown.module.css";
 import { Spinner } from "./Spinner";
 
 const SyntaxHighlighter = React.lazy(() => import("./SyntaxHighlighter"));
@@ -11,7 +14,7 @@ export const Markdown: React.FC<{ text: string; className?: string }> =
   React.memo(({ className, text }) => (
     <ReactMarkdown
       children={text}
-      className={className}
+      className={cn(styles.markdown, className)}
       components={{
         code: Code,
       }}

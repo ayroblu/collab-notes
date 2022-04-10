@@ -19,6 +19,9 @@
   justify-content: center;
   align-items: center;
 }
+.markdownPreview {
+  padding: var(--spacing-4) var(--spacing-8);
+}
 button.newCommentButton {
   position: fixed;
   inset-block-end: var(--spacing-16);

@@ -6,11 +6,14 @@
   transition: background-color 0.2s;
 }
 .drawer {
-  width: 300px;
+  min-width: 300px;
+  max-width: 1000px;
+  width: 50vw;
   height: 100%;
   background-color: var(--main-background-color);
   position: absolute;
   inset-block: 0 0;
+  overflow: auto;
 }
 .start {
   inset-inline-start: 0;
@@ -26,7 +29,7 @@
   background-color: transparent;
 }
 .offscreen {
-  transform: translateX(500px);
+  transform: translateX(100%);
   /* transition: transform 0.2s; */
 }
 .onscreen {

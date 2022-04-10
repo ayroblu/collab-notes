@@ -35,3 +35,8 @@ export const commentDrawerVisibleState = atom<boolean>({
   default: !getIsVerySmallScreen(),
   effects: [syncIdbEffect("commentDrawerVisible")],
 });
+
+export const previewDrawerVisibleState = atom<boolean>({
+  key: "previewDrawerVisibleState",
+  default: false,
+});

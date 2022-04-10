@@ -10,10 +10,12 @@ type Props = {
   isVisible: boolean;
   setIsVisible: React.Dispatch<boolean>;
   preserveOffscreen?: boolean;
+  drawerClassName?: string;
 };
 
 export const Drawer: React.FC<Props> = ({
   children,
+  drawerClassName,
   isFixed,
   isVisible,
   position,
@@ -45,6 +47,7 @@ export const Drawer: React.FC<Props> = ({
           isFixed && styles.fixed,
           preserveOffscreen &&
             (!isVisible ? styles.offscreen : styles.onscreen),
+          drawerClassName,
         )}
         onClick={stopPropagation}
       >

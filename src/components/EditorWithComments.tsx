@@ -11,8 +11,13 @@ import { NoMatchFile } from "./NoMatchFile";
 import { FilesParamsSync } from "./Sync";
 import { SimpleCommentButton } from "./comments/CommentButton";
 import { CommentsPane } from "./comments/CommentsPane";
-import { activeFileNameState, commentDrawerVisibleState } from "./data-model";
+import {
+  activeFileNameState,
+  commentDrawerVisibleState,
+  previewDrawerVisibleState,
+} from "./data-model";
 import { Drawer } from "./shared/Drawer";
+import { Markdown } from "./shared/Markdown";
 import { useFileName, useRoom } from "./utils";
 
 const Editor = React.lazy(() => import("./editor/Editor"));
@@ -28,6 +33,9 @@ const MainEditorWithComments: React.FC = () => {
   const fileName = useFileName();
   const [isCommentDrawerVisible, setIsCommentDrawerVisible] = useRecoilState(
     commentDrawerVisibleState,
+  );
+  const [isPreviewDrawerVisible, setIsPreviewDrawerVisible] = useRecoilState(
+    previewDrawerVisibleState,
   );
   const isSmallScreen = getIsSmallScreen();
   const text = getDocument(room.id, room.password, fileName);
@@ -45,6 +53,13 @@ const MainEditorWithComments: React.FC = () => {
         }
       >
         <Editor />
+        <Drawer
+          isVisible={isPreviewDrawerVisible}
+          position="end"
+          setIsVisible={() => setIsPreviewDrawerVisible(false)}
+        >
+          <MarkdownPreview />
+        </Drawer>
         {isSmallScreen ? (
           <>
             <Drawer
@@ -57,10 +72,10 @@ const MainEditorWithComments: React.FC = () => {
             </Drawer>
             <NewCommentButton />
           </>
-        ) : isCommentDrawerVisible ? (
-          <CommentsPane />
         ) : (
-          <NewCommentButton />
+          <>
+            {isCommentDrawerVisible ? <CommentsPane /> : <NewCommentButton />}
+          </>
         )}
       </div>
     </section>
@@ -109,6 +124,18 @@ const NewFileDialog: React.FC = () => {
         onKeyDown={handleKeyDown}
         placeholder="filename.ts"
       />
+    </section>
+  );
+};
+
+const MarkdownPreview: React.FC = () => {
+  const room = useRoom();
+  const fileName = useFileName();
+  const text = getDocument(room.id, room.password, fileName);
+  if (!text) return;
+  return (
+    <section className={styles.markdownPreview}>
+      <Markdown text={text.toString()} />
     </section>
   );
 };
