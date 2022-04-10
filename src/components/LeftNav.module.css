@@ -6,7 +6,7 @@
   height: 100vh;
   background: var(--fade-color);
 }
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 650px) {
   .leftNav {
     flex-direction: column-reverse;
     height: var(--main-nav-height);

@@ -27,7 +27,7 @@
 .highlight {
   background-color: var(--deep-color);
 }
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 650px) {
   .leftNavButton {
     width: var(--main-nav-height);
     height: var(--main-nav-height);
