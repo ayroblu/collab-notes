@@ -13,6 +13,8 @@
     position: fixed;
     inset-block-end: 0;
     inset-inline: 0 0;
+    z-index: 1;
+    background-color: var(--main-background-color);
   }
   .leftNav ul {
     display: flex;
