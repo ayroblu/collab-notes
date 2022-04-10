@@ -1,6 +1,6 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { createNewFile, getDocument } from "@/modules/documents";
 
@@ -9,7 +9,7 @@ import { NavBar } from "./NavBar";
 import { NoMatchFile } from "./NoMatchFile";
 import { FilesParamsSync } from "./Sync";
 import { CommentsPane } from "./comments/CommentsPane";
-import { activeFileNameState } from "./data-model";
+import { activeFileNameState, commentDrawerVisibleState } from "./data-model";
 import { useFileName, useRoom } from "./utils";
 
 const Editor = React.lazy(() => import("./editor/Editor"));
@@ -23,6 +23,7 @@ export const EditorWithComments: React.FC = () => (
 const MainEditorWithComments: React.FC = () => {
   const room = useRoom();
   const fileName = useFileName();
+  const isCommentDrawerVisible = useRecoilValue(commentDrawerVisibleState);
   const text = getDocument(room.id, room.password, fileName);
   if (!text) {
     return <NoMatchFile />;
@@ -30,9 +31,13 @@ const MainEditorWithComments: React.FC = () => {
   return (
     <section className={styles.wrapper}>
       <NavBar />
-      <div className={styles.editorWithComments}>
+      <div
+        className={
+          isCommentDrawerVisible ? styles.editorWithComments : undefined
+        }
+      >
         <Editor />
-        <CommentsPane />
+        {isCommentDrawerVisible && <CommentsPane />}
       </div>
     </section>
   );

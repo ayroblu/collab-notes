@@ -34,17 +34,17 @@ export const useCommentDecorationsHover = () => {
             v.classList.remove(styles.selectionHover);
           }
 
-          const classes = [...v.classList];
-          const commentClass = classes.find((c) => c.startsWith("comment-"));
-          if (!commentClass) return;
-          const commentId = commentClass.replace("comment-", "");
-          const el = commentRefs.current[commentId];
-          if (!el) return;
-          if (isIn) {
-            el.classList.add(styles.commentHover);
-          } else if (!isIn) {
-            el.classList.remove(styles.commentHover);
-          }
+          // const classes = [...v.classList];
+          // const commentClass = classes.find((c) => c.startsWith("comment-"));
+          // if (!commentClass) return;
+          // const commentId = commentClass.replace("comment-", "");
+          // const el = commentRefs.current[commentId];
+          // if (!el) return;
+          // if (isIn) {
+          //   el.classList.add(styles.commentHover);
+          // } else if (!isIn) {
+          //   el.classList.remove(styles.commentHover);
+          // }
         });
       });
     };

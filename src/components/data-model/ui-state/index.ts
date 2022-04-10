@@ -27,3 +27,9 @@ export const leftDrawerVisibleState = atom<boolean>({
   default: false,
   effects: [syncIdbEffect("leftDrawerVisible")],
 });
+
+export const commentDrawerVisibleState = atom<boolean>({
+  key: "commentDrawerVisibleState",
+  default: true,
+  effects: [syncIdbEffect("commentDrawerVisible")],
+});

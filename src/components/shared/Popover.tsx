@@ -5,11 +5,13 @@ import styles from "./Popover.module.css";
 
 type Props = {
   anchor: React.ReactNode;
+  buttonProps: React.ComponentProps<typeof Button>;
   buttonTestId?: string;
 };
 
 export const Popover: React.FC<Props> = ({
   anchor,
+  buttonProps,
   buttonTestId,
   children,
 }) => {
@@ -41,6 +43,7 @@ export const Popover: React.FC<Props> = ({
         className={styles.center}
         data-testid={buttonTestId}
         onClick={onClick}
+        {...buttonProps}
       >
         {anchor}
       </Button>

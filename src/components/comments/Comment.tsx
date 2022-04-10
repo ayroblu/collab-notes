@@ -122,7 +122,7 @@ export const CommentHolder: React.FC<CommentHolderProps> = ({
     <section
       className={cn(
         styles.comment,
-        isFocusComment && styles.focus,
+        isActiveComment && isFocusComment && styles.focus,
         isResolved && styles.resolved,
       )}
       data-testid="Comment"

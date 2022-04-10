@@ -8,6 +8,3 @@
 .selectionFocus {
   background: rgba(213, 169, 45, 0.7);
 }
-.commentHover {
-  border: 1px solid var(--deep-color);
-}

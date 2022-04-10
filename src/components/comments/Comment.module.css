@@ -17,9 +17,6 @@
   transition: transform 0.2s;
 }
 /* } */
-.comment:hover {
-  border: 1px solid var(--deep-color);
-}
 .focus {
   border: 1px solid var(--text-color);
 }

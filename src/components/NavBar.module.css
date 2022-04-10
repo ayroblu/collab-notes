@@ -10,7 +10,11 @@
 }
 .endSection {
   display: flex;
+  gap: var(--spacing-8);
 }
 .resolved {
   color: var(--primary-color);
+}
+.facepileContainer {
+  margin-inline-end: var(--spacing-8);
 }
