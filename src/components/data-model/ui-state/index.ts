@@ -1,6 +1,8 @@
 import type { IPosition } from "monaco-editor";
 import { atom, atomFamily } from "recoil";
 
+import { getIsVerySmallScreen } from "@/modules/utils";
+
 import { LeftNavEnum } from "../types";
 import { syncIdbEffect } from "../utils";
 
@@ -30,6 +32,6 @@ export const leftDrawerVisibleState = atom<boolean>({
 
 export const commentDrawerVisibleState = atom<boolean>({
   key: "commentDrawerVisibleState",
-  default: true,
+  default: !getIsVerySmallScreen(),
   effects: [syncIdbEffect("commentDrawerVisible")],
 });

@@ -8,9 +8,11 @@
 }
 @media screen and (max-width: 650px) {
   .leftNav {
-    flex-direction: column-reverse;
     height: var(--main-nav-height);
     flex-direction: row;
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0 0;
   }
   .leftNav ul {
     display: flex;

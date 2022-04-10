@@ -13,9 +13,6 @@
   flex-direction: column;
 }
 @media screen and (max-width: 650px) {
-  .layout {
-    flex-direction: column-reverse;
-  }
   .grid {
     min-height: calc(100vh - var(--main-nav-height));
   }
