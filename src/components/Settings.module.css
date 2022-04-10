@@ -29,3 +29,8 @@
   align-items: center;
   justify-content: center;
 }
+@media screen and (max-width: 1000px) {
+  .settings {
+    min-height: calc(100vh - var(--main-nav-height));
+  }
+}
