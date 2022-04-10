@@ -16,3 +16,7 @@ function getTextareaHeight(scrollHeight: number) {
   const minTextareaHeight = lineHeight * 2 + 8;
   return Math.max(Math.min(maxHeight, scrollHeight), minTextareaHeight);
 }
+
+export function getIsSmallScreen(): boolean {
+  return window.matchMedia("(max-width: 1000px)").matches;
+}

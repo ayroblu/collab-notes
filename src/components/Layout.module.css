@@ -4,6 +4,7 @@
 .grid {
   display: flex;
   flex: 1 1 auto;
+  position: relative;
 }
 .flexFill {
   flex: 1 1 auto;

@@ -1,0 +1,22 @@
+.background {
+  background-color: var(--deep-color);
+  position: absolute;
+  inset: 0 0 0 0;
+  z-index: 1;
+}
+.drawer {
+  width: 300px;
+  height: 100%;
+  background-color: var(--main-background-color);
+  position: absolute;
+  inset-block: 0 0;
+}
+.start {
+  inset-inline-start: 0;
+}
+.end {
+  inset-inline-end: 0;
+}
+.fixed {
+  position: fixed;
+}

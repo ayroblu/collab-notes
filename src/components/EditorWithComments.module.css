@@ -4,6 +4,11 @@
   flex-grow: 1;
 }
 .editorWithComments {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.editorWithCommentsDesktop {
   display: grid;
   grid-template-columns: 1fr 400px;
 }

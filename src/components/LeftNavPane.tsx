@@ -1,7 +1,7 @@
 import React from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { unreachable } from "@/modules/utils";
+import { getIsSmallScreen, unreachable } from "@/modules/utils";
 
 import { FilesListPane } from "./FilesListPane";
 import styles from "./LeftNavPane.module.css";
@@ -11,15 +11,30 @@ import {
   LeftNavEnum,
   leftNavState,
 } from "./data-model";
+import { Drawer } from "./shared/Drawer";
 
 export const LeftNavPane: React.FC = () => {
   const leftNav = useRecoilValue(leftNavState);
-  const leftDrawerVisible = useRecoilValue(leftDrawerVisibleState);
+  const [leftDrawerVisible, setLeftDrawerVisible] = useRecoilState(
+    leftDrawerVisibleState,
+  );
   const part = getLeftNavPanePart(leftNav, leftDrawerVisible);
   useKeyboardShortcut();
+  const isSmallScreen = getIsSmallScreen();
   return (
     <section className={styles.leftNavPane}>
-      {part && <div className={styles.fixedWidth}>{part}</div>}
+      {part &&
+        (isSmallScreen ? (
+          <Drawer
+            isVisible={leftDrawerVisible}
+            position="start"
+            setIsVisible={() => setLeftDrawerVisible(false)}
+          >
+            {part}
+          </Drawer>
+        ) : (
+          <div className={styles.fixedWidth}>{part}</div>
+        ))}
     </section>
   );
 };

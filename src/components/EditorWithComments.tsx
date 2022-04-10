@@ -1,8 +1,9 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import { createNewFile, getDocument } from "@/modules/documents";
+import { getIsSmallScreen } from "@/modules/utils";
 
 import styles from "./EditorWithComments.module.css";
 import { NavBar } from "./NavBar";
@@ -10,6 +11,7 @@ import { NoMatchFile } from "./NoMatchFile";
 import { FilesParamsSync } from "./Sync";
 import { CommentsPane } from "./comments/CommentsPane";
 import { activeFileNameState, commentDrawerVisibleState } from "./data-model";
+import { Drawer } from "./shared/Drawer";
 import { useFileName, useRoom } from "./utils";
 
 const Editor = React.lazy(() => import("./editor/Editor"));
@@ -23,7 +25,10 @@ export const EditorWithComments: React.FC = () => (
 const MainEditorWithComments: React.FC = () => {
   const room = useRoom();
   const fileName = useFileName();
-  const isCommentDrawerVisible = useRecoilValue(commentDrawerVisibleState);
+  const [isCommentDrawerVisible, setIsCommentDrawerVisible] = useRecoilState(
+    commentDrawerVisibleState,
+  );
+  const isSmallScreen = getIsSmallScreen();
   const text = getDocument(room.id, room.password, fileName);
   if (!text) {
     return <NoMatchFile />;
@@ -33,11 +38,24 @@ const MainEditorWithComments: React.FC = () => {
       <NavBar />
       <div
         className={
-          isCommentDrawerVisible ? styles.editorWithComments : undefined
+          isCommentDrawerVisible && !isSmallScreen
+            ? styles.editorWithCommentsDesktop
+            : styles.editorWithComments
         }
       >
         <Editor />
-        {isCommentDrawerVisible && <CommentsPane />}
+        {isCommentDrawerVisible &&
+          (isSmallScreen ? (
+            <Drawer
+              isVisible={isCommentDrawerVisible}
+              position="end"
+              setIsVisible={() => setIsCommentDrawerVisible(false)}
+            >
+              <CommentsPane />
+            </Drawer>
+          ) : (
+            <CommentsPane />
+          ))}
       </div>
     </section>
   );
