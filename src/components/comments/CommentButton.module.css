@@ -1,5 +1,4 @@
 .commentButton {
-  padding: 8px;
   padding: var(--spacing-8);
   position: absolute;
   inset-inline-start: 0;
@@ -10,5 +9,15 @@
   align-items: center;
 }
 .commentButton:hover {
+  background-color: var(--fade-color);
+}
+.simpleCommentButton {
+  padding: var(--spacing-8);
+  border-radius: var(--button-border-radius);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.simpleCommentButton:hover {
   background-color: var(--fade-color);
 }

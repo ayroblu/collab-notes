@@ -1,6 +1,6 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 import { createNewFile, getDocument } from "@/modules/documents";
 import { getIsSmallScreen } from "@/modules/utils";
@@ -9,6 +9,7 @@ import styles from "./EditorWithComments.module.css";
 import { NavBar } from "./NavBar";
 import { NoMatchFile } from "./NoMatchFile";
 import { FilesParamsSync } from "./Sync";
+import { SimpleCommentButton } from "./comments/CommentButton";
 import { CommentsPane } from "./comments/CommentsPane";
 import { activeFileNameState, commentDrawerVisibleState } from "./data-model";
 import { Drawer } from "./shared/Drawer";
@@ -44,8 +45,8 @@ const MainEditorWithComments: React.FC = () => {
         }
       >
         <Editor />
-        {isCommentDrawerVisible &&
-          (isSmallScreen ? (
+        {isCommentDrawerVisible ? (
+          isSmallScreen ? (
             <Drawer
               isVisible={isCommentDrawerVisible}
               position="end"
@@ -55,11 +56,18 @@ const MainEditorWithComments: React.FC = () => {
             </Drawer>
           ) : (
             <CommentsPane />
-          ))}
+          )
+        ) : (
+          <NewCommentButton />
+        )}
       </div>
     </section>
   );
 };
+
+const NewCommentButton: React.FC = () => (
+  <SimpleCommentButton className={styles.newCommentButton} />
+);
 
 const NewFileDialog: React.FC = () => {
   const room = useRoom();

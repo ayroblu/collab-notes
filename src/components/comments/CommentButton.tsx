@@ -1,46 +1,90 @@
 import React from "react";
 import { VscComment } from "react-icons/vsc";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import { useIsMounted } from "@/hooks/useIsMounted";
-import type { SelectionRange } from "@/modules/documents";
-import { nonNullable } from "@/modules/utils";
+import type { CommentData, SelectionRange } from "@/modules/documents";
+import { cn, nonNullable } from "@/modules/utils";
 
 import { EditorContext } from "../Contexts";
 import {
   activeFileNameState,
   activeRoomIdSelector,
+  commentDrawerVisibleState,
   focusCommentIsActiveState,
+  inProgressCommentsSelector,
+  settingsSelector,
 } from "../data-model";
+import { useFileParams, useSetFocusCommentIdState } from "../utils";
 
 import styles from "./CommentButton.module.css";
 
 type CommentButtonProps = {
-  onClick: (selection: SelectionRange) => void;
   offset: number;
 };
 export const CommentButton: React.FC<CommentButtonProps> = React.memo(
-  ({ offset, onClick }) => {
+  ({ offset }) => {
     const showComment = useShowCommentButton();
     if (!showComment) return null;
-    const { position, selection } = showComment;
-
-    const offsetTop = position + offset;
-    return (
-      <button
-        className={styles.commentButton}
-        data-testid="CommentButton"
-        onClick={() => onClick(selection)}
-        style={{
-          top: offsetTop,
-        }}
-      >
-        <VscComment />
-      </button>
-    );
+    return <CommentButtonContent {...showComment} offset={offset} />;
   },
 );
+type ShowComment = {
+  selection: SelectionRange;
+  position: number;
+};
+const CommentButtonContent: React.FC<CommentButtonProps & ShowComment> = ({
+  offset,
+  position,
+  selection,
+}) => {
+  const offsetTop = position + offset;
+  const onClick = useOnClick();
+  const handleClick = React.useCallback(() => {
+    onClick(selection);
+  }, [onClick, selection]);
+  return (
+    <button
+      className={styles.commentButton}
+      data-testid="CommentButton"
+      onClick={handleClick}
+      style={{
+        top: offsetTop,
+      }}
+    >
+      <VscComment />
+    </button>
+  );
+};
+
+type SimpleCommentButtonProps = {
+  className?: string | undefined;
+};
+export const SimpleCommentButton: React.FC<SimpleCommentButtonProps> =
+  React.memo(({ className }) => {
+    const showComment = useShowCommentButton();
+    if (!showComment) return null;
+    return (
+      <SimpleCommentButtonContent {...showComment} className={className} />
+    );
+  });
+const SimpleCommentButtonContent: React.FC<
+  ShowComment & SimpleCommentButtonProps
+> = ({ className, position, selection }) => {
+  const onClick = useOnClick();
+  const handleClick = React.useCallback(() => {
+    onClick(selection);
+  }, [onClick, selection]);
+  return (
+    <button
+      className={cn(styles.simpleCommentButton, className)}
+      onClick={handleClick}
+    >
+      <VscComment />
+    </button>
+  );
+};
 
 const useShowCommentButton = () => {
   const { position, selection } = useSelectionPosition();
@@ -96,4 +140,48 @@ const useSelectionPosition = () => {
     };
   }, [editor, getIsMounted]);
   return { position, selection };
+};
+
+const useOnClick = () => {
+  const settings = useRecoilValue(settingsSelector);
+  const setInProgressComments = useSetRecoilState(inProgressCommentsSelector);
+  const setFocusCommentId = useSetFocusCommentIdState();
+  const { fileName, roomId } = useFileParams();
+  const setFocusCommentIsActive = useSetRecoilState(
+    focusCommentIsActiveState({ fileName, roomId }),
+  );
+  const setIsCommentDrawerVisible = useSetRecoilState(
+    commentDrawerVisibleState,
+  );
+
+  const addInProgressComment = React.useCallback(
+    (selection: SelectionRange) => {
+      const now = new Date().toISOString();
+      const comment: CommentData = {
+        selection,
+        id: uuidv4(),
+        byId: settings.id,
+        byName: settings.name,
+        dateCreated: now,
+        dateUpdated: now,
+        text: "",
+      };
+      setInProgressComments((inProgressComments) => [
+        ...inProgressComments,
+        comment,
+      ]);
+      setFocusCommentId(comment.id);
+      setFocusCommentIsActive(true);
+      setIsCommentDrawerVisible(true);
+    },
+    [
+      setFocusCommentId,
+      setFocusCommentIsActive,
+      setInProgressComments,
+      setIsCommentDrawerVisible,
+      settings.id,
+      settings.name,
+    ],
+  );
+  return addInProgressComment;
 };

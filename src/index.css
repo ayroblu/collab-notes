@@ -12,7 +12,7 @@
   --darker-color: rgba(0, 0, 0, 0.2);
   --lighter-color: rgba(255, 255, 255, 0.1);
   --darker-filter: brightness(85%);
-  --lighter-filter: brightness(130%);
+  --lighter-filter: brightness(115%);
 
   --primary-color: #5bf;
   --background-color: var(--dark-background-color);

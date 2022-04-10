@@ -1,23 +1,16 @@
 import React from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { v4 as uuidv4 } from "uuid";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 import { createComment } from "@/modules/documents";
-import type { CommentData, SelectionRange } from "@/modules/documents";
+import type { CommentData } from "@/modules/documents";
 
 import { CommentsContext, EditorContext } from "../Contexts";
 import {
   focusCommentIsActiveState,
   focusNearestCommentIdSelector,
   inProgressCommentsSelector,
-  settingsSelector,
 } from "../data-model";
-import {
-  useComments,
-  useFileParams,
-  useFocusCommentIdState,
-  useSetFocusCommentIdState,
-} from "../utils";
+import { useComments, useFileParams, useFocusCommentIdState } from "../utils";
 
 import { AddComment } from "./AddComment";
 import { Comment } from "./Comment";
@@ -28,8 +21,6 @@ import { useEditorHeight } from "./useEditorHeight";
 import { useEditorScrollSync } from "./useEditorScrollSync";
 
 export const CommentsPane: React.FC = () => {
-  const settings = useRecoilValue(settingsSelector);
-  const setFocusCommentId = useSetFocusCommentIdState();
   const { commentRefs } = React.useContext(CommentsContext);
   const { editor } = React.useContext(EditorContext);
   const [inProgressComments, setInProgressComments] = useRecoilState(
@@ -55,21 +46,6 @@ export const CommentsPane: React.FC = () => {
     scrollOffset,
   );
 
-  const addInProgressComment = (selection: SelectionRange) => {
-    const now = new Date().toISOString();
-    const comment: CommentData = {
-      selection,
-      id: uuidv4(),
-      byId: settings.id,
-      byName: settings.name,
-      dateCreated: now,
-      dateUpdated: now,
-      text: "",
-    };
-    setInProgressComments([...inProgressComments, comment]);
-    setFocusCommentId(comment.id);
-    setFocusCommentIsActive(true);
-  };
   const createCommentFn = (comment: CommentData) => () => {
     setInProgressComments(
       inProgressComments.filter(({ id }) => comment.id !== id),
@@ -98,7 +74,7 @@ export const CommentsPane: React.FC = () => {
             height: editorHeight,
           }}
         >
-          <CommentButton offset={0} onClick={addInProgressComment} />
+          <CommentButton offset={0} />
         </div>
       </section>
       <section
