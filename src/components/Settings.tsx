@@ -66,7 +66,7 @@ export const Settings: React.FC = () => {
           {form.createFormItem("name", {
             required: true,
             adaptor,
-            meta: { label: "Nickname: " },
+            meta: { label: "Nickname " },
           })(({ errorText, meta: { label }, ...props }) => (
             <InputField label={label} {...props} errorText={errorText || ""} />
           ))}
@@ -74,9 +74,9 @@ export const Settings: React.FC = () => {
         <div>
           {form.createFormItem("wordWrap", {
             adaptor: checkedAdaptor,
-            meta: { label: "Word wrap enabled: " },
+            meta: { label: "Word wrap enabled " },
           })(({ meta: { label }, name, onChange, value }) => (
-            <FormLabelWrapper>
+            <FormLabelWrapper isOneLine>
               <FormLabel>{label}</FormLabel>
               <div className={styles.centered}>
                 <input
@@ -92,9 +92,9 @@ export const Settings: React.FC = () => {
         <div>
           {form.createFormItem("isVim", {
             adaptor: checkedAdaptor,
-            meta: { label: "Vim Mode enabled: " },
+            meta: { label: "Vim Mode enabled " },
           })(({ meta: { label }, name, onChange, value }) => (
-            <FormLabelWrapper>
+            <FormLabelWrapper isOneLine>
               <FormLabel>{label}</FormLabel>
               <div className={styles.centered}>
                 <input
@@ -117,7 +117,7 @@ export const Settings: React.FC = () => {
           })(({ errorText, name, onChange, value }) => (
             <TextArea
               errorText={errorText || ""}
-              label="vimrc:"
+              label="vimrc"
               name={name}
               onChange={onChange}
               ref={textAreaRef}
@@ -129,7 +129,7 @@ export const Settings: React.FC = () => {
           adaptor,
         })(({ name, onChange, value }) => (
           <FormLabelWrapper>
-            <FormLabel>Theme:</FormLabel>
+            <FormLabel>Theme</FormLabel>
             <select name={name} onChange={onChange} value={value}>
               <optgroup label="Built in themes">
                 {builtInThemes.map(({ label, value }) => (
@@ -153,7 +153,7 @@ export const Settings: React.FC = () => {
           {},
         )(({ onChange, value }) => (
           <FormWrapper>
-            <FormLabel>Websockets:</FormLabel>
+            <FormLabel>Websockets</FormLabel>
             <div className={styles.lines}>
               {value.map((v, i) => (
                 <div className={styles.checkedLine} key={i}>
@@ -171,26 +171,25 @@ export const Settings: React.FC = () => {
                       type="checkbox"
                     />
                   </div>
-                  <div>
-                    <input
-                      onChange={(e) =>
-                        onChange(
-                          value.map((newV, j) =>
-                            i === j
-                              ? { ...newV, url: e.currentTarget.value }
-                              : newV,
-                          ),
-                        )
-                      }
-                      value={v.url}
-                    />
-                    <Button
-                      buttonType="inline"
-                      onClick={() => onChange(value.filter((_, j) => i !== j))}
-                    >
-                      ❌
-                    </Button>
-                  </div>
+                  <input
+                    className={styles.textInputLine}
+                    onChange={(e) =>
+                      onChange(
+                        value.map((newV, j) =>
+                          i === j
+                            ? { ...newV, url: e.currentTarget.value }
+                            : newV,
+                        ),
+                      )
+                    }
+                    value={v.url}
+                  />
+                  <Button
+                    buttonType="inline"
+                    onClick={() => onChange(value.filter((_, j) => i !== j))}
+                  >
+                    ❌
+                  </Button>
                 </div>
               ))}
               <Button

@@ -9,7 +9,8 @@
   --dark-text-color: white;
   --dark-subtle-text-color: #aaa;
 
-  --darker-color: rgba(0, 0, 0, 0.2);
+  --darker-color: rgba(0, 0, 0, 0.1);
+  --more-darker-color: rgba(0, 0, 0, 0.2);
   --lighter-color: rgba(255, 255, 255, 0.1);
   --darker-filter: brightness(85%);
   --lighter-filter: brightness(115%);
@@ -19,7 +20,8 @@
   --main-background-color: var(--dark-main-background-color);
   --text-color: var(--dark-text-color);
   --subtle-text-color: var(--dark-subtle-text-color);
-  --deep-color: var(--darker-color);
+  --border-color: var(--darker-color);
+  --deep-color: var(--more-darker-color);
   --fade-color: var(--lighter-color);
   --deep-filter: var(--darker-filter);
   --fade-filter: var(--lighter-filter);

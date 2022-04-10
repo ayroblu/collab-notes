@@ -1,5 +1,7 @@
 import React from "react";
 
+import { cn } from "@/modules/utils";
+
 import styles from "./InputField.module.css";
 
 type InputFieldProps = {
@@ -44,8 +46,13 @@ export const FormLabel: React.FC = ({ children }) => (
   <span className={styles.formLabel}>{children}</span>
 );
 
-export const FormLabelWrapper: React.FC = ({ children }) => (
-  <label className={styles.input}>{children}</label>
+export const FormLabelWrapper: React.FC<{ isOneLine?: boolean }> = ({
+  children,
+  isOneLine,
+}) => (
+  <label className={cn(styles.input, isOneLine && styles.oneline)}>
+    {children}
+  </label>
 );
 export const FormWrapper: React.FC = ({ children }) => (
   <div className={styles.input}>{children}</div>

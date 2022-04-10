@@ -13,3 +13,16 @@
   vertical-align: top;
   text-align: end;
 }
+@media screen and (max-width: 650px) {
+  .input {
+    flex-direction: column;
+    border-bottom: 1px solid var(--deep-color);
+  }
+  .formLabel {
+    text-align: start;
+  }
+  .oneline {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}

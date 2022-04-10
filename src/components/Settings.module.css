@@ -30,7 +30,7 @@
   justify-content: center;
 }
 @media screen and (max-width: 650px) {
-  .settings {
-    min-height: calc(100vh - var(--main-nav-height));
+  .textInputLine {
+    flex: 1 1 auto;
   }
 }
