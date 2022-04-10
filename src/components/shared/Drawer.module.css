@@ -3,6 +3,7 @@
   position: absolute;
   inset: 0 0 0 0;
   z-index: 1;
+  transition: background-color 0.2s;
 }
 .drawer {
   width: 300px;
@@ -19,4 +20,16 @@
 }
 .fixed {
   position: fixed;
+}
+.invisible {
+  pointer-events: none;
+  background-color: transparent;
+}
+.offscreen {
+  transform: translateX(500px);
+  /* transition: transform 0.2s; */
+}
+.onscreen {
+  transform: translateX(0);
+  /* transition: transform 0.2s; */
 }

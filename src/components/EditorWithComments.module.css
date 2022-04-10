@@ -31,3 +31,8 @@ button.newCommentButton:hover {
   background-color: var(--primary-color);
   filter: var(--fade-filter);
 }
+@media screen and (max-width: 650px) {
+  button.newCommentButton {
+    inset-block-end: calc(var(--spacing-16) + var(--main-nav-height));
+  }
+}

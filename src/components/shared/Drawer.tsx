@@ -9,6 +9,7 @@ type Props = {
   position: "end" | "start";
   isVisible: boolean;
   setIsVisible: React.Dispatch<boolean>;
+  preserveOffscreen?: boolean;
 };
 
 export const Drawer: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const Drawer: React.FC<Props> = ({
   isFixed,
   isVisible,
   position,
+  preserveOffscreen,
   setIsVisible,
 }) => {
   const onBackgroundClick = React.useCallback(() => {
@@ -26,10 +28,14 @@ export const Drawer: React.FC<Props> = ({
     [],
   );
 
-  if (!isVisible) return null;
+  if (!preserveOffscreen && !isVisible) return null;
   return (
     <section
-      className={cn(styles.background, isFixed && styles.fixed)}
+      className={cn(
+        styles.background,
+        isFixed && styles.fixed,
+        !isVisible && styles.invisible,
+      )}
       onClick={onBackgroundClick}
     >
       <div
@@ -37,6 +43,8 @@ export const Drawer: React.FC<Props> = ({
           styles.drawer,
           position === "start" ? styles.start : styles.end,
           isFixed && styles.fixed,
+          preserveOffscreen &&
+            (!isVisible ? styles.offscreen : styles.onscreen),
         )}
         onClick={stopPropagation}
       >

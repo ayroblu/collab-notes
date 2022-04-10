@@ -45,18 +45,20 @@ const MainEditorWithComments: React.FC = () => {
         }
       >
         <Editor />
-        {isCommentDrawerVisible ? (
-          isSmallScreen ? (
+        {isSmallScreen ? (
+          <>
             <Drawer
               isVisible={isCommentDrawerVisible}
               position="end"
+              preserveOffscreen
               setIsVisible={() => setIsCommentDrawerVisible(false)}
             >
               <CommentsPane />
             </Drawer>
-          ) : (
-            <CommentsPane />
-          )
+            <NewCommentButton />
+          </>
+        ) : isCommentDrawerVisible ? (
+          <CommentsPane />
         ) : (
           <NewCommentButton />
         )}
