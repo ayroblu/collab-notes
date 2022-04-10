@@ -20,3 +20,6 @@ function getTextareaHeight(scrollHeight: number) {
 export function getIsSmallScreen(): boolean {
   return window.matchMedia("(max-width: 1000px)").matches;
 }
+export function getIsVerySmallScreen(): boolean {
+  return window.matchMedia("(max-width: 650px)").matches;
+}

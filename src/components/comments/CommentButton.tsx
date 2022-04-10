@@ -71,7 +71,7 @@ export const SimpleCommentButton: React.FC<SimpleCommentButtonProps> =
   });
 const SimpleCommentButtonContent: React.FC<
   ShowComment & SimpleCommentButtonProps
-> = ({ className, position, selection }) => {
+> = ({ className, selection }) => {
   const onClick = useOnClick();
   const handleClick = React.useCallback(() => {
     onClick(selection);

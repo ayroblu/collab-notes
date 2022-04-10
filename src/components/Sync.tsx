@@ -21,7 +21,6 @@ import {
   activeRoomIdSelector,
   filesDataState,
   settingsSelector,
-  websocketConnectionsState,
 } from "./data-model";
 import { useFileName, useRoom, useSetComments } from "./utils";
 
