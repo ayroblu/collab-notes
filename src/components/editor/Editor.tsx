@@ -316,6 +316,7 @@ function createMonacoEditor(
     wordWrap: settings.wordWrap ? "on" : "off",
     autoClosingBrackets: "never",
     tabSize: 2,
+    overviewRulerLanes: 0,
     minimap: {
       enabled: false,
     },
