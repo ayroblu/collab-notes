@@ -24,3 +24,8 @@
   background: var(--deep-color);
   height: 100vh;
 }
+@media screen and (max-width: 1000px) {
+  .fileslist {
+    height: calc(100vh - var(--main-nav-height));
+  }
+}

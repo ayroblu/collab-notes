@@ -6,3 +6,14 @@
   height: 100vh;
   background: var(--fade-color);
 }
+@media screen and (max-width: 1000px) {
+  .leftNav {
+    flex-direction: column-reverse;
+    height: var(--main-nav-height);
+    flex-direction: row;
+  }
+  .leftNav ul {
+    display: flex;
+    flex-direction: row;
+  }
+}

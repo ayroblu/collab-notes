@@ -31,44 +31,40 @@ export const LeftNav = () => {
   };
   return (
     <nav className={styles.leftNav}>
-      <section>
-        <ul>
-          <li>
-            <LeftNavButton
-              isHighlight={leftNav === LeftNavEnum.files}
-              onClick={setNewLeftNav(LeftNavEnum.files)}
-            >
-              <VscFiles />
-              Files
-            </LeftNavButton>
-          </li>
-          <li>
-            <LeftNavButton
-              isHighlight={leftNav === LeftNavEnum.rooms}
-              onClick={setNewLeftNav(LeftNavEnum.rooms)}
-            >
-              <VscOrganization />
-              Groups
-            </LeftNavButton>
-          </li>
-        </ul>
-      </section>
-      <section>
-        <ul>
-          <li>
-            <LeftNavButton onClick={reloadPage}>
-              <VscRefresh />
-              Reset
-            </LeftNavButton>
-          </li>
-          <li>
-            <LeftNavButtonLink to="/settings">
-              <VscSettingsGear />
-              Settings
-            </LeftNavButtonLink>
-          </li>
-        </ul>
-      </section>
+      <ul>
+        <li>
+          <LeftNavButton
+            isHighlight={leftNav === LeftNavEnum.files}
+            onClick={setNewLeftNav(LeftNavEnum.files)}
+          >
+            <VscFiles />
+            Files
+          </LeftNavButton>
+        </li>
+        <li>
+          <LeftNavButton
+            isHighlight={leftNav === LeftNavEnum.rooms}
+            onClick={setNewLeftNav(LeftNavEnum.rooms)}
+          >
+            <VscOrganization />
+            Groups
+          </LeftNavButton>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <LeftNavButton onClick={reloadPage}>
+            <VscRefresh />
+            Reset
+          </LeftNavButton>
+        </li>
+        <li>
+          <LeftNavButtonLink to="/settings">
+            <VscSettingsGear />
+            Settings
+          </LeftNavButtonLink>
+        </li>
+      </ul>
     </nav>
   );
 };

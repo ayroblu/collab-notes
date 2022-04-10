@@ -4,3 +4,8 @@
   border: none;
   overflow: hidden;
 }
+@media screen and (max-width: 1000px) {
+  .editor {
+    height: calc(100vh - var(--nav-bar-height) - var(--main-nav-height));
+  }
+}

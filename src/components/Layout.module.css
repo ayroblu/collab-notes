@@ -1,6 +1,11 @@
 .layout {
   display: flex;
 }
+@media screen and (max-width: 1000px) {
+  .layout {
+    flex-direction: column-reverse;
+  }
+}
 .grid {
   display: flex;
   flex: 1 1 auto;
