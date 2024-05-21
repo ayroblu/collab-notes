@@ -1,7 +1,7 @@
 Collab Notes
 ============
 
-Uses Monaco (the editor from VS Code), WebRTC so that all communication happens peer to peer, and Yjs for synchronised editing
+Uses Monaco (the editor from VS Code), WebRTC so that all communication happens peer to peer, and Yjs for synchronised editing. May should consider automerge? They already have an example that does exactly this
 
 TODO
 ----
